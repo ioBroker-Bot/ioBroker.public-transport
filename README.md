@@ -1,4 +1,5 @@
 ![Logo](admin/public-transport.png)
+
 # ioBroker.public-transport
 
 [![NPM version](https://img.shields.io/npm/v/iobroker.public-transport.svg)](https://www.npmjs.com/package/iobroker.public-transport)
@@ -10,50 +11,168 @@
 
 **Tests:** ![Test and Release](https://github.com/tt-tom17/ioBroker.public-transport/workflows/Test%20and%20Release/badge.svg)
 
-## public-transport adapter for ioBroker
+## Public Transport Adapter for ioBroker
 
-Der public-transport ermöglicht die Integration von Fahrplaninformationen des öffentlichen Nahverkehrs in ioBroker. Mit diesem Adapter können Sie Abfahrtszeiten von Haltestellen verschiedener Verkehrsbetriebe abrufen und in Ihrer Smart-Home-Umgebung nutzen.
+The public-transport adapter enables seamless integration of real-time public transportation schedule information into your ioBroker smart home environment. With this adapter, you can retrieve departure times from stops of various transport operators in Germany, Austria, and other countries and use them for automation.
 
-### Hauptfunktionen
+[🇩🇪 Deutsche Dokumentation](doc/README.de.md)
 
-- **Mehrere Transport-Services**: Unterstützung für HAFAS und DB Vendo APIs
-- **Flexible Station-Konfiguration**: Konfigurieren Sie mehrere Haltestellen gleichzeitig
-- **Automatische Aktualisierung**: Regelmäßige Abfrage der Abfahrtszeiten im konfigurierbaren Intervall
-- **Filteroptionen**: Filtern Sie nach Verkehrsmitteln (Bus, Bahn, Tram, etc.)
-- **Zeitoffset**: Zeigen Sie Abfahrten ab einem bestimmten Zeitpunkt in der Zukunft an
-- **Anpassbare Anzahl**: Bestimmen Sie, wie viele Abfahrten pro Station angezeigt werden sollen
+## Table of Contents
 
-### Unterstützte Verkehrsverbünde
+- [Key Features](#key-features)
+- [Installation](#installation)
+- [Supported Transport Networks](#supported-transport-networks)
+- [Configuration](#configuration)
+- [Data Structure](#data-structure)
+- [Usage Examples](#usage-examples)
+- [Changelog](#changelog)
+- [License](#license)
 
-#### HAFAS-Profile
-Der Adapter unterstützt verschiedene Verkehrsverbünde über HAFAS, darunter:
-- VBB (Verkehrsverbund Berlin-Brandenburg)
-- ÖBB (Östereichische Bundesbahn)
-- Und viele weitere Profile
+## Key Features
 
-#### DB Vendo
-Unterstützung für Verkehrsbetriebe, die die DB Vendo API verwenden.
+- **Multiple Transport Services**: Full support for HAFAS and DB Vendo APIs
+- **Flexible Station Configuration**: Configure any number of stops simultaneously
+- **Real-time Data**: Retrieve live departure times with delay information
+- **Automatic Updates**: Regular polling of departure times at freely configurable intervals
+- **Comprehensive Filter Options**: Filter by transport modes (bus, train, tram, subway, ferry, etc.)
+- **Flexible Time Offset**: Show departures from a specific point in the future
+- **Customizable Query Count**: Determine how many departures per station should be displayed
+- **Custom Names**: Assign individual names to your stations
+- **Time Period Filtering**: Define a time period in which departures should be shown
 
-### Konfiguration
+## Installation
 
-1. **Service-Typ**: Wählen Sie zwischen HAFAS und Vendo
-2. **Profil**: Bei HAFAS - wählen Sie das entsprechende Verkehrsverbund-Profil
-3. **Abfrageintervall**: Legen Sie fest, wie oft die Daten aktualisiert werden sollen (in Minuten)
-4. **Stationen**: Fügen Sie Ihre gewünschten Haltestellen hinzu mit:
-   - Station-ID
-   - Benutzerdefinierter Name (optional)
-   - Anzahl der abzurufenden Abfahrten
-   - Zeitoffset für zukünftige Abfahrten
-   - Zeitraum der Abfragen
-   - Filterung nach Verkehrsmitteln
+### Prerequisites
 
-### Anwendungsbeispiele
+- ioBroker installation (Node.js 20.x or higher required)
+- Internet access for retrieving schedule data
 
-- Anzeige der nächsten Busabfahrten auf einem Dashboard
-- Benachrichtigungen, wenn die nächste Bahn bald abfährt
-- Integration in Morgenroutinen zur Anzeige der Pendelverbindungen
-- Planung von Ausfahrten basierend auf Fahrplänen
-  
+### Installation via ioBroker Admin
+
+1. Open the ioBroker Admin interface
+2. Navigate to "Adapters"
+3. Search for "public-transport"
+4. Click "Install"
+
+## Supported Transport Networks
+
+### HAFAS Profiles
+
+The adapter uses the HAFAS (HaCon Timetable Information System) API and supports numerous transport networks and operators:
+
+#### Germany
+- **VBB** - Verkehrsverbund Berlin-Brandenburg
+
+
+#### Austria
+- **ÖBB** - Österreichische Bundesbahnen (nationwide)
+
+- And more international profiles
+
+### DB Vendo
+
+Additional support for transport operators using the DB Vendo API. This API is used by various regional transport companies.
+
+## Configuration
+
+### General Settings
+
+1. **Select Service Type**
+   - Choose between `HAFAS` and `Vendo` based on your transport operator
+
+2. **Select Profile** (HAFAS only)
+   - Choose the appropriate transport network profile from the dropdown list
+   - Example: "db" for Deutsche Bahn, "vbb" for Berlin-Brandenburg
+
+3. **Query Interval**
+   - Define how often data should be updated (in minutes)
+   - Recommended: 2-5 minutes for real-time data
+   - Minimum: 1 minute
+
+### Adding a Station
+
+The following parameters can be configured for each stop:
+
+#### Configuration Parameters
+
+- **Station ID** (required)
+  - The unique ID of the station
+
+- **Custom Name** (optional)
+  - An individual name for the station in ioBroker
+  - Used as object name
+  - Example: "Bus_Stop_Work" instead of the official designation
+
+- **Number of Departures**
+  - How many departures should be retrieved?
+  - Default: 5
+  - Range: 1-20
+
+- **Time Offset (minutes)**
+  - Show departures from this point in the future
+  - Default: 0 (immediately)
+  - Example: 5 = only show departures in 5+ minutes
+  - Useful to hide departures you can no longer catch
+
+- **Time Period (minutes)**
+  - Maximum time period for displayed departures
+  - Default: 60
+  - Example: 30 = only departures within the next 30 minutes
+
+- **Transport Mode Filter**
+  - Select which transport modes should be displayed:
+    - Bus
+    - S-Bahn (Suburban)
+    - U-Bahn (Subway)
+    - Tram (Streetcar)
+    - Regional Train
+    - National Train
+    - Ferry
+    - Express
+    - Taxi
+  - Multiple selection possible
+
+## Data Structure
+
+The adapter creates an object tree in ioBroker for each configured station:
+
+```
+public-transport.0
+├── <Station-Name or ID>
+│   ├── 0
+│   │   ├── delay                    // Delay in minutes
+│   │   ├── departure                // Scheduled departure time
+│   │   ├── departureTime            // Actual departure time (with delay)
+│   │   ├── direction                // Direction/final destination
+│   │   ├── line                     // Line designation
+│   │   ├── platform                 // Platform/track
+│   │   ├── type                     // Transport mode type
+│   │   └── cancelled                // Cancellation (true/false)
+│   ├── 1
+│   │   └── ...
+│   ├── ...
+│   └── json                         // JSON string of all departures
+```
+
+### Data Types and Example Values
+
+| State | Type | Example | Description |
+|-------|------|---------|-------------|
+| delay | number | `3` | Delay in minutes (0 = on time) |
+| departure | string | `2026-02-16T14:30:00.000Z` | Scheduled departure time (ISO 8601) |
+| departureTime | string | `2026-02-16T14:33:00.000Z` | Actual departure time incl. delay |
+| direction | string | `S Potsdam Hauptbahnhof` | Final destination |
+| line | string | `S7` | Line designation |
+| platform | string | `3` | Track/platform/bus bay |
+| type | string | `suburban` | Transport mode type |
+| cancelled | boolean | `false` | Trip cancellation |
+
+## Usage Examples
+
+### 1. Vis Display
+
+For Vis1, there is a widget available for displaying departures. The JSON data is used for the display.
+
 ## Changelog
 <!--
 	Placeholder for the next version (at the beginning of the line):
