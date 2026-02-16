@@ -182,7 +182,7 @@ For Vis1, there is a widget available for displaying departures. The JSON data i
 ### **WORK IN PROGRESS**
 * (tt-tom17)   optimization react pages
 
-### 0.0.1 (2025-12-01)
+### 0.0.1-preAlpha.0 (2025-12-01)
 * (tt-tom17) initial release
 
 ## License
