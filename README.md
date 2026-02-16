@@ -178,8 +178,7 @@ For Vis1, there is a widget available for displaying departures. The JSON data i
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
-
-### **WORK IN PROGRESS**
+### 0.0.2 (2026-02-16)
 * (tt-tom17)   optimization react pages
 
 ### 0.0.1-preAlpha.0 (2025-12-01)
