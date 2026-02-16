@@ -183,7 +183,7 @@ für Vis1 gibt es ein Widget für die Abfahrten. Für die Anzeige wird das JSON 
 ### **WORK IN PROGRESS**
 * (tt-tom17) Optimierung der React-Seiten
 
-### 0.0.1 (2025-12-01)
+### 0.0.1-preAlpha.0 (2025-12-01)
 * (tt-tom17) Erstveröffentlichung
 
 ## Lizenz
