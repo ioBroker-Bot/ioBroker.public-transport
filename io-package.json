@@ -1,20 +1,33 @@
 {
   "common": {
     "name": "public-transport",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "news": {
+      "0.0.5": {
+        "en": "Dependency updated",
+        "de": "Abhängigkeit aktualisiert",
+        "ru": "Зависимость обновлена",
+        "pt": "Dependência atualizada",
+        "nl": "Afhankelijkheid bijgewerkt",
+        "fr": "Dépendance mise à jour",
+        "it": "Dipendenza aggiornata",
+        "es": "Dependencia actualizada",
+        "pl": "Zależność zaktualizowana",
+        "uk": "Залежність оновлена",
+        "zh-cn": "依赖已更新"
+      },
       "0.0.4": {
         "en": "optimization react pages",
-        "de": "optimierung von reaktseiten",
-        "ru": "seo реагирует на страницы",
-        "pt": "páginas de reação de otimização",
-        "nl": "optimalisatie reactie pagina's",
-        "fr": "pages de réaction d'optimisation",
-        "it": "ottimizzazione reagire le pagine",
-        "es": "páginas de optimización",
-        "pl": "optymalizacja stron reakcji",
-        "uk": "оптимізація реактивних сторінок",
-        "zh-cn": "优化页面反应"
+        "de": "Optimierung von React-Seiten",
+        "ru": "Оптимизация страниц React",
+        "pt": "Otimização de páginas React",
+        "nl": "Optimalisatie van React-pagina's",
+        "fr": "Optimisation des pages React",
+        "it": "Ottimizzazione delle pagine React",
+        "es": "Optimización de páginas React",
+        "pl": "Optymalizacja stron React",
+        "uk": "Оптимізація сторінок React",
+        "zh-cn": "优化React页面"
       }
     },
     "titleLang": {
