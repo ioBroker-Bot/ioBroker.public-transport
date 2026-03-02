@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "public-transport",
-    "version": "0.0.5",
+    "version": "0.0.4",
     "news": {
       "0.0.4": {
         "en": "optimization react pages",
