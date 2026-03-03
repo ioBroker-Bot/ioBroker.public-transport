@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "public-transport",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "news": {
+      "0.0.5": {
+        "en": "Upgrade dependency",
+        "de": "Abhängigkeit aktualisieren",
+        "ru": "Обновить зависимость",
+        "pt": "Atualizar a dependência",
+        "nl": "Afhankelijkheid upgraden",
+        "fr": "Amélioration de la dépendance",
+        "it": "Dipendenza di aggiornamento",
+        "es": "Dependencia de actualización",
+        "pl": "Ulepszenie zależności",
+        "uk": "Підвищення залежності",
+        "zh-cn": "提升依赖性"
+      },
       "0.0.4": {
         "en": "optimization react pages",
         "de": "Optimierung von React-Seiten",
