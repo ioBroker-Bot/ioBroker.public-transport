@@ -15,7 +15,7 @@
 
 The public-transport adapter enables seamless integration of real-time public transportation schedule information into your ioBroker smart home environment. With this adapter, you can retrieve departure times from stops of various transport operators in Germany, Austria, and other countries and use them for automation.
 
-[🇩🇪 Deutsche Dokumentation](doc/README.de.md)
+[🇩🇪 Deutsche Dokumentation](doc/de/README.de.md)
 
 ## Table of Contents
 
