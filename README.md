@@ -1,4 +1,4 @@
-![Logo](admin/public-transport.png)
+![Logo](admin/iconAdapter.png)
 
 # ioBroker.public-transport
 
