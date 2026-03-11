@@ -141,58 +141,16 @@ vis.binds['public-transportDepTt'] = {
             }
         }
 
-        function updateDepartures(e, newVal, oldVal) {
-            let departures = [];
-
-            try {
-                if (typeof newVal === 'string') {
-                    departures = JSON.parse(newVal);
-                } else if (Array.isArray(newVal)) {
-                    departures = newVal;
-                } else if (newVal && typeof newVal === 'object') {
-                    departures = [newVal];
-                }
-            } catch (err) {
-                console.error('Error parsing departures data:', err);
-                $('#content-' + widgetID).html(
-                    '<div class="pub-trans-deptt-no-data">Fehler beim Laden der Daten</div>',
-                );
-                return;
-            }
-
+        function renderDepartures(departuresToRender) {
             const $content = $('#content-' + widgetID);
 
-            if (!departures || departures.length === 0) {
-                $content.html('<div class="pub-trans-deptt-no-data">Keine Abfahrten verfügbar</div>');
-                return;
-            }
-
-            if (useFilter && data.oidDepartures) {
-            // Instanz aus der OID ableiten: "public-transport.0.xxx" → "0"
-                const match = data.oidDepartures.match(/^public-transport\.(\d+)\./);
-                const instance = match ? match[1] : '0';
-
-                vis.conn.getObject('system.adapter.public-transport.' + instance, function (err, obj) {
-                    if (obj && obj.native && obj.native.stationConfig) {
-                        // Station anhand der OID finden und Filter anwenden
-                        const stationConfig = obj.native.stationConfig;
-                        // ... Abfahrten nach products filtern
-                        if (stationConfig.products && stationConfig.products.length > 0) {
-                            departures = departures.filter(dep => {
-                                const product = dep.line && (dep.line.product || dep.line.productName) ? (dep.line.product || dep.line.productName).toLowerCase() : '';
-                                return stationConfig.products.includes(product);
-                            });
-                        }
-                    }
-                });
-            }
-
-            // Begrenze auf maxDepartures
-            //const displayDepartures = departures.slice(0, maxDepartures);
-            const displayDepartures = departures.filter(dep => {
+            // Begrenze auf maxDepartures und filtere alte Abfahrten
+            const displayDepartures = departuresToRender.filter(dep => {
                 const time = dep.when || dep.time || dep.scheduledWhen || null;
                 return time && new Date(time).getTime() >= Date.now() - 60 * 1000;
             }).slice(0, maxDepartures);
+
+            console.log('[DepTt Render] Anzahl Abfahrten zu rendern:', displayDepartures.length);
 
             let html = '';
             displayDepartures.forEach(function (dep) {
@@ -250,6 +208,112 @@ vis.binds['public-transportDepTt'] = {
             });
 
             $content.html(html);
+        }
+
+        function updateDepartures(e, newVal, oldVal) {
+            let departures = [];
+
+            try {
+                if (typeof newVal === 'string') {
+                    departures = JSON.parse(newVal);
+                } else if (Array.isArray(newVal)) {
+                    departures = newVal;
+                } else if (newVal && typeof newVal === 'object') {
+                    departures = [newVal];
+                }
+            } catch (err) {
+                console.error('[DepTt] Error parsing departures data:', err);
+                $('#content-' + widgetID).html(
+                    '<div class="pub-trans-deptt-no-data">Fehler beim Laden der Daten</div>',
+                );
+                return;
+            }
+
+            const $content = $('#content-' + widgetID);
+
+            if (!departures || departures.length === 0) {
+                console.log('[DepTt] Keine Abfahrten verfügbar');
+                $content.html('<div class="pub-trans-deptt-no-data">Keine Abfahrten verfügbar</div>');
+                return;
+            }
+
+            console.log('[DepTt] Geladene Abfahrten (roh):', departures.length);
+
+            if (useFilter && data.oidDepartures) {
+                console.log('[DepTt Filter] Filter ist aktiviert (useFilter=true)');
+                
+                // Instanz aus der OID ableiten: "public-transport.0.xxx" → "0"
+                const match = data.oidDepartures.match(/^public-transport\.(\d+)\./);
+                const instance = match ? match[1] : '0';
+                console.log('[DepTt Filter] Instanz:', instance, 'OID:', data.oidDepartures);
+
+                vis.conn.getObject('system.adapter.public-transport.' + instance, function (err, obj) {
+                    if (err) {
+                        console.error('[DepTt Filter] Fehler beim Laden der Adapter-Config:', err);
+                        renderDepartures(departures);
+                        return;
+                    }
+                    
+                    console.log('[DepTt Filter] Adapter-Objekt geladen:', obj ? 'OK' : 'NULL');
+                    
+                    if (obj && obj.native && obj.native.stationConfig) {
+                        const allStations = obj.native.stationConfig || [];
+                        console.log('[DepTt Filter] Anzahl Stationen in Config:', allStations.length);
+                        console.log('[DepTt Filter] Alle Stationen:', allStations.map(s => s.id + ' (' + s.name + ')'));
+                        
+                        // StationID anhand der OID finden und Filter anwenden
+                        const stationMatch = data.oidDepartures.match(/\.Stations\.([^.]+)\./);
+                        const stationID = stationMatch ? stationMatch[1] : null;
+                        console.log('[DepTt Filter] Extrahierte StationID:', stationID);
+                        
+                        if (stationID) {
+                            const stationConfig = allStations.find(station => station.id === stationID);
+                            console.log('[DepTt Filter] Gefundene Station-Config:', stationConfig);
+                            
+                            if (stationConfig && stationConfig.products) {
+                                console.log('[DepTt Filter] Products-Config:', stationConfig.products);
+                                console.log('[DepTt Filter] Type of products:', typeof stationConfig.products);
+                                console.log('[DepTt Filter] Is Array?', Array.isArray(stationConfig.products));
+                                
+                                // WICHTIG: products ist ein Objekt {bus: true, tram: false, ...}, KEIN Array!
+                                const beforeFilterCount = departures.length;
+                                
+                                departures = departures.filter(dep => {
+                                    const productFromLine = dep.line && dep.line.product ? dep.line.product : null;
+                                    const productFromProductName = dep.line && dep.line.productName ? dep.line.productName : null;
+                                    const product = (productFromLine || productFromProductName || '').toLowerCase();
+                                    
+                                    // Prüfe ob das Produkt in der Config aktiviert ist
+                                    const isEnabled = stationConfig.products[product] === true;
+                                    
+                                    console.log('[DepTt Filter] Abfahrt:', dep.line?.name, 
+                                                '| Product:', product, 
+                                                '| Enabled:', isEnabled,
+                                                '| Config-Wert:', stationConfig.products[product]);
+                                    
+                                    return isEnabled;
+                                });
+                                
+                                console.log('[DepTt Filter] Gefiltert:', beforeFilterCount, '→', departures.length, 'Abfahrten');
+                            } else {
+                                console.log('[DepTt Filter] Keine products-Config gefunden oder stationConfig ist null');
+                            }
+                        } else {
+                            console.log('[DepTt Filter] Konnte StationID nicht aus OID extrahieren');
+                        }
+                        
+                        // Rendern NACH dem Filtern
+                        renderDepartures(departures);
+                    } else {
+                        console.log('[DepTt Filter] Keine stationConfig in native gefunden');
+                        renderDepartures(departures);
+                    }
+                });
+            } else {
+                console.log('[DepTt Filter] Filter nicht aktiv - useFilter:', useFilter, 'oidDepartures:', data.oidDepartures);
+                // Ohne Filter direkt rendern
+                renderDepartures(departures);
+            }
         }
 
         // State-Binding einrichten
