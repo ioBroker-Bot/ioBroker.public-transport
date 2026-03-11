@@ -14,6 +14,7 @@ $.extend(true, systemDictionary, {
     remarkhint: { en: 'Show hints', de: 'Hinweise anzeigen' },
     remarkwarning: { en: 'Show warnings', de: 'Warnungen anzeigen' },
     remarkstatus: { en: 'Show status messages', de: 'Statusmeldungen anzeigen' },
+    usefilter: { en: 'Use filter from config', de: 'Filter aus Konfig verwenden' },
 });
 
 // Widget Binding
@@ -52,7 +53,7 @@ vis.binds['public-transportDepTt'] = {
         const showRemarkHint = data.remarkhint === true;
         const showRemarkWarning = data.remarkwarning === true;
         const showRemarkStatus = data.remarkstatus === true;
-
+        const useFilter = data.usefilter === true;
         // HTML-Struktur erstellen
         let html = '';
         html += '<div class="pub-trans-deptt-container ' + data.class + '" style="width: 100%; height: 100%;">';
@@ -164,6 +165,26 @@ vis.binds['public-transportDepTt'] = {
             if (!departures || departures.length === 0) {
                 $content.html('<div class="pub-trans-deptt-no-data">Keine Abfahrten verfügbar</div>');
                 return;
+            }
+
+            if (useFilter && data.oidDepartures) {
+            // Instanz aus der OID ableiten: "public-transport.0.xxx" → "0"
+                const match = data.oidDepartures.match(/^public-transport\.(\d+)\./);
+                const instance = match ? match[1] : '0';
+
+                vis.conn.getObject('system.adapter.public-transport.' + instance, function (err, obj) {
+                    if (obj && obj.native && obj.native.stationConfig) {
+                        // Station anhand der OID finden und Filter anwenden
+                        const stationConfig = obj.native.stationConfig;
+                        // ... Abfahrten nach products filtern
+                        if (stationConfig.products && stationConfig.products.length > 0) {
+                            departures = departures.filter(dep => {
+                                const product = dep.line && (dep.line.product || dep.line.productName) ? (dep.line.product || dep.line.productName).toLowerCase() : '';
+                                return stationConfig.products.includes(product);
+                            });
+                        }
+                    }
+                });
             }
 
             // Begrenze auf maxDepartures
