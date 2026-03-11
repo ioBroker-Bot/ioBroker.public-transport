@@ -162,8 +162,7 @@ const JourneyList: React.FC<JourneyListProps> = ({
                                             )}
                                         </>
                                     }
-                                    primaryTypographyProps={{ fontWeight: 500 }}
-                                    secondaryTypographyProps={{ component: 'div' }}
+                                    slotProps={{ primary: { fontWeight: 500 }, secondary: { component: 'div' } }}
                                 />
                                 <IconButton
                                     edge="end"

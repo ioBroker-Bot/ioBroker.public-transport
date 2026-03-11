@@ -127,7 +127,7 @@ const StationConfig: React.FC<StationConfigProps> = ({ station, onUpdate, alive 
                             onChange={handlenumDeparturesChange}
                             fullWidth
                             size="small"
-                            inputProps={{ min: 1, max: 50 }}
+                            slotProps={{ htmlInput: { min: 1, max: 50 } }}
                             helperText={I18n.t('departure_count_hint')}
                             disabled={!alive}
                         />
@@ -140,7 +140,7 @@ const StationConfig: React.FC<StationConfigProps> = ({ station, onUpdate, alive 
                             onChange={handleOffsetTimeChange}
                             fullWidth
                             size="small"
-                            inputProps={{ min: 0 }}
+                            slotProps={{ htmlInput: { min: 0 } }}
                             helperText={I18n.t('offset_time_hint')}
                             disabled={!alive}
                         />
