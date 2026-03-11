@@ -3,6 +3,11 @@ import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import {
     Box,
     Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
     IconButton,
     List,
     ListItemButton,
@@ -12,7 +17,7 @@ import {
     useMediaQuery,
     useTheme,
 } from '@mui/material';
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 
 interface Journey {
     id: string;
@@ -44,6 +49,22 @@ const JourneyList: React.FC<JourneyListProps> = ({
 }) => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
+
+    const handleDeleteClick = useCallback((journeyId: string, journeyName: string): void => {
+        setDeleteConfirm({ id: journeyId, name: journeyName });
+    }, []);
+
+    const handleDeleteConfirm = useCallback((): void => {
+        if (deleteConfirm) {
+            onDeleteJourney(deleteConfirm.id);
+            setDeleteConfirm(null);
+        }
+    }, [deleteConfirm, onDeleteJourney]);
+
+    const handleDeleteCancel = useCallback((): void => {
+        setDeleteConfirm(null);
+    }, []);
     return (
         <Paper sx={{ p: 2, height: '100%', minHeight: 400, display: 'flex', flexDirection: 'column' }}>
             <Box
@@ -149,7 +170,7 @@ const JourneyList: React.FC<JourneyListProps> = ({
                                     aria-label="delete"
                                     onClick={e => {
                                         e.stopPropagation();
-                                        onDeleteJourney(journey.id);
+                                        handleDeleteClick(journey.id, journey.customName);
                                     }}
                                     size="small"
                                 >
@@ -160,6 +181,28 @@ const JourneyList: React.FC<JourneyListProps> = ({
                     </List>
                 )}
             </Box>
+
+            <Dialog
+                open={deleteConfirm !== null}
+                onClose={handleDeleteCancel}
+            >
+                <DialogTitle>{I18n.t('confirm_delete_title')}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        {I18n.t('confirm_delete_journey').replace('%s', deleteConfirm?.name || '')}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleDeleteCancel}>{I18n.t('stationSearch_cancel')}</Button>
+                    <Button
+                        onClick={handleDeleteConfirm}
+                        color="error"
+                        variant="contained"
+                    >
+                        {I18n.t('confirm_delete_button')}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Paper>
     );
 };
