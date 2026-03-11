@@ -56,12 +56,8 @@ const JourneyManagerContent: React.FC<ConfigComponentProps> = ({ oContext, data,
 
     const handleDeleteJourney = useCallback(
         async (journeyId: string): Promise<void> => {
-            setJourneys(prev => {
-                const updated = prev.filter(j => j.id !== journeyId);
-                void onChange('journeyConfig', updated);
-                return updated;
-            });
-
+            const updated = journeys.filter(j => j.id !== journeyId);
+            setJourneys(updated);
             setSelectedJourneyId(prev => (prev === journeyId ? null : prev));
 
             // ioBroker-Objekte rekursiv löschen (Journeys/{journeyId} inkl. Unterordner)
@@ -74,10 +70,10 @@ const JourneyManagerContent: React.FC<ConfigComponentProps> = ({ oContext, data,
                 console.error('Cannot delete journey objects:', err);
             }
 
-            // Konfiguration automatisch speichern
-            onSave();
+            // Konfiguration direkt speichern (ohne Dialog)
+            await onSave('journeyConfig', updated);
         },
-        [onChange, oContext, onSave],
+        [journeys, oContext, onSave],
     );
 
     const handleJourneyUpdate = useCallback(

@@ -74,12 +74,8 @@ const DepartureManagerContent: React.FC<ConfigComponentProps> = ({ oContext, dat
 
     const handleDeleteStation = useCallback(
         async (stationId: string): Promise<void> => {
-            setStations(prev => {
-                const updated = prev.filter(s => s.id !== stationId);
-                void onChange('stationConfig', updated);
-                return updated;
-            });
-
+            const updated = stations.filter(s => s.id !== stationId);
+            setStations(updated);
             setSelectedStationId(prev => (prev === stationId ? null : prev));
 
             // ioBroker-Objekte rekursiv löschen (Stations/{stationId} inkl. Unterordner)
@@ -92,10 +88,10 @@ const DepartureManagerContent: React.FC<ConfigComponentProps> = ({ oContext, dat
                 console.error('Cannot delete station objects:', err);
             }
 
-            // Konfiguration automatisch speichern
-            onSave();
+            // Konfiguration direkt speichern (ohne Dialog)
+            await onSave('stationConfig', updated);
         },
-        [onChange, oContext, onSave],
+        [stations, oContext, onSave],
     );
 
     const handleStationUpdate = useCallback(

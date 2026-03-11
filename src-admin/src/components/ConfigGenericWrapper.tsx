@@ -7,7 +7,7 @@ export interface ConfigComponentProps {
     onChange: (attr: string, value: any) => Promise<void>;
     alive: boolean;
     disabled: boolean;
-    onSave: () => void;
+    onSave: (configKey: string, configValue: any) => Promise<void>;
 }
 
 /**
@@ -32,10 +32,18 @@ export function withConfigGeneric(
             return this.onChange(attr, value);
         };
 
-        private triggerSave = (): void => {
-            // Triggert das Speichern über die Admin-Framework onChange-Prop
-            // 4. Parameter = saveConfig: true → speichert die Konfiguration direkt
-            (this.props as any).onChange(null, null, null, true);
+        private triggerSave = async (configKey: string, configValue: any): Promise<void> => {
+            // Daten im Framework aktualisieren (aktiviert Save-Button)
+            await new Promise<void>(resolve => this.onChange(configKey, configValue, resolve));
+
+            // Warten bis React den aktivierten Save-Button gerendert hat
+            await new Promise<void>(resolve => setTimeout(resolve, 50));
+
+            // Save-Button programmatisch klicken → Framework speichert und setzt changed/originalData zurück
+            const saveBtn = document.querySelector('[aria-label="Save"]');
+            if (saveBtn instanceof HTMLElement) {
+                saveBtn.click();
+            }
         };
 
         renderItem(_error: string, disabled: boolean): React.ReactElement {
