@@ -19,7 +19,7 @@ interface Journey {
     client_profile?: string;
 }
 
-const JourneyManagerContent: React.FC<ConfigComponentProps> = ({ oContext, data, onChange, alive }) => {
+const JourneyManagerContent: React.FC<ConfigComponentProps> = ({ oContext, data, onChange, alive, onSave }) => {
     const [journeys, setJourneys] = useState<Journey[]>(() => {
         const saved = ConfigGeneric.getValue(data, 'journeyConfig');
         return Array.isArray(saved) ? saved : [];
@@ -55,7 +55,7 @@ const JourneyManagerContent: React.FC<ConfigComponentProps> = ({ oContext, data,
     }, [data, journeys, onChange]);
 
     const handleDeleteJourney = useCallback(
-        (journeyId: string): void => {
+        async (journeyId: string): Promise<void> => {
             setJourneys(prev => {
                 const updated = prev.filter(j => j.id !== journeyId);
                 void onChange('journeyConfig', updated);
@@ -63,8 +63,21 @@ const JourneyManagerContent: React.FC<ConfigComponentProps> = ({ oContext, data,
             });
 
             setSelectedJourneyId(prev => (prev === journeyId ? null : prev));
+
+            // ioBroker-Objekte rekursiv löschen (Journeys/{journeyId} inkl. Unterordner)
+            try {
+                await oContext.socket.delObjects(
+                    `${oContext.adapterName}.${oContext.instance}.Journeys.${journeyId}`,
+                    false,
+                );
+            } catch (err) {
+                console.error('Cannot delete journey objects:', err);
+            }
+
+            // Konfiguration automatisch speichern
+            onSave();
         },
-        [onChange],
+        [onChange, oContext, onSave],
     );
 
     const handleJourneyUpdate = useCallback(

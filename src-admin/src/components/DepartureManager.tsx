@@ -18,7 +18,7 @@ interface Station {
     client_profile?: string;
 }
 
-const DepartureManagerContent: React.FC<ConfigComponentProps> = ({ oContext, data, onChange, alive }) => {
+const DepartureManagerContent: React.FC<ConfigComponentProps> = ({ oContext, data, onChange, alive, onSave }) => {
     const [stations, setStations] = useState<Station[]>(() => {
         const departures = ConfigGeneric.getValue(data, 'stationConfig');
         return Array.isArray(departures) ? departures : [];
@@ -73,7 +73,7 @@ const DepartureManagerContent: React.FC<ConfigComponentProps> = ({ oContext, dat
     );
 
     const handleDeleteStation = useCallback(
-        (stationId: string): void => {
+        async (stationId: string): Promise<void> => {
             setStations(prev => {
                 const updated = prev.filter(s => s.id !== stationId);
                 void onChange('stationConfig', updated);
@@ -81,8 +81,21 @@ const DepartureManagerContent: React.FC<ConfigComponentProps> = ({ oContext, dat
             });
 
             setSelectedStationId(prev => (prev === stationId ? null : prev));
+
+            // ioBroker-Objekte rekursiv löschen (Stations/{stationId} inkl. Unterordner)
+            try {
+                await oContext.socket.delObjects(
+                    `${oContext.adapterName}.${oContext.instance}.Stations.${stationId}`,
+                    false,
+                );
+            } catch (err) {
+                console.error('Cannot delete station objects:', err);
+            }
+
+            // Konfiguration automatisch speichern
+            onSave();
         },
-        [onChange],
+        [onChange, oContext, onSave],
     );
 
     const handleStationUpdate = useCallback(

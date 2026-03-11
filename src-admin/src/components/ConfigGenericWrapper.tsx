@@ -7,6 +7,7 @@ export interface ConfigComponentProps {
     onChange: (attr: string, value: any) => Promise<void>;
     alive: boolean;
     disabled: boolean;
+    onSave: () => void;
 }
 
 /**
@@ -31,6 +32,12 @@ export function withConfigGeneric(
             return this.onChange(attr, value);
         };
 
+        private triggerSave = (): void => {
+            // Triggert das Speichern über die Admin-Framework onChange-Prop
+            // 4. Parameter = saveConfig: true → speichert die Konfiguration direkt
+            (this.props as any).onChange(null, null, null, true);
+        };
+
         renderItem(_error: string, disabled: boolean): React.ReactElement {
             return (
                 <Component
@@ -39,6 +46,7 @@ export function withConfigGeneric(
                     onChange={this.configOnChange}
                     alive={this.props.alive}
                     disabled={disabled}
+                    onSave={this.triggerSave}
                 />
             );
         }
@@ -52,6 +60,7 @@ export function withConfigGeneric(
                         onChange={this.configOnChange}
                         alive={this.props.alive}
                         disabled={false}
+                        onSave={this.triggerSave}
                     />
                 );
             }
