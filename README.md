@@ -178,6 +178,12 @@ For Vis1, there is a widget available for displaying departures. The JSON data i
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+* (tt-tom17) Refactor admin UI: convert class components to functional components
+* (tt-tom17) Add confirmation dialog for station and journey deletion
+* (tt-tom17) Auto-save and delete ioBroker object tree on station/journey removal
+* (tt-tom17) Upgrade admin dependencies
+
 ### 0.0.5 (2026-03-03)  
 * (tt-tom17) Upgrade dependency
 
