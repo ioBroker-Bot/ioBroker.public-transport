@@ -19,17 +19,13 @@
         "@mui/icons-material": "^6.4.8",
         "@mui/material": "^6.4.8",
         "@mui/styles": "^6.5.0",
-        "@originjs/vite-plugin-federation": "^1.4.0",
-        "@types/dagre": "^0.7.53",
-        "@types/lodash": "^4.17.20",
+
         "@types/node": "^24.10.0",
         "@types/react": "^18.3.19",
         "@types/react-dom": "^18.3.5",
         "@vitejs/plugin-react": "^4.3.4",
-        "dagre": "^0.8.5",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
-        "reactflow": "^11.11.4",
         "vite": "^7.2.2",
         "vite-plugin-commonjs": "^0.10.4",
         "vite-tsconfig-paths": "^5.1.4"
@@ -46,9 +42,5 @@
             "last 1 safari version"
         ]
     },
-    "dependencies": {
-        "d3-hierarchy": "^3.1.2",
-        "lodash": "^4.17.21",
-        "react-flow": "^1.0.3"
-    }
+    "dependencies": {}
 }

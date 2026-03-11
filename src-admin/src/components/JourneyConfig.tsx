@@ -22,11 +22,11 @@ interface Journey {
 interface JourneyConfigProps {
     journey: Journey | null;
     onUpdate?: (journeyId: string, updates: Partial<Journey>) => void;
-    configProps?: ConfigGenericProps;
+    oContext?: ConfigGenericProps['oContext'];
     alive: boolean;
 }
 
-const JourneyConfig: React.FC<JourneyConfigProps> = ({ journey, onUpdate, configProps, alive }) => {
+const JourneyConfig: React.FC<JourneyConfigProps> = ({ journey, onUpdate, oContext, alive }) => {
     const [showFromSearch, setShowFromSearch] = useState(false);
     const [showToSearch, setShowToSearch] = useState(false);
 
@@ -227,9 +227,9 @@ const JourneyConfig: React.FC<JourneyConfigProps> = ({ journey, onUpdate, config
             </Paper>
 
             {/* From Station Search Dialog */}
-            {showFromSearch && journey && configProps && (
+            {showFromSearch && journey && oContext && (
                 <Dialog
-                    open={showFromSearch}
+                    open
                     onClose={() => setShowFromSearch(false)}
                     maxWidth="md"
                     fullWidth
@@ -243,7 +243,8 @@ const JourneyConfig: React.FC<JourneyConfigProps> = ({ journey, onUpdate, config
                     }}
                 >
                     <StationSearch
-                        {...configProps}
+                        oContext={oContext}
+                        alive={alive}
                         onStationSelected={handleFromStationSelected}
                         onClose={() => setShowFromSearch(false)}
                     />
@@ -251,9 +252,9 @@ const JourneyConfig: React.FC<JourneyConfigProps> = ({ journey, onUpdate, config
             )}
 
             {/* To Station Search Dialog */}
-            {showToSearch && journey && configProps && (
+            {showToSearch && journey && oContext && (
                 <Dialog
-                    open={showToSearch}
+                    open
                     onClose={() => setShowToSearch(false)}
                     maxWidth="md"
                     fullWidth
@@ -267,7 +268,8 @@ const JourneyConfig: React.FC<JourneyConfigProps> = ({ journey, onUpdate, config
                     }}
                 >
                     <StationSearch
-                        {...configProps}
+                        oContext={oContext}
+                        alive={alive}
                         onStationSelected={handleToStationSelected}
                         onClose={() => setShowToSearch(false)}
                     />

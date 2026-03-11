@@ -1,5 +1,5 @@
 import { I18n } from '@iobroker/adapter-react-v5';
-import { ConfigGeneric, type ConfigGenericProps, type ConfigGenericState } from '@iobroker/json-config';
+import { ConfigGeneric } from '@iobroker/json-config';
 import type { SelectChangeEvent } from '@mui/material';
 import {
     Box,
@@ -14,8 +14,8 @@ import {
     Typography,
 } from '@mui/material';
 import React from 'react';
+import { withConfigGeneric, type ConfigComponentProps } from './ConfigGenericWrapper';
 
-// Define the structure for service options
 interface ServiceOption {
     value: string;
     label: string;
@@ -23,238 +23,184 @@ interface ServiceOption {
     profile: string;
 }
 
-// List of available service options
 const SERVICE_OPTIONS: ServiceOption[] = [
     { value: 'hafas:vbb', label: 'HAFAS - VBB (Berlin/Brandenburg)', serviceType: 'hafas', profile: 'vbb' },
     { value: 'hafas:oebb', label: 'HAFAS - ÖBB (Österreich)', serviceType: 'hafas', profile: 'oebb' },
     { value: 'vendo:db', label: 'Vendo - Deutsche Bahn', serviceType: 'vendo', profile: 'db' },
 ];
 
-interface ClientConfigState extends ConfigGenericState {
-    alive: boolean; // Ensure alive is defined in the state
-}
+const ClientConfigContent: React.FC<ConfigComponentProps> = ({ data, onChange, alive, disabled }) => {
+    const serviceType = ConfigGeneric.getValue(data, 'serviceType') as string;
+    const profile = ConfigGeneric.getValue(data, 'profile') as string;
+    const combinedValue = `${serviceType || 'hafas'}:${profile || 'vbb'}`;
 
-class ClientConfig extends ConfigGeneric<ConfigGenericProps, ClientConfigState> {
-    constructor(props: ConfigGenericProps) {
-        super(props);
-        this.state = {
-            ...this.state,
-            alive: false, // Ensure alive is set to true for the component to function
-        };
-    }
+    const clientName = ConfigGeneric.getValue(data, 'clientName') as string;
+    const pollInterval = ConfigGeneric.getValue(data, 'pollInterval') as number;
+    const logUnknownTokens = ConfigGeneric.getValue(data, 'logUnknownTokens') as boolean;
+    const suppressInfoLogs = ConfigGeneric.getValue(data, 'suppressInfoLogs') as boolean;
+    const delayOffset = ConfigGeneric.getValue(data, 'delayOffset') as number;
 
-    componentWillUnmount(): void {
-        const instance = this.props.oContext.instance ?? '0';
-        const adapterName = this.props.oContext.adapterName;
-        this.props.oContext.socket.unsubscribeState(
-            `system.adapter.${adapterName}.${instance}.alive`,
-            this.onAliveChanged,
-        );
-    }
+    const isDisabled = disabled || !alive;
 
-    async componentDidMount(): Promise<void> {
-        super.componentDidMount();
+    const handlePollIntervalChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+        const newValue = parseInt(event.target.value, 10);
+        await onChange('pollInterval', isNaN(newValue) ? 5 : newValue);
+    };
 
-        const instance = this.props.oContext.instance ?? '0';
-        const adapterName = this.props.oContext.adapterName;
-        const aliveStateId = `system.adapter.${adapterName}.${instance}.alive`;
-
-        try {
-            const state = await this.props.oContext.socket.getState(aliveStateId);
-            const isAlive = !!state?.val;
-            this.setState({ alive: isAlive } as ClientConfigState);
-
-            await this.props.oContext.socket.subscribeState(aliveStateId, this.onAliveChanged);
-        } catch (error) {
-            console.error('[PageConfig] Failed to get alive state or subscribe:', error);
-            this.setState({ alive: false } as ClientConfigState);
-        }
-    }
-
-    onAliveChanged = (_id: string, state: ioBroker.State | null | undefined): void => {
-        const wasAlive = this.state.alive;
-        const isAlive = state ? !!state.val : false;
-
-        if (wasAlive !== isAlive) {
-            this.setState({ alive: isAlive } as ClientConfigState);
+    const handleProfileChange = async (event: SelectChangeEvent<string>): Promise<void> => {
+        const selected = SERVICE_OPTIONS.find(opt => opt.value === event.target.value);
+        if (selected) {
+            await onChange('serviceType', selected.serviceType);
+            await onChange('profile', selected.profile);
         }
     };
 
-    renderItem(_error: string, disabled: boolean): React.ReactElement {
-        // Use ConfigGeneric.getValue to safely get values
-        const serviceType = ConfigGeneric.getValue(this.props.data, 'serviceType') as string;
-        const profile = ConfigGeneric.getValue(this.props.data, 'profile') as string;
-        const combinedValue = `${serviceType || 'hafas'}:${profile || 'vbb'}`;
+    const handleClientNameChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+        await onChange('clientName', event.target.value);
+    };
 
-        const clientName = ConfigGeneric.getValue(this.props.data, 'clientName') as string;
-        const pollInterval = ConfigGeneric.getValue(this.props.data, 'pollInterval') as number;
-        const logUnknownTokens = ConfigGeneric.getValue(this.props.data, 'logUnknownTokens') as boolean;
-        const suppressInfoLogs = ConfigGeneric.getValue(this.props.data, 'suppressInfoLogs') as boolean;
-        const delayOffset = ConfigGeneric.getValue(this.props.data, 'delayOffset') as number;
+    const handlelogUnknownTokensChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+        await onChange('logUnknownTokens', event.target.checked);
+    };
 
-        const handlePollIntervalChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
-            const newValue = parseInt(event.target.value, 10);
-            await this.onChange('pollInterval', isNaN(newValue) ? 5 : newValue);
-        };
+    const handleSuppressInfoLogsChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+        await onChange('suppressInfoLogs', event.target.checked);
+    };
 
-        const handleProfileChange = async (event: SelectChangeEvent<string>): Promise<void> => {
-            const selected = SERVICE_OPTIONS.find(opt => opt.value === event.target.value);
-            if (selected) {
-                await this.onChange('serviceType', selected.serviceType);
-                await this.onChange('profile', selected.profile);
-            }
-        };
+    const handleDelayOffsetChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+        const newValue = parseInt(event.target.value, 2);
+        await onChange('delayOffset', isNaN(newValue) ? 0 : newValue);
+    };
 
-        const handleClientNameChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
-            const newValue = event.target.value;
-            await this.onChange('clientName', newValue);
-        };
+    return (
+        <Box sx={{ p: { xs: 1, sm: 2 }, maxWidth: 1200, mx: 'auto' }}>
+            <Typography
+                variant="h5"
+                sx={{ mb: { xs: 2, sm: 3 }, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
+            >
+                {I18n.t('clientConfig_title')}
+            </Typography>
 
-        const handlelogUnknownTokensChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
-            await this.onChange('logUnknownTokens', event.target.checked);
-        };
-
-        const handleSuppressInfoLogsChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
-            await this.onChange('suppressInfoLogs', event.target.checked);
-        };
-
-        const handleDelayOffsetChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
-            const newValue = parseInt(event.target.value, 2);
-            await this.onChange('delayOffset', isNaN(newValue) ? 0 : newValue);
-        };
-
-        return (
-            <Box sx={{ p: { xs: 1, sm: 2 }, maxWidth: 1200, mx: 'auto' }}>
-                <Typography
-                    variant="h5"
-                    sx={{ mb: { xs: 2, sm: 3 }, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 3 }}>
+                <FormControl
+                    sx={{ flex: { sm: '1 1 0' }, minWidth: { xs: '100%', sm: 200 } }}
+                    disabled={isDisabled}
+                    fullWidth
                 >
-                    {I18n.t('clientConfig_title')}
-                </Typography>
-
-                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 3 }}>
-                    <FormControl
-                        sx={{ flex: { sm: '1 1 0' }, minWidth: { xs: '100%', sm: 200 } }}
-                        disabled={disabled}
-                        fullWidth
+                    <InputLabel id="client-profile-label">{I18n.t('clientConfig_profile_label')}</InputLabel>
+                    <Select
+                        labelId="client-profile-label"
+                        id="client-profile-select"
+                        value={combinedValue}
+                        label={I18n.t('clientConfig_profile_label')}
+                        onChange={handleProfileChange}
+                        disabled={isDisabled}
                     >
-                        <InputLabel id="client-profile-label">{I18n.t('clientConfig_profile_label')}</InputLabel>
-                        <Select
-                            labelId="client-profile-label"
-                            id="client-profile-select"
-                            value={combinedValue}
-                            label={I18n.t('clientConfig_profile_label')}
-                            onChange={handleProfileChange}
-                            disabled={!this.state.alive}
-                        >
-                            {SERVICE_OPTIONS.map(option => (
-                                <MenuItem
-                                    key={option.value}
-                                    value={option.value}
-                                >
-                                    {option.label}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                        <FormHelperText>{I18n.t('clientConfig_profile_helper')}</FormHelperText>
-                    </FormControl>
+                        {SERVICE_OPTIONS.map(option => (
+                            <MenuItem
+                                key={option.value}
+                                value={option.value}
+                            >
+                                {option.label}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    <FormHelperText>{I18n.t('clientConfig_profile_helper')}</FormHelperText>
+                </FormControl>
 
-                    <FormControl
-                        sx={{ flex: { sm: '1 1 0' }, minWidth: { xs: '100%', sm: 200 } }}
-                        disabled={!this.state.alive}
-                        fullWidth
-                    >
-                        <TextField
-                            id="client-name-input"
-                            label={I18n.t('clientConfig_clientName_label')}
-                            value={clientName || ''}
-                            onChange={handleClientNameChange}
-                            helperText={I18n.t('clientConfig_clientName_helper')}
-                            disabled={!this.state.alive}
-                            fullWidth
-                        />
-                    </FormControl>
-                </Box>
-                <Typography
-                    variant="h5"
-                    sx={{ mb: { xs: 2, sm: 3 }, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
+                <FormControl
+                    sx={{ flex: { sm: '1 1 0' }, minWidth: { xs: '100%', sm: 200 } }}
+                    disabled={isDisabled}
+                    fullWidth
                 >
-                    {I18n.t('settings_title')}
-                </Typography>
-                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 3 }}>
-                    <FormControl
-                        sx={{ flex: { sm: '1 1 0' }, minWidth: { xs: '100%', sm: 200 } }}
-                        disabled={!this.state.alive}
+                    <TextField
+                        id="client-name-input"
+                        label={I18n.t('clientConfig_clientName_label')}
+                        value={clientName || ''}
+                        onChange={handleClientNameChange}
+                        helperText={I18n.t('clientConfig_clientName_helper')}
+                        disabled={isDisabled}
                         fullWidth
-                    >
-                        {/* Pollintervall */}
-                        <TextField
-                            label={I18n.t('clientConfig_pollInterval_label')}
-                            type="number"
-                            value={pollInterval || 0}
-                            onChange={handlePollIntervalChange}
-                            fullWidth
-                            size="small"
-                            inputProps={{ min: 5, step: 1, max: 60 }}
-                            helperText={I18n.t('clientConfig_pollInterval_helper')}
-                        />
-                    </FormControl>
-
-                    <FormControl
-                        sx={{ flex: { sm: '1 1 0' }, minWidth: { xs: '100%', sm: 200 } }}
-                        disabled={!this.state.alive}
-                    >
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    checked={logUnknownTokens || false}
-                                    onChange={handlelogUnknownTokensChange}
-                                    disabled={!this.state.alive}
-                                />
-                            }
-                            label={I18n.t('clientConfig_logUnknownTokens_label')}
-                        />
-                        <FormHelperText>{I18n.t('clientConfig_logUnknownTokens_helper')}</FormHelperText>
-                    </FormControl>
-
-                    <FormControl
-                        sx={{ flex: { sm: '1 1 0' }, minWidth: { xs: '100%', sm: 200 } }}
-                        disabled={!this.state.alive}
-                    >
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    checked={suppressInfoLogs || false}
-                                    onChange={handleSuppressInfoLogsChange}
-                                    disabled={!this.state.alive}
-                                />
-                            }
-                            label={I18n.t('clientConfig_suppressInfoLogs_label')}
-                        />
-                        <FormHelperText>{I18n.t('clientConfig_suppressInfoLogs_helper')}</FormHelperText>
-                    </FormControl>
-
-                    <FormControl
-                        sx={{ flex: { sm: '1 1 0' }, minWidth: { xs: '100%', sm: 200 } }}
-                        disabled={!this.state.alive}
-                        fullWidth
-                    >
-                        {/* Delay Offset for On Time */}
-                        <TextField
-                            label={I18n.t('clientConfig_delayOffset_label')}
-                            type="number"
-                            value={delayOffset || 2}
-                            onChange={handleDelayOffsetChange}
-                            fullWidth
-                            size="small"
-                            inputProps={{ min: 5, step: 1, max: 60 }}
-                            helperText={I18n.t('clientConfig_delayOffset_helper')}
-                        />
-                    </FormControl>
-                </Box>
+                    />
+                </FormControl>
             </Box>
-        );
-    }
-}
+            <Typography
+                variant="h5"
+                sx={{ mb: { xs: 2, sm: 3 }, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
+            >
+                {I18n.t('settings_title')}
+            </Typography>
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 3 }}>
+                <FormControl
+                    sx={{ flex: { sm: '1 1 0' }, minWidth: { xs: '100%', sm: 200 } }}
+                    disabled={isDisabled}
+                    fullWidth
+                >
+                    <TextField
+                        label={I18n.t('clientConfig_pollInterval_label')}
+                        type="number"
+                        value={pollInterval || 0}
+                        onChange={handlePollIntervalChange}
+                        fullWidth
+                        size="small"
+                        inputProps={{ min: 5, step: 1, max: 60 }}
+                        helperText={I18n.t('clientConfig_pollInterval_helper')}
+                    />
+                </FormControl>
 
-export default ClientConfig;
+                <FormControl
+                    sx={{ flex: { sm: '1 1 0' }, minWidth: { xs: '100%', sm: 200 } }}
+                    disabled={isDisabled}
+                >
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={logUnknownTokens || false}
+                                onChange={handlelogUnknownTokensChange}
+                                disabled={isDisabled}
+                            />
+                        }
+                        label={I18n.t('clientConfig_logUnknownTokens_label')}
+                    />
+                    <FormHelperText>{I18n.t('clientConfig_logUnknownTokens_helper')}</FormHelperText>
+                </FormControl>
+
+                <FormControl
+                    sx={{ flex: { sm: '1 1 0' }, minWidth: { xs: '100%', sm: 200 } }}
+                    disabled={isDisabled}
+                >
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={suppressInfoLogs || false}
+                                onChange={handleSuppressInfoLogsChange}
+                                disabled={isDisabled}
+                            />
+                        }
+                        label={I18n.t('clientConfig_suppressInfoLogs_label')}
+                    />
+                    <FormHelperText>{I18n.t('clientConfig_suppressInfoLogs_helper')}</FormHelperText>
+                </FormControl>
+
+                <FormControl
+                    sx={{ flex: { sm: '1 1 0' }, minWidth: { xs: '100%', sm: 200 } }}
+                    disabled={isDisabled}
+                    fullWidth
+                >
+                    <TextField
+                        label={I18n.t('clientConfig_delayOffset_label')}
+                        type="number"
+                        value={delayOffset || 2}
+                        onChange={handleDelayOffsetChange}
+                        fullWidth
+                        size="small"
+                        inputProps={{ min: 5, step: 1, max: 60 }}
+                        helperText={I18n.t('clientConfig_delayOffset_helper')}
+                    />
+                </FormControl>
+            </Box>
+        </Box>
+    );
+};
+
+export default withConfigGeneric(ClientConfigContent);

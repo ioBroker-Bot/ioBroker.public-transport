@@ -3,6 +3,11 @@ import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import {
     Box,
     Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
     IconButton,
     List,
     ListItemButton,
@@ -12,7 +17,7 @@ import {
     useMediaQuery,
     useTheme,
 } from '@mui/material';
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 
 interface Station {
     id: string;
@@ -41,6 +46,22 @@ const StationList: React.FC<StationListProps> = ({
 }) => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
+
+    const handleDeleteClick = useCallback((stationId: string, stationName: string): void => {
+        setDeleteConfirm({ id: stationId, name: stationName });
+    }, []);
+
+    const handleDeleteConfirm = useCallback((): void => {
+        if (deleteConfirm) {
+            onDeleteStation(deleteConfirm.id);
+            setDeleteConfirm(null);
+        }
+    }, [deleteConfirm, onDeleteStation]);
+
+    const handleDeleteCancel = useCallback((): void => {
+        setDeleteConfirm(null);
+    }, []);
     return (
         <Paper sx={{ p: 2, height: '100%', minHeight: 400, display: 'flex', flexDirection: 'column' }}>
             <Box
@@ -137,15 +158,14 @@ const StationList: React.FC<StationListProps> = ({
                                             )}
                                         </>
                                     }
-                                    primaryTypographyProps={{ fontWeight: 500 }}
-                                    secondaryTypographyProps={{ component: 'div' }}
+                                    slotProps={{ primary: { fontWeight: 500 }, secondary: { component: 'div' } }}
                                 />
                                 <IconButton
                                     edge="end"
                                     aria-label="delete"
                                     onClick={e => {
                                         e.stopPropagation();
-                                        onDeleteStation(station.id);
+                                        handleDeleteClick(station.id, station.customName || station.name);
                                     }}
                                     size="small"
                                 >
@@ -156,6 +176,28 @@ const StationList: React.FC<StationListProps> = ({
                     </List>
                 )}
             </Box>
+
+            <Dialog
+                open={deleteConfirm !== null}
+                onClose={handleDeleteCancel}
+            >
+                <DialogTitle>{I18n.t('confirm_delete_title')}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        {I18n.t('confirm_delete_station').replace('%s', deleteConfirm?.name || '')}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleDeleteCancel}>{I18n.t('stationSearch_cancel')}</Button>
+                    <Button
+                        onClick={handleDeleteConfirm}
+                        color="error"
+                        variant="contained"
+                    >
+                        {I18n.t('confirm_delete_button')}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Paper>
     );
 };

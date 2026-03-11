@@ -1,6 +1,7 @@
-import { ConfigGeneric, type ConfigGenericProps, type ConfigGenericState } from '@iobroker/json-config';
+import { ConfigGeneric } from '@iobroker/json-config';
 import { Box, Dialog } from '@mui/material';
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { withConfigGeneric, type ConfigComponentProps } from './ConfigGenericWrapper';
 import { defaultProducts, filterAvailableProducts, type Products } from './ProductSelector';
 import StationConfig from './StationConfig';
 import StationList from './StationList';
@@ -13,216 +14,155 @@ interface Station {
     enabled?: boolean;
     numDepartures?: number;
     products?: Products;
-    availableProducts?: Partial<Products>; // Produkte die von HAFAS für diese Station zurückgegeben wurden
+    availableProducts?: Partial<Products>;
     client_profile?: string;
 }
 
-interface DepartureManagerState extends ConfigGenericState {
-    stations: Station[];
-    selectedStationId: string | null;
-    showSearchDialog: boolean;
-    alive: boolean;
-}
+const DepartureManagerContent: React.FC<ConfigComponentProps> = ({ oContext, data, onChange, alive, onSave }) => {
+    const [stations, setStations] = useState<Station[]>(() => {
+        const departures = ConfigGeneric.getValue(data, 'stationConfig');
+        return Array.isArray(departures) ? departures : [];
+    });
+    const [selectedStationId, setSelectedStationId] = useState<string | null>(null);
+    const [showSearchDialog, setShowSearchDialog] = useState(false);
 
-class DepartureManager extends ConfigGeneric<ConfigGenericProps, DepartureManagerState> {
-    constructor(props: ConfigGenericProps) {
-        super(props);
-
-        // Initialisiere stations aus props.data.departures
-        const departures = ConfigGeneric.getValue(this.props.data, 'stationConfig');
-        const initialStations = Array.isArray(departures) ? departures : [];
-
-        this.state = {
-            ...this.state,
-            stations: initialStations,
-            selectedStationId: null,
-            showSearchDialog: false,
-            alive: false,
-        };
-    }
-
-    async componentDidMount(): Promise<void> {
-        // Lade gespeicherte Stationen beim Start
-        const departures = ConfigGeneric.getValue(this.props.data, 'stationConfig');
+    useEffect(() => {
+        const departures = ConfigGeneric.getValue(data, 'stationConfig');
         if (Array.isArray(departures)) {
-            this.setState({ stations: departures });
+            setStations(departures);
         }
-        const instance = this.props.oContext.instance ?? '0';
-        const adapterName = this.props.oContext.adapterName;
-        const aliveStateId = `system.adapter.${adapterName}.${instance}.alive`;
+    }, [data]);
 
-        try {
-            const state = await this.props.oContext.socket.getState(aliveStateId);
-            const isAlive = !!state?.val;
-            this.setState({ alive: isAlive } as DepartureManagerState);
+    const handleAddStation = useCallback((): void => {
+        setShowSearchDialog(true);
+    }, []);
 
-            await this.props.oContext.socket.subscribeState(aliveStateId, this.onAliveChanged);
-        } catch (error) {
-            console.error('[PageConfig] Failed to get alive state or subscribe:', error);
-            this.setState({ alive: false } as DepartureManagerState);
-        }
-    }
+    const handleStationSelected = useCallback(
+        (stationId: string, stationName: string, availableProducts?: Partial<Products>): void => {
+            const filteredProducts = filterAvailableProducts(availableProducts);
 
-    componentWillUnmount(): void {
-        const instance = this.props.oContext.instance ?? '0';
-        const adapterName = this.props.oContext.adapterName;
-        this.props.oContext.socket.unsubscribeState(
-            `system.adapter.${adapterName}.${instance}.alive`,
-            this.onAliveChanged,
-        );
-    }
+            const serviceType = ConfigGeneric.getValue(data, 'serviceType') as string;
+            const profile = ConfigGeneric.getValue(data, 'profile') as string;
+            const client_profile = `${serviceType || 'unknown'}:${profile || 'unknown'}`;
 
-    componentDidUpdate(prevProps: ConfigGenericProps): void {
-        if (prevProps.data !== this.props.data) {
-            const departures = ConfigGeneric.getValue(this.props.data, 'stationConfig');
-            if (Array.isArray(departures)) {
-                this.setState({ stations: departures });
-            }
-        }
-    }
+            const newStation: Station = {
+                id: stationId,
+                name: stationName,
+                customName: stationName,
+                enabled: true,
+                numDepartures: 10,
+                products: filteredProducts ? { ...filteredProducts } : { ...defaultProducts },
+                availableProducts: filteredProducts,
+                client_profile,
+            };
 
-    onAliveChanged = (_id: string, state: ioBroker.State | null | undefined): void => {
-        const wasAlive = this.state.alive;
-        const isAlive = state ? !!state.val : false;
-
-        if (wasAlive !== isAlive) {
-            this.setState({ alive: isAlive } as DepartureManagerState);
-        }
-    };
-
-    handleAddStation = (): void => {
-        this.setState({ showSearchDialog: true });
-    };
-
-    handleStationSelected = async (
-        stationId: string,
-        stationName: string,
-        availableProducts?: Partial<Products>,
-    ): Promise<void> => {
-        // Filtere nur die Products mit true Werten
-        const filteredProducts = filterAvailableProducts(availableProducts);
-
-        // Hole die aktuellen ClientConfig-Einstellungen
-        const serviceType = ConfigGeneric.getValue(this.props.data, 'serviceType') as string;
-        const profile = ConfigGeneric.getValue(this.props.data, 'profile') as string;
-        const client_profile = `${serviceType || 'unknown'}:${profile || 'unknown'}`;
-
-        const newStation: Station = {
-            id: stationId,
-            name: stationName,
-            customName: stationName,
-            enabled: true,
-            numDepartures: 10,
-            products: filteredProducts ? { ...filteredProducts } : { ...defaultProducts },
-            availableProducts: filteredProducts,
-            client_profile,
-        };
-
-        // Prüfe ob Station bereits existiert
-        const exists = this.state.stations.some(s => s.id === stationId);
-        if (!exists) {
-            const updatedStations = [...this.state.stations, newStation];
-            this.setState({
-                stations: updatedStations,
-                selectedStationId: stationId, // Automatisch die neue Station auswählen
+            setStations(prev => {
+                const exists = prev.some(s => s.id === stationId);
+                if (exists) {
+                    return prev;
+                }
+                const updated = [...prev, newStation];
+                void onChange('stationConfig', updated);
+                return updated;
             });
 
-            // Verwende this.onChange() statt this.props.onChange()
-            await this.onChange('stationConfig', updatedStations);
-        }
+            setSelectedStationId(stationId);
+            setShowSearchDialog(false);
+        },
+        [data, onChange],
+    );
 
-        this.setState({ showSearchDialog: false });
-    };
+    const handleDeleteStation = useCallback(
+        async (stationId: string): Promise<void> => {
+            const updated = stations.filter(s => s.id !== stationId);
+            setStations(updated);
+            setSelectedStationId(prev => (prev === stationId ? null : prev));
 
-    handleDeleteStation = async (stationId: string): Promise<void> => {
-        const updatedStations = this.state.stations.filter(s => s.id !== stationId);
-        this.setState({ stations: updatedStations });
+            // ioBroker-Objekte rekursiv löschen (Stations/{stationId} inkl. Unterordner)
+            try {
+                await oContext.socket.delObjects(
+                    `${oContext.adapterName}.${oContext.instance}.Stations.${stationId}`,
+                    false,
+                );
+            } catch (err) {
+                console.error('Cannot delete station objects:', err);
+            }
 
-        // Verwende this.onChange() statt this.props.onChange()
-        await this.onChange('stationConfig', updatedStations);
+            // Konfiguration direkt speichern (ohne Dialog)
+            await onSave('stationConfig', updated);
+        },
+        [stations, oContext, onSave],
+    );
 
-        // Wenn die gelöschte Station ausgewählt war, Auswahl zurücksetzen
-        if (this.state.selectedStationId === stationId) {
-            this.setState({ selectedStationId: null });
-        }
-    };
+    const handleStationUpdate = useCallback(
+        (stationId: string, updates: Partial<Station>): void => {
+            setStations(prev => {
+                const updated = prev.map(station => (station.id === stationId ? { ...station, ...updates } : station));
+                void onChange('stationConfig', updated);
+                return updated;
+            });
+        },
+        [onChange],
+    );
 
-    handleStationUpdate = async (stationId: string, updates: Partial<Station>): Promise<void> => {
-        const updatedStations = this.state.stations.map(station =>
-            station.id === stationId ? { ...station, ...updates } : station,
-        );
+    const handleStationClick = useCallback((stationId: string): void => {
+        setSelectedStationId(stationId);
+    }, []);
 
-        this.setState({ stations: updatedStations });
+    const handleCloseSearch = useCallback((): void => {
+        setShowSearchDialog(false);
+    }, []);
 
-        // Verwende this.onChange() statt this.props.onChange()
-        await this.onChange('stationConfig', updatedStations);
-    };
+    const selectedStation = stations.find(s => s.id === selectedStationId) || null;
 
-    handleStationClick = (stationId: string): void => {
-        this.setState({ selectedStationId: stationId });
-    };
-
-    handleCloseSearch = (): void => {
-        this.setState({ showSearchDialog: false });
-    };
-
-    render(): React.JSX.Element {
-        const { stations, selectedStationId, showSearchDialog } = this.state;
-        const selectedStation = stations.find(s => s.id === selectedStationId) || null;
-
-        return (
-            <Box sx={{ height: '100%', p: { xs: 1, sm: 2 } }}>
-                {/* Zwei-Spalten Layout - Desktop: nebeneinander, Mobile: untereinander */}
+    return (
+        <Box sx={{ height: '100%', p: { xs: 1, sm: 2 } }}>
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: { xs: 'column', md: 'row' },
+                    gap: 2,
+                    height: '100%',
+                    width: '100%',
+                }}
+            >
                 <Box
                     sx={{
-                        display: 'flex',
-                        flexDirection: { xs: 'column', md: 'row' },
-                        gap: 2,
-                        height: '100%',
-                        width: '100%',
+                        width: { xs: '100%', md: 400 },
+                        flexShrink: { md: 0 },
+                        minHeight: { xs: 300, md: 'auto' },
                     }}
                 >
-                    {/* Linke Spalte - Stationsübersicht */}
-                    <Box
-                        sx={{
-                            // Mobile: volle Breite, Desktop: fixe 400px
-                            width: { xs: '100%', md: 400 },
-                            flexShrink: { md: 0 },
-                            minHeight: { xs: 300, md: 'auto' },
-                        }}
-                    >
-                        <StationList
-                            stations={stations}
-                            selectedStationId={selectedStationId}
-                            onAddStation={this.handleAddStation}
-                            onDeleteStation={this.handleDeleteStation}
-                            onStationClick={this.handleStationClick}
-                            alive={this.state.alive}
-                        />
-                    </Box>
-
-                    {/* Rechte Spalte - Konfiguration */}
-                    <Box
-                        sx={{
-                            // Mobile: volle Breite, Desktop: restlicher Platz
-                            width: { xs: '100%', md: 'calc(100% - 400px - 16px)' },
-                            maxWidth: { md: '500px' },
-                            flexGrow: { md: 1 },
-                            minHeight: { xs: 200, md: 'auto' },
-                        }}
-                    >
-                        <StationConfig
-                            station={selectedStation}
-                            onUpdate={this.handleStationUpdate}
-                            alive={this.state.alive}
-                        />
-                    </Box>
+                    <StationList
+                        stations={stations}
+                        selectedStationId={selectedStationId}
+                        onAddStation={handleAddStation}
+                        onDeleteStation={handleDeleteStation}
+                        onStationClick={handleStationClick}
+                        alive={alive}
+                    />
                 </Box>
 
-                {/* Station Search Dialog */}
+                <Box
+                    sx={{
+                        width: { xs: '100%', md: 'calc(100% - 400px - 16px)' },
+                        maxWidth: { md: '500px' },
+                        flexGrow: { md: 1 },
+                        minHeight: { xs: 200, md: 'auto' },
+                    }}
+                >
+                    <StationConfig
+                        station={selectedStation}
+                        onUpdate={handleStationUpdate}
+                        alive={alive}
+                    />
+                </Box>
+            </Box>
+
+            {showSearchDialog && (
                 <Dialog
-                    open={showSearchDialog}
-                    onClose={this.handleCloseSearch}
+                    open
+                    onClose={handleCloseSearch}
                     maxWidth="md"
                     fullWidth
                     fullScreen={false}
@@ -235,15 +175,15 @@ class DepartureManager extends ConfigGeneric<ConfigGenericProps, DepartureManage
                     }}
                 >
                     <StationSearch
-                        {...this.props}
-                        alive={this.state.alive}
-                        onStationSelected={this.handleStationSelected}
-                        onClose={this.handleCloseSearch}
+                        oContext={oContext}
+                        alive={alive}
+                        onStationSelected={handleStationSelected}
+                        onClose={handleCloseSearch}
                     />
                 </Dialog>
-            </Box>
-        );
-    }
-}
+            )}
+        </Box>
+    );
+};
 
-export default DepartureManager;
+export default withConfigGeneric(DepartureManagerContent, { useRenderItem: false });

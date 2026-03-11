@@ -1,6 +1,7 @@
-import { ConfigGeneric, type ConfigGenericProps, type ConfigGenericState } from '@iobroker/json-config';
+import { ConfigGeneric } from '@iobroker/json-config';
 import { Box } from '@mui/material';
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { withConfigGeneric, type ConfigComponentProps } from './ConfigGenericWrapper';
 import JourneyConfig from './JourneyConfig';
 import JourneyList from './JourneyList';
 import { type Products } from './ProductSelector';
@@ -18,192 +19,126 @@ interface Journey {
     client_profile?: string;
 }
 
-interface JourneyManagerState extends ConfigGenericState {
-    journeys: Journey[];
-    selectedJourneyId: string | null;
-    alive: boolean;
-}
+const JourneyManagerContent: React.FC<ConfigComponentProps> = ({ oContext, data, onChange, alive, onSave }) => {
+    const [journeys, setJourneys] = useState<Journey[]>(() => {
+        const saved = ConfigGeneric.getValue(data, 'journeyConfig');
+        return Array.isArray(saved) ? saved : [];
+    });
+    const [selectedJourneyId, setSelectedJourneyId] = useState<string | null>(null);
 
-class JourneyManager extends ConfigGeneric<ConfigGenericProps, JourneyManagerState> {
-    constructor(props: ConfigGenericProps) {
-        super(props);
-
-        // Initialisiere journeys aus props.data.journeyConfig
-        const journeys = ConfigGeneric.getValue(this.props.data, 'journeyConfig');
-        const initialJourneys = Array.isArray(journeys) ? journeys : [];
-
-        this.state = {
-            ...this.state,
-            journeys: initialJourneys,
-            selectedJourneyId: null,
-            alive: false,
-        };
-    }
-
-    async componentDidMount(): Promise<void> {
-        super.componentDidMount();
-        // Lade gespeicherte Journeys beim Start
-        const journeys = ConfigGeneric.getValue(this.props.data, 'journeyConfig');
-        if (Array.isArray(journeys)) {
-            this.setState({ journeys });
+    useEffect(() => {
+        const saved = ConfigGeneric.getValue(data, 'journeyConfig');
+        if (Array.isArray(saved)) {
+            setJourneys(saved);
         }
-        // Setze alive auf true, um die UI zu aktivieren
-        const instance = this.props.oContext.instance ?? '0';
-        const adapterName = this.props.oContext.adapterName;
-        const aliveStateId = `system.adapter.${adapterName}.${instance}.alive`;
+    }, [data]);
 
-        try {
-            const state = await this.props.oContext.socket.getState(aliveStateId);
-            const isAlive = !!state?.val;
-            this.setState({ alive: isAlive } as JourneyManagerState);
-
-            await this.props.oContext.socket.subscribeState(aliveStateId, this.onAliveChanged);
-        } catch (error) {
-            console.error('[PageConfig] Failed to get alive state or subscribe:', error);
-            this.setState({ alive: false } as JourneyManagerState);
-        }
-    }
-
-    componentWillUnmount(): void {
-        const instance = this.props.oContext.instance ?? '0';
-        const adapterName = this.props.oContext.adapterName;
-        this.props.oContext.socket.unsubscribeState(
-            `system.adapter.${adapterName}.${instance}.alive`,
-            this.onAliveChanged,
-        );
-    }
-
-    componentDidUpdate(prevProps: ConfigGenericProps): void {
-        if (prevProps.data !== this.props.data) {
-            const journeys = ConfigGeneric.getValue(this.props.data, 'journeyConfig');
-            if (Array.isArray(journeys)) {
-                this.setState({ journeys });
-            }
-        }
-    }
-
-    onAliveChanged = (_id: string, state: ioBroker.State | null | undefined): void => {
-        const wasAlive = this.state.alive;
-        const isAlive = state ? !!state.val : false;
-
-        if (wasAlive !== isAlive) {
-            this.setState({ alive: isAlive } as JourneyManagerState);
-        }
-    };
-
-    handleAddJourney = (): void => {
-        // Erstelle eine neue Journey mit einer eindeutigen ID
+    const handleAddJourney = useCallback((): void => {
         const newId = `journey_${Date.now()}`;
 
-        // Hole die aktuellen ClientConfig-Einstellungen
-        const serviceType = ConfigGeneric.getValue(this.props.data, 'serviceType') as string;
-        const profile = ConfigGeneric.getValue(this.props.data, 'profile') as string;
+        const serviceType = ConfigGeneric.getValue(data, 'serviceType') as string;
+        const profile = ConfigGeneric.getValue(data, 'profile') as string;
         const client_profile = `${serviceType || 'unknown'}:${profile || 'unknown'}`;
 
         const newJourney: Journey = {
             id: newId,
-            customName: `Journey ${this.state.journeys.length + 1}`,
+            customName: `Journey ${journeys.length + 1}`,
             enabled: true,
             numResults: 5,
-            // products werden erst gesetzt, wenn Stationen ausgewählt wurden
-            //products: { ...defaultProducts },
             client_profile,
         };
 
-        const updatedJourneys = [...this.state.journeys, newJourney];
-        this.setState({
-            journeys: updatedJourneys,
-            selectedJourneyId: newId, // Automatisch die neue Journey auswählen
-        });
+        const updatedJourneys = [...journeys, newJourney];
+        setJourneys(updatedJourneys);
+        setSelectedJourneyId(newId);
+        void onChange('journeyConfig', updatedJourneys);
+    }, [data, journeys, onChange]);
 
-        // Speichere die Änderungen
-        void this.onChange('journeyConfig', updatedJourneys);
-    };
+    const handleDeleteJourney = useCallback(
+        async (journeyId: string): Promise<void> => {
+            const updated = journeys.filter(j => j.id !== journeyId);
+            setJourneys(updated);
+            setSelectedJourneyId(prev => (prev === journeyId ? null : prev));
 
-    handleDeleteJourney = async (journeyId: string): Promise<void> => {
-        const updatedJourneys = this.state.journeys.filter(j => j.id !== journeyId);
-        this.setState({ journeys: updatedJourneys });
+            // ioBroker-Objekte rekursiv löschen (Journeys/{journeyId} inkl. Unterordner)
+            try {
+                await oContext.socket.delObjects(
+                    `${oContext.adapterName}.${oContext.instance}.Journeys.${journeyId}`,
+                    false,
+                );
+            } catch (err) {
+                console.error('Cannot delete journey objects:', err);
+            }
 
-        // Verwende this.onChange() statt this.props.onChange()
-        await this.onChange('journeyConfig', updatedJourneys);
+            // Konfiguration direkt speichern (ohne Dialog)
+            await onSave('journeyConfig', updated);
+        },
+        [journeys, oContext, onSave],
+    );
 
-        // Wenn die gelöschte Journey ausgewählt war, Auswahl zurücksetzen
-        if (this.state.selectedJourneyId === journeyId) {
-            this.setState({ selectedJourneyId: null });
-        }
-    };
+    const handleJourneyUpdate = useCallback(
+        (journeyId: string, updates: Partial<Journey>): void => {
+            setJourneys(prev => {
+                const updated = prev.map(journey => (journey.id === journeyId ? { ...journey, ...updates } : journey));
+                void onChange('journeyConfig', updated);
+                return updated;
+            });
+        },
+        [onChange],
+    );
 
-    handleJourneyUpdate = async (journeyId: string, updates: Partial<Journey>): Promise<void> => {
-        const updatedJourneys = this.state.journeys.map(journey =>
-            journey.id === journeyId ? { ...journey, ...updates } : journey,
-        );
+    const handleJourneyClick = useCallback((journeyId: string): void => {
+        setSelectedJourneyId(journeyId);
+    }, []);
 
-        this.setState({ journeys: updatedJourneys });
+    const selectedJourney = journeys.find(j => j.id === selectedJourneyId) || null;
 
-        // Verwende this.onChange() statt this.props.onChange()
-        await this.onChange('journeyConfig', updatedJourneys);
-    };
-
-    handleJourneyClick = (journeyId: string): void => {
-        this.setState({ selectedJourneyId: journeyId });
-    };
-
-    render(): React.JSX.Element {
-        const { journeys, selectedJourneyId } = this.state;
-        const selectedJourney = journeys.find(j => j.id === selectedJourneyId) || null;
-
-        return (
-            <Box sx={{ height: '100%', p: { xs: 1, sm: 2 } }}>
-                {/* Zwei-Spalten Layout - Desktop: nebeneinander, Mobile: untereinander */}
+    return (
+        <Box sx={{ height: '100%', p: { xs: 1, sm: 2 } }}>
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: { xs: 'column', md: 'row' },
+                    gap: 2,
+                    height: '100%',
+                    width: '100%',
+                }}
+            >
                 <Box
                     sx={{
-                        display: 'flex',
-                        flexDirection: { xs: 'column', md: 'row' },
-                        gap: 2,
-                        height: '100%',
-                        width: '100%',
+                        width: { xs: '100%', md: 400 },
+                        flexShrink: { md: 0 },
+                        minHeight: { xs: 300, md: 'auto' },
                     }}
                 >
-                    {/* Linke Spalte - Journey-Übersicht */}
-                    <Box
-                        sx={{
-                            // Mobile: volle Breite, Desktop: fixe 400px
-                            width: { xs: '100%', md: 400 },
-                            flexShrink: { md: 0 },
-                            minHeight: { xs: 300, md: 'auto' },
-                        }}
-                    >
-                        <JourneyList
-                            journeys={journeys}
-                            selectedJourneyId={selectedJourneyId}
-                            onAddJourney={this.handleAddJourney}
-                            onDeleteJourney={this.handleDeleteJourney}
-                            onJourneyClick={this.handleJourneyClick}
-                            alive={this.state.alive}
-                        />
-                    </Box>
+                    <JourneyList
+                        journeys={journeys}
+                        selectedJourneyId={selectedJourneyId}
+                        onAddJourney={handleAddJourney}
+                        onDeleteJourney={handleDeleteJourney}
+                        onJourneyClick={handleJourneyClick}
+                        alive={alive}
+                    />
+                </Box>
 
-                    {/* Rechte Spalte - Konfiguration */}
-                    <Box
-                        sx={{
-                            // Mobile: volle Breite, Desktop: restlicher Platz
-                            width: { xs: '100%', md: 'calc(100% - 400px - 16px)' },
-                            maxWidth: { md: '500px' },
-                            flexGrow: { md: 1 },
-                            minHeight: { xs: 200, md: 'auto' },
-                        }}
-                    >
-                        <JourneyConfig
-                            journey={selectedJourney}
-                            onUpdate={this.handleJourneyUpdate}
-                            configProps={this.props}
-                            alive={this.state.alive}
-                        />
-                    </Box>
+                <Box
+                    sx={{
+                        width: { xs: '100%', md: 'calc(100% - 400px - 16px)' },
+                        maxWidth: { md: '500px' },
+                        flexGrow: { md: 1 },
+                        minHeight: { xs: 200, md: 'auto' },
+                    }}
+                >
+                    <JourneyConfig
+                        journey={selectedJourney}
+                        onUpdate={handleJourneyUpdate}
+                        oContext={oContext}
+                        alive={alive}
+                    />
                 </Box>
             </Box>
-        );
-    }
-}
+        </Box>
+    );
+};
 
-export default JourneyManager;
+export default withConfigGeneric(JourneyManagerContent, { useRenderItem: false });
