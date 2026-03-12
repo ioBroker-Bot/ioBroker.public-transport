@@ -68,7 +68,7 @@ const ClientConfigContent: React.FC<ConfigComponentProps> = ({ data, onChange, a
     };
 
     const handleDelayOffsetChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
-        const newValue = parseInt(event.target.value, 2);
+        const newValue = parseInt(event.target.value, 10);
         await onChange('delayOffset', isNaN(newValue) ? 0 : newValue);
     };
 
@@ -139,13 +139,12 @@ const ClientConfigContent: React.FC<ConfigComponentProps> = ({ data, onChange, a
                     <TextField
                         label={I18n.t('clientConfig_pollInterval_label')}
                         type="number"
-                        value={pollInterval || 0}
+                        value={pollInterval || 5}
                         onChange={handlePollIntervalChange}
                         fullWidth
                         size="small"
-                        slotProps={{ htmlInput: { min: 5, step: 1, max: 60 } }}
+                        slotProps={{ htmlInput: { min: 5, step: 1, max: 60, disabled: isDisabled } }}
                         helperText={I18n.t('clientConfig_pollInterval_helper')}
-                        disabled={isDisabled}
                     />
                 </FormControl>
 
@@ -195,9 +194,8 @@ const ClientConfigContent: React.FC<ConfigComponentProps> = ({ data, onChange, a
                         onChange={handleDelayOffsetChange}
                         fullWidth
                         size="small"
-                        slotProps={{ htmlInput: { min: 5, step: 1, max: 60 } }}
+                        slotProps={{ htmlInput: { min: 2, step: 1, max: 60, disabled: isDisabled } }}
                         helperText={I18n.t('clientConfig_delayOffset_helper')}
-                        disabled={isDisabled}
                     />
                 </FormControl>
             </Box>
