@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "public-transport",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "news": {
+      "0.0.6": {
+        "en": "Widget for Journey\nRefactor admin UI: convert class components to functional components",
+        "de": "Widget für die Verbindungen\nRefactor admin UI: Klassenkomponenten in Funktionskomponenten umwandeln",
+        "ru": "Виджет для путешествия\nRefactor admin UI: преобразование компонентов класса в функциональные компоненты",
+        "pt": "Widget para viagem\nRefactor admin UI: converter componentes de classe para componentes funcionais",
+        "nl": "Widget voor reis\nRefactor admin UI: klassecomponenten omzetten naar functionele componenten",
+        "fr": "Widget pour Voyage\nRefactor admin UI: convertir les composants de classe en composants fonctionnels",
+        "it": "Widget per il viaggio\nRefactor admin UI: convertire i componenti di classe in componenti funzionali",
+        "es": "Widget para el viaje\nRefactor admin UI: convertir componentes de clase a componentes funcionales",
+        "pl": "Widget for Journey\nRefactor admin UI: konwertuj komponenty klasy do funkcjonalnych",
+        "uk": "Віджети для подорожі\nRefactor admin UI: перетворення компонентів класу в функціональні компоненти",
+        "zh-cn": "行程部件\n重构管理员 UI: 将类组件转换为函数组件"
+      },
       "0.0.5": {
         "en": "Upgrade dependency",
         "de": "Abhängigkeit aktualisieren",
