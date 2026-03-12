@@ -1,0 +1,73 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Hintergrund -->
+  <rect width="400" height="300" fill="#1a1a1a"/>
+  <rect width="400" height="50" fill="#2c5aa0"/>
+  <rect width="400" height="3" y="50" fill="#ffcc00"/>
+  
+  <!-- Header Text -->
+  <text x="200" y="32" font-family="Arial, sans-serif" font-size="20" fill="#ffffff" text-anchor="middle" font-weight="bold">VERBINDUNGEN</text>
+  
+  <!-- Spaltenüberschriften -->
+  <rect width="400" height="30" y="53" fill="#2c2c2c"/>
+  <text x="45" y="73" font-family="Courier New, monospace" font-size="10" fill="#ffcc00" font-weight="bold" text-anchor="middle">AB</text>
+  <text x="95" y="73" font-family="Courier New, monospace" font-size="10" fill="#ffcc00" font-weight="bold" text-anchor="middle">+MIN</text>
+  <text x="140" y="73" font-family="Courier New, monospace" font-size="10" fill="#ffcc00" font-weight="bold" text-anchor="middle">GL</text>
+  <text x="190" y="73" font-family="Courier New, monospace" font-size="10" fill="#ffcc00" font-weight="bold" text-anchor="middle">AN</text>
+  <text x="240" y="73" font-family="Courier New, monospace" font-size="10" fill="#ffcc00" font-weight="bold" text-anchor="middle">+MIN</text>
+  <text x="285" y="73" font-family="Courier New, monospace" font-size="10" fill="#ffcc00" font-weight="bold" text-anchor="middle">GL</text>
+  <text x="340" y="73" font-family="Courier New, monospace" font-size="10" fill="#ffcc00" font-weight="bold" text-anchor="middle">UMS</text>
+  
+  <!-- Beispiel-Zeilen -->
+  <!-- Zeile 1 - Direktverbindung -->
+  <rect width="400" height="40" y="83" fill="#000000"/>
+  <text x="45" y="108" font-family="Courier New, monospace" font-size="13" fill="#00ff00" font-weight="bold" text-anchor="middle">15:08</text>
+  <text x="95" y="108" font-family="Courier New, monospace" font-size="12" fill="#00ff00" text-anchor="middle">0</text>
+  <text x="140" y="108" font-family="Courier New, monospace" font-size="12" fill="#ffcc00" text-anchor="middle">5</text>
+  <text x="190" y="108" font-family="Courier New, monospace" font-size="13" fill="#00ff00" font-weight="bold" text-anchor="middle">18:41</text>
+  <text x="240" y="108" font-family="Courier New, monospace" font-size="12" fill="#00ff00" text-anchor="middle">0</text>
+  <text x="285" y="108" font-family="Courier New, monospace" font-size="12" fill="#ffcc00" text-anchor="middle">--</text>
+  <text x="340" y="108" font-family="Courier New, monospace" font-size="12" fill="#ffffff" text-anchor="middle">4</text>
+  
+  <!-- Zeile 2 - Mit Verspätung -->
+  <rect width="400" height="40" y="123" fill="#0a0a0a"/>
+  <text x="45" y="148" font-family="Courier New, monospace" font-size="13" fill="#00ff00" font-weight="bold" text-anchor="middle">15:46</text>
+  <text x="95" y="148" font-family="Courier New, monospace" font-size="12" fill="#00ff00" text-anchor="middle">0</text>
+  <text x="140" y="148" font-family="Courier New, monospace" font-size="12" fill="#ffcc00" text-anchor="middle">5</text>
+  <text x="190" y="148" font-family="Courier New, monospace" font-size="13" fill="#00ff00" font-weight="bold" text-anchor="middle">19:41</text>
+  <text x="240" y="148" font-family="Courier New, monospace" font-size="12" fill="#00ff00" text-anchor="middle">0</text>
+  <text x="285" y="148" font-family="Courier New, monospace" font-size="12" fill="#ffcc00" text-anchor="middle">2</text>
+  <text x="340" y="148" font-family="Courier New, monospace" font-size="12" fill="#ffffff" text-anchor="middle">3</text>
+  
+  <!-- Zeile 3 - Mit Verspätung Ankunft -->
+  <rect width="400" height="40" y="163" fill="#000000"/>
+  <text x="45" y="188" font-family="Courier New, monospace" font-size="13" fill="#00ff00" font-weight="bold" text-anchor="middle">17:08</text>
+  <text x="95" y="188" font-family="Courier New, monospace" font-size="12" fill="#00ff00" text-anchor="middle">0</text>
+  <text x="140" y="188" font-family="Courier New, monospace" font-size="12" fill="#ffcc00" text-anchor="middle">5</text>
+  <text x="190" y="188" font-family="Courier New, monospace" font-size="13" fill="#00ff00" font-weight="bold" text-anchor="middle">20:41</text>
+  <text x="240" y="188" font-family="Courier New, monospace" font-size="12" fill="#00ff00" text-anchor="middle">0</text>
+  <text x="285" y="188" font-family="Courier New, monospace" font-size="12" fill="#ffcc00" text-anchor="middle">--</text>
+  <text x="340" y="188" font-family="Courier New, monospace" font-size="12" fill="#ffffff" text-anchor="middle">4</text>
+  
+  <!-- Zeile 4 - Mit großer Verspätung Abfahrt -->
+  <rect width="400" height="40" y="203" fill="#0a0a0a"/>
+  <text x="45" y="228" font-family="Courier New, monospace" font-size="13" fill="#00ff00" font-weight="bold" text-anchor="middle">15:08</text>
+  <text x="95" y="228" font-family="Courier New, monospace" font-size="12" fill="#ff0000" text-anchor="middle">+2</text>
+  <text x="140" y="228" font-family="Courier New, monospace" font-size="12" fill="#ffcc00" text-anchor="middle">3</text>
+  <text x="190" y="228" font-family="Courier New, monospace" font-size="13" fill="#00ff00" font-weight="bold" text-anchor="middle">15:27</text>
+  <text x="240" y="228" font-family="Courier New, monospace" font-size="12" fill="#00ff00" text-anchor="middle">0</text>
+  <text x="285" y="228" font-family="Courier New, monospace" font-size="12" fill="#ffcc00" text-anchor="middle">2</text>
+  <text x="340" y="228" font-family="Courier New, monospace" font-size="12" fill="#ffffff" text-anchor="middle">1</text>
+  
+  <!-- Zeile 5 - Schnelle Verbindung -->
+  <rect width="400" height="40" y="243" fill="#000000"/>
+  <text x="45" y="268" font-family="Courier New, monospace" font-size="13" fill="#00ff00" font-weight="bold" text-anchor="middle">17:46</text>
+  <text x="95" y="268" font-family="Courier New, monospace" font-size="12" fill="#00ff00" text-anchor="middle">0</text>
+  <text x="140" y="268" font-family="Courier New, monospace" font-size="12" fill="#ffcc00" text-anchor="middle">5</text>
+  <text x="190" y="268" font-family="Courier New, monospace" font-size="13" fill="#00ff00" font-weight="bold" text-anchor="middle">21:41</text>
+  <text x="240" y="268" font-family="Courier New, monospace" font-size="12" fill="#00ff00" text-anchor="middle">0</text>
+  <text x="285" y="268" font-family="Courier New, monospace" font-size="12" fill="#ffcc00" text-anchor="middle">--</text>
+  <text x="340" y="268" font-family="Courier New, monospace" font-size="12" fill="#ffffff" text-anchor="middle">3</text>
+  
+  <!-- Border -->
+  <rect width="400" height="300" fill="none" stroke="#333" stroke-width="2"/>
+</svg>

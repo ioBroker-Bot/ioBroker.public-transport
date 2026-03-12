@@ -1,0 +1,370 @@
+/* Verbindungen - Bahnhofsanzeige Stil */
+
+/* Container für die gesamte Verbindungstabelle */
+.pub-trans-conn-container {
+    background-color: #1a1a1a;
+    border: 2px solid #333;
+    border-radius: 4px;
+    overflow: hidden;
+    font-family: 'Courier New', 'Lucida Console', monospace;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    min-height: 600px;
+    max-height: 100%;
+}
+
+/* Header der Verbindungstabelle */
+.pub-trans-conn-header {
+    background: linear-gradient(180deg, #2c5aa0 0%, #1e3a6e 100%);
+    color: #ffffff;
+    padding: 10px 15px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    border-bottom: 3px solid #ffcc00;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Zeile mit Spaltenüberschriften */
+.pub-trans-conn-column-header {
+    background-color: #2c2c2c;
+    color: #ffcc00;
+    padding: 8px 10px;
+    display: grid;
+    grid-template-columns: 80px 100px 80px 80px 100px 80px 100px;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: bold;
+    border-bottom: 2px solid #444;
+}
+
+.pub-trans-conn-column-header > div {
+    text-align: center;
+}
+
+/* Container für die Verbindungszeilen */
+.pub-trans-conn-content {
+    background-color: #000000;
+    overflow-y: auto;
+    max-height: calc(100% - 100px);
+    height: auto;
+}
+
+/* Einzelne Verbindungszeile */
+.pub-trans-conn-row {
+    display: grid;
+    grid-template-columns: 80px 100px 80px 80px 100px 80px 100px;
+    gap: 10px;
+    padding: 10px;
+    border-bottom: 1px solid #333;
+    color: #ffcc00;
+    font-size: 14px;
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+
+.pub-trans-conn-row:hover {
+    background-color: #1a1a1a;
+}
+
+/* Alternative Zeilenfarbe für bessere Lesbarkeit */
+.pub-trans-conn-row:nth-child(even) {
+    background-color: #0a0a0a;
+}
+
+/* Spalten in der Verbindungszeile */
+.pub-trans-conn-time {
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+    color: #00ff00;
+}
+
+.pub-trans-conn-delay {
+    text-align: center;
+    font-weight: bold;
+}
+
+.pub-trans-conn-delay.ontime {
+    color: #00ff00;
+}
+
+.pub-trans-conn-delay.delayed {
+    color: #ff0000;
+}
+
+.pub-trans-conn-platform {
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffcc00;
+}
+
+.pub-trans-conn-platform.changed {
+    color: #ff0000;
+    animation: blink 1s infinite;
+}
+
+.pub-trans-conn-transfers {
+    text-align: center;
+    font-size: 14px;
+    color: #ffffff;
+}
+
+/* Blinken für geänderte Bahnsteige */
+@keyframes blink {
+    0%, 50%, 100% {
+        opacity: 1;
+    }
+    25%, 75% {
+        opacity: 0.3;
+    }
+}
+
+/* Keine Daten Nachricht */
+.pub-trans-conn-no-data {
+    padding: 30px;
+    text-align: center;
+    color: #888;
+    font-size: 16px;
+}
+
+/* Uhrzeit-Anzeige */
+.pub-trans-conn-clock {
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    color: #00ff00;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* Ladeindikator */
+.pub-trans-conn-loading {
+    padding: 20px;
+    text-align: center;
+    color: #ffcc00;
+    font-size: 14px;
+}
+
+.pub-trans-conn-loading::after {
+    content: '...';
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        content: '.';
+    }
+    33% {
+        content: '..';
+    }
+    66% {
+        content: '...';
+    }
+}
+
+/* Scrollbar Styling */
+.pub-trans-conn-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.pub-trans-conn-content::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+.pub-trans-conn-content::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 4px;
+}
+
+.pub-trans-conn-content::-webkit-scrollbar-thumb:hover {
+    background: #a2a2a2;
+}
+
+/* Popup/Modal für den Verbindungsverlauf */
+.pub-trans-conn-modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.pub-trans-conn-modal.active {
+    display: block;
+}
+
+.pub-trans-conn-modal-content {
+    background-color: #1a1a1a;
+    border: 2px solid #333;
+    border-radius: 4px;
+    margin: 5% auto;
+    padding: 20px;
+    width: 80%;
+    max-width: 900px;
+    max-height: 80%;
+    overflow-y: auto;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
+}
+
+.pub-trans-conn-modal-header {
+    background: linear-gradient(180deg, #2c5aa0 0%, #1e3a6e 100%);
+    color: #ffffff;
+    padding: 15px;
+    margin: -20px -20px 20px -20px;
+    border-radius: 4px 4px 0 0;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 3px solid #ffcc00;
+}
+
+.pub-trans-conn-modal-close {
+    color: #ffffff;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 20px;
+}
+
+.pub-trans-conn-modal-close:hover,
+.pub-trans-conn-modal-close:focus {
+    color: #ffcc00;
+}
+
+/* Leg-Details im Popup */
+.pub-trans-conn-leg {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #0a0a0a;
+    border: 1px solid #333;
+    border-radius: 4px;
+}
+
+.pub-trans-conn-leg-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #444;
+}
+
+.pub-trans-conn-leg-icon {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 3px;
+    font-weight: bold;
+    font-size: 14px;
+    text-align: center;
+    min-width: 50px;
+    background-color: #ffcc00;
+    color: #000000;
+}
+
+/* Verschiedene Verkehrsmittel-Farben */
+.pub-trans-conn-leg-icon.bus {
+    background-color: #9d1b4c;
+    color: #ffffff;
+}
+
+.pub-trans-conn-leg-icon.tram {
+    background-color: #d4000b;
+    color: #ffffff;
+}
+
+.pub-trans-conn-leg-icon.subway {
+    background-color: #0066b3;
+    color: #ffffff;
+}
+
+.pub-trans-conn-leg-icon.train {
+    background-color: #ffffff;
+    color: #d4000b;
+    border: 2px solid #d4000b;
+}
+
+.pub-trans-conn-leg-icon.sbahn {
+    background-color: #006e34;
+    color: #ffffff;
+}
+
+.pub-trans-conn-leg-icon.walking {
+    background-color: #888888;
+    color: #ffffff;
+}
+
+.pub-trans-conn-leg-direction {
+    color: #ffcc00;
+    font-size: 16px;
+    font-weight: bold;
+    flex: 1;
+}
+
+.pub-trans-conn-leg-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.pub-trans-conn-leg-detail-item {
+    padding: 5px;
+}
+
+.pub-trans-conn-leg-detail-label {
+    color: #ffcc00;
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.pub-trans-conn-leg-detail-value {
+    color: #ffffff;
+}
+
+.pub-trans-conn-leg-detail-value.delayed {
+    color: #ff0000;
+}
+
+.pub-trans-conn-leg-detail-value.ontime {
+    color: #00ff00;
+}
+
+.pub-trans-conn-leg-detail-value.changed {
+    color: #ff0000;
+}
+
+/* Fußweg-Styling */
+.pub-trans-conn-leg.walking {
+    background-color: #151515;
+    border-left: 4px solid #888888;
+}
+
+.pub-trans-conn-leg.walking .pub-trans-conn-leg-direction {
+    color: #888888;
+    font-style: italic;
+}
+
+/* Scrollbar für Modal */
+.pub-trans-conn-modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.pub-trans-conn-modal-content::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+.pub-trans-conn-modal-content::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 4px;
+}
+
+.pub-trans-conn-modal-content::-webkit-scrollbar-thumb:hover {
+    background: #a2a2a2;
+}
