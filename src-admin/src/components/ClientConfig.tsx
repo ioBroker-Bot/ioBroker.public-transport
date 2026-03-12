@@ -143,8 +143,9 @@ const ClientConfigContent: React.FC<ConfigComponentProps> = ({ data, onChange, a
                         onChange={handlePollIntervalChange}
                         fullWidth
                         size="small"
-                        inputProps={{ min: 5, step: 1, max: 60 }}
+                        slotProps={{ htmlInput: { min: 5, step: 1, max: 60 } }}
                         helperText={I18n.t('clientConfig_pollInterval_helper')}
+                        disabled={isDisabled}
                     />
                 </FormControl>
 
@@ -194,8 +195,9 @@ const ClientConfigContent: React.FC<ConfigComponentProps> = ({ data, onChange, a
                         onChange={handleDelayOffsetChange}
                         fullWidth
                         size="small"
-                        inputProps={{ min: 5, step: 1, max: 60 }}
+                        slotProps={{ htmlInput: { min: 5, step: 1, max: 60 } }}
                         helperText={I18n.t('clientConfig_delayOffset_helper')}
+                        disabled={isDisabled}
                     />
                 </FormControl>
             </Box>
