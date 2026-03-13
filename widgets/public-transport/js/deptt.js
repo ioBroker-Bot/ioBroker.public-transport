@@ -72,9 +72,11 @@ vis.binds['public-transportDepTt'] = {
         html += '<div class="col-line">Linie  / Ziel</div>';
         html += '<div class="col-delay">Verspätung</div>';
         html += '<div class="col-platform">Gleis</div>';
-        if (!showRemarkHint && !showRemarkWarning && !showRemarkStatus) {
-            console.log('[DepTt] Keine Remark aktiviert - zeige keine Info-Spalte');
+        if (showRemarkHint || showRemarkWarning || showRemarkStatus) {
+            console.log('[DepTt] Remark aktiviert - zeige Info-Spalte');
             html += '<div class="col-info">Info</div>';
+        } else {
+            console.log('[DepTt] Keine Remark aktiviert - zeige keine Info-Spalte');
         }
         html += '</div>';
 
@@ -206,9 +208,11 @@ vis.binds['public-transportDepTt'] = {
                     (cancelled ? '<span class="pub-trans-deptt-delay cancelled">Ausfall</span>' : formatDelay(delay)) +
                     '</div>';
                 html += '<div class="pub-trans-deptt-platform' + (changedPlatform ? ' changed' : '') + '">' + platform + '</div>';
-                if (!showRemarkHint && !showRemarkWarning && !showRemarkStatus) {
-                    console.log('[DepTt] Keine Remark aktiviert - zeige keine Info-Spalte');
+                if (showRemarkHint || showRemarkWarning || showRemarkStatus) {
+                    console.log('[DepTt] Remark aktiviert - zeige Info-Spalte');
                     html += '<div>' + (cancelled ? 'Fällt aus' : remarksText) + '</div>';
+                } else {
+                    console.log('[DepTt - Zeilen] Keine Remark aktiviert - zeige keine Info-Spalte');
                 }
                 html += '</div>';
             });
