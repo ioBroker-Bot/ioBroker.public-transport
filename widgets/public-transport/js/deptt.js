@@ -11,10 +11,10 @@ $.extend(true, systemDictionary, {
     oidDepartures: { en: 'Departures Object ID', de: 'Abfahrten Objekt ID' },
     maxDepartures: { en: 'Max. Departures', de: 'Max. Abfahrten' },
     showClock: { en: 'Show Clock', de: 'Uhr anzeigen' },
-    remarkhint: { en: 'Show hints', de: 'Hinweise anzeigen' },
-    remarkwarning: { en: 'Show warnings', de: 'Warnungen anzeigen' },
-    remarkstatus: { en: 'Show status messages', de: 'Statusmeldungen anzeigen' },
-    usefilter: { en: 'Use filter from config', de: 'Filter aus Konfig verwenden' },
+    remarkHint: { en: 'Show hints', de: 'Hinweise anzeigen' },
+    remarkWarning: { en: 'Show warnings', de: 'Warnungen anzeigen' },
+    remarkStatus: { en: 'Show status messages', de: 'Statusmeldungen anzeigen' },
+    useFilter: { en: 'Use filter from config', de: 'Filter aus Config verwenden' },
 });
 
 // Widget Binding
@@ -50,10 +50,10 @@ vis.binds['public-transportDepTt'] = {
         const headerText = data.headerText || 'Abfahrten';
         const maxDepartures = data.maxDepartures || 10;
         const showClock = data.showClock === true;
-        const showRemarkHint = data.remarkhint === true;
-        const showRemarkWarning = data.remarkwarning === true;
-        const showRemarkStatus = data.remarkstatus === true;
-        const useFilter = data.usefilter === true;
+        const showRemarkHint = data.remarkHint === true;
+        const showRemarkWarning = data.remarkWarning === true;
+        const showRemarkStatus = data.remarkStatus === true;
+        const useFilter = data.useFilter === true;
         // HTML-Struktur erstellen
         let html = '';
         html += '<div class="pub-trans-deptt-container ' + data.class + '" style="width: 100%; height: 100%;">';
@@ -72,7 +72,10 @@ vis.binds['public-transportDepTt'] = {
         html += '<div class="col-line">Linie  / Ziel</div>';
         html += '<div class="col-delay">Verspätung</div>';
         html += '<div class="col-platform">Gleis</div>';
-        html += '<div class="col-info">Info</div>';
+        if (!showRemarkHint && !showRemarkWarning && !showRemarkStatus) {
+            console.log('[DepTt] Keine Remark aktiviert - zeige keine Info-Spalte');
+            html += '<div class="col-info">Info</div>';
+        }
         html += '</div>';
 
         // Content-Bereich für Abfahrten
@@ -203,7 +206,10 @@ vis.binds['public-transportDepTt'] = {
                     (cancelled ? '<span class="pub-trans-deptt-delay cancelled">Ausfall</span>' : formatDelay(delay)) +
                     '</div>';
                 html += '<div class="pub-trans-deptt-platform' + (changedPlatform ? ' changed' : '') + '">' + platform + '</div>';
-                html += '<div>' + (cancelled ? 'Fällt aus' : remarksText) + '</div>';
+                if (!showRemarkHint && !showRemarkWarning && !showRemarkStatus) {
+                    console.log('[DepTt] Keine Remark aktiviert - zeige keine Info-Spalte');
+                    html += '<div>' + (cancelled ? 'Fällt aus' : remarksText) + '</div>';
+                }
                 html += '</div>';
             });
 
