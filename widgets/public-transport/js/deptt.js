@@ -54,6 +54,9 @@ vis.binds['public-transportDepTt'] = {
         const showRemarkWarning = data.remarkWarning === true;
         const showRemarkStatus = data.remarkStatus === true;
         const useFilter = data.useFilter === true;
+
+        const hasRemarks = showRemarkHint || showRemarkWarning || showRemarkStatus;
+
         // HTML-Struktur erstellen
         let html = '';
         html += '<div class="pub-trans-deptt-container ' + data.class + '" style="width: 100%; height: 100%;">';
@@ -67,12 +70,13 @@ vis.binds['public-transportDepTt'] = {
         html += '</div>';
 
         // Spaltenüberschriften
-        html += '<div class="pub-trans-deptt-column-header">';
+
+        html += '<div class="pub-trans-deptt-column-header' + (hasRemarks ? ' with-remarks' : ' no-remarks') + '">';
         html += '<div class="col-time">Zeit</div>';
         html += '<div class="col-line">Linie  / Ziel</div>';
         html += '<div class="col-delay">Verspätung</div>';
         html += '<div class="col-platform">Gleis</div>';
-        if (showRemarkHint || showRemarkWarning || showRemarkStatus) {
+        if (hasRemarks) {
             console.log('[DepTt] Remark aktiviert - zeige Info-Spalte');
             html += '<div class="col-info">Info</div>';
         } else {
@@ -171,6 +175,8 @@ vis.binds['public-transportDepTt'] = {
                 const product = dep.line.product || dep.productName || 'train';
                 const remarks = dep.remarks && dep.remarks.length > 0 ? groupRemarksByType(dep.remarks) : {};
 
+                const hasRemark = showRemarkHint || showRemarkWarning || showRemarkStatus;
+
                 // remarks formatieren
                 let remarksText = '';
                 if (showRemarkWarning && remarks.warning) {
@@ -195,7 +201,7 @@ vis.binds['public-transportDepTt'] = {
                     }
                 }
 
-                html += '<div class="pub-trans-deptt-row">';
+                html += '<div class="pub-trans-deptt-row' + (hasRemark ? ' with-remarks' : ' no-remarks') + '">';
                 html += '<div class="pub-trans-deptt-time">' + displayTime + '</div>';
 
                 html += '<div class="pub-trans-deptt-line">';
@@ -208,7 +214,7 @@ vis.binds['public-transportDepTt'] = {
                     (cancelled ? '<span class="pub-trans-deptt-delay cancelled">Ausfall</span>' : formatDelay(delay)) +
                     '</div>';
                 html += '<div class="pub-trans-deptt-platform' + (changedPlatform ? ' changed' : '') + '">' + platform + '</div>';
-                if (showRemarkHint || showRemarkWarning || showRemarkStatus) {
+                if (hasRemark) {
                     console.log('[DepTt] Remark aktiviert - zeige Info-Spalte');
                     html += '<div>' + (cancelled ? 'Fällt aus' : remarksText) + '</div>';
                 } else {
