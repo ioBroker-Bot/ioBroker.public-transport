@@ -268,6 +268,9 @@ For Vis1, there is a widget available for displaying departures. The JSON data i
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**  
+* (tt-tom17) begin beta-test
+
 ### 0.0.6 (2026-03-12)
 * (tt-tom17) Widget for Journey
 * (tt-tom17) Refactor admin UI: convert class components to functional components
