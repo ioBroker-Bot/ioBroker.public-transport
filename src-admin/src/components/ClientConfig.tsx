@@ -36,7 +36,6 @@ const ClientConfigContent: React.FC<ConfigComponentProps> = ({ data, onChange, a
 
     const clientName = ConfigGeneric.getValue(data, 'clientName') as string;
     const pollInterval = ConfigGeneric.getValue(data, 'pollInterval') as number;
-    const logUnknownTokens = ConfigGeneric.getValue(data, 'logUnknownTokens') as boolean;
     const suppressInfoLogs = ConfigGeneric.getValue(data, 'suppressInfoLogs') as boolean;
     const delayOffset = ConfigGeneric.getValue(data, 'delayOffset') as number;
 
@@ -59,10 +58,6 @@ const ClientConfigContent: React.FC<ConfigComponentProps> = ({ data, onChange, a
         await onChange('clientName', event.target.value);
     };
 
-    const handlelogUnknownTokensChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
-        await onChange('logUnknownTokens', event.target.checked);
-    };
-
     const handleSuppressInfoLogsChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
         await onChange('suppressInfoLogs', event.target.checked);
     };
@@ -82,6 +77,7 @@ const ClientConfigContent: React.FC<ConfigComponentProps> = ({ data, onChange, a
             </Typography>
 
             <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 3 }}>
+                {/* Auswahl des Fahrplan-Services und Profils */}
                 <FormControl
                     sx={{ flex: { sm: '1 1 0' }, minWidth: { xs: '100%', sm: 200 } }}
                     disabled={isDisabled}
@@ -108,6 +104,7 @@ const ClientConfigContent: React.FC<ConfigComponentProps> = ({ data, onChange, a
                     <FormHelperText>{I18n.t('clientConfig_profile_helper')}</FormHelperText>
                 </FormControl>
 
+                {/* Optionaler Name für den Client */}
                 <FormControl
                     sx={{ flex: { sm: '1 1 0' }, minWidth: { xs: '100%', sm: 200 } }}
                     disabled={isDisabled}
@@ -131,6 +128,7 @@ const ClientConfigContent: React.FC<ConfigComponentProps> = ({ data, onChange, a
                 {I18n.t('settings_title')}
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 3 }}>
+                {/* Abruf Intervall in minuten */}
                 <FormControl
                     sx={{ flex: { sm: '1 1 0' }, minWidth: { xs: '100%', sm: 200 } }}
                     disabled={isDisabled}
@@ -148,23 +146,7 @@ const ClientConfigContent: React.FC<ConfigComponentProps> = ({ data, onChange, a
                     />
                 </FormControl>
 
-                <FormControl
-                    sx={{ flex: { sm: '1 1 0' }, minWidth: { xs: '100%', sm: 200 } }}
-                    disabled={isDisabled}
-                >
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                checked={logUnknownTokens || false}
-                                onChange={handlelogUnknownTokensChange}
-                                disabled={isDisabled}
-                            />
-                        }
-                        label={I18n.t('clientConfig_logUnknownTokens_label')}
-                    />
-                    <FormHelperText>{I18n.t('clientConfig_logUnknownTokens_helper')}</FormHelperText>
-                </FormControl>
-
+                {/* Erweiterte Info-Logs unterdrücken */}
                 <FormControl
                     sx={{ flex: { sm: '1 1 0' }, minWidth: { xs: '100%', sm: 200 } }}
                     disabled={isDisabled}
@@ -182,6 +164,7 @@ const ClientConfigContent: React.FC<ConfigComponentProps> = ({ data, onChange, a
                     <FormHelperText>{I18n.t('clientConfig_suppressInfoLogs_helper')}</FormHelperText>
                 </FormControl>
 
+                {/* Offset in Minuten, damit die Verspätung noch als Pünktlich gilt */}
                 <FormControl
                     sx={{ flex: { sm: '1 1 0' }, minWidth: { xs: '100%', sm: 200 } }}
                     disabled={isDisabled}

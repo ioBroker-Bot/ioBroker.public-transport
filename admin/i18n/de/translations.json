@@ -9,8 +9,6 @@
     "clientConfig_clientName_label": "Client Name",
     "clientConfig_delayOffset_helper": "Offset in Minuten, damit die Verspätung noch als Pünktlich gilt.",
     "clientConfig_delayOffset_label": "Verspätungsoffset (Minuten)",
-    "clientConfig_logUnknownTokens_helper": "Aktivieren, wenn unbekannte Tokens geloggt werden sollen.",
-    "clientConfig_logUnknownTokens_label": "Unbekanntes Token",
     "clientConfig_pollInterval_helper": "Intervall in Minuten, in dem die Abfahrten aktualisiert werden.",
     "clientConfig_pollInterval_label": "Abfrageintervall (Minuten)",
     "clientConfig_profile_helper": "Wähle das Profil für die Verkehrsanbindung.",

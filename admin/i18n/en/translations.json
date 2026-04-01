@@ -9,8 +9,6 @@
     "clientConfig_clientName_label": "Client Name",
     "clientConfig_delayOffset_helper": "Offset in minutes for a delay to still be considered on time.",
     "clientConfig_delayOffset_label": "Delay Offset (minutes)",
-    "clientConfig_logUnknownTokens_helper": "Enable if unknown tokens should be logged.",
-    "clientConfig_logUnknownTokens_label": "Unknown Token",
     "clientConfig_pollInterval_helper": "Interval in minutes to update departures.",
     "clientConfig_pollInterval_label": "Poll Interval (Minutes)",
     "clientConfig_profile_helper": "Select the profile for the transport connection.",

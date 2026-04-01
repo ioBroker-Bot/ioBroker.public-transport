@@ -7,7 +7,6 @@ declare global {
 			serviceType: 'hafas' | 'vendo';
 			profile?: string;
 			clientName?: string;
-			logUnknownTokens?: boolean;
 			stationConfig?: StationConfig[];
 			journeyConfig?: JourneyConfig[];
 			pollInterval?: number;
@@ -20,12 +19,12 @@ declare global {
 			name: string;
 			customName?: string;
 			enabled: boolean;
-			numDepartures?: number;
+			numDepartures: number;
 			offsetTime?: number;
 			duration?: number;
-			products?: Products;
-			delayOffset?: number;
-			client_profile?: string;
+			products: Products;
+			availableProducts?: Products;
+			client_profile: string;
 		}
 
 		interface Products {
@@ -45,11 +44,13 @@ declare global {
 			id: string;
 			customName: string;
 			enabled: boolean;
-			numResults?: number;
+			numResults: number;
 			fromStationId: string;
 			fromStationName: string;
 			toStationId: string;
 			toStationName: string;
+			availableProducts: Products;
+			client_profile: string;
 			departure?: string;
 			arrival?: string;
 			via?: string;
@@ -58,9 +59,6 @@ declare global {
 			transferTime?: number;
 			accessibility?: 'partial' | 'complete';
 			bike?: boolean;
-			products?: Products;
-			delayOffset?: number;
-			client_profile?: string;
 		}
 	}
 }
