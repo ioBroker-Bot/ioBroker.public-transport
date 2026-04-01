@@ -123,26 +123,123 @@ Für jede Haltestelle können folgende Parameter konfiguriert werden:
     - Taxi
   - Mehrfachauswahl möglich
 
+### Verbindung hinzufügen
+
+Verbindungen ermöglichen die Abfrage von Routen zwischen zwei Stationen. Folgende Parameter können konfiguriert werden:
+
+#### Verbindungskonfigurationsparameter
+
+- **Benutzerdefinierter Name** (optional)
+  - Ein individueller Name für die Verbindung in ioBroker
+  - Beispiel: "Heimweg_Arbeit" zur besseren Identifikation
+
+- **Von Station** (erforderlich)
+  - Die Startstation für die Verbindung
+  - Auswahl aus verfügbaren Stationen
+
+- **Nach Station** (erforderlich)
+  - Die Zielstation für die Verbindung
+  - Auswahl aus verfügbaren Stationen
+
+- **Anzahl der Ergebnisse**
+  - Wie viele Verbindungsoptionen sollen abgerufen werden?
+  - Standard: 3
+  - Bereich: 1-10
+
+- **Verkehrsmittel-Filter**
+  - Wie bei Stationen (siehe oben)
+  - Schränkt die in der Verbindung verwendeten Verkehrsmittel ein
+
 ## Datenstruktur
+
+### Stationen-Datenstruktur
 
 Der Adapter erstellt für jede konfigurierte Station einen Objektbaum in ioBroker:
 
 ```
 public-transport.0
-├── <Station-Name oder ID>
-│   ├── 0
-│   │   ├── delay                    // Verspätung in Minuten
-│   │   ├── departure                // Geplante Abfahrtszeit
-│   │   ├── departureTime            // Tatsächliche Abfahrtszeit (mit Verspätung)
-│   │   ├── direction                // Fahrtrichtung/Endhaltestelle
-│   │   ├── line                     // Linienbezeichnung
-│   │   ├── platform                 // Gleis/Steig
-│   │   ├── type                     // Verkehrsmitteltyp
-│   │   └── cancelled                // Ausfall (true/false)
-│   ├── 1
-│   │   └── ...
-│   ├── ...
-│   └── json                         // JSON-String aller Abfahrten
+├── Stations
+│   └── <Station-ID>                 // Stations-ID (z.B. 900350163)
+│       ├── json                     // Rohdaten der Abfahrten (JSON)
+│       ├── enabled                  // Station aktiviert (boolean)
+│       ├── Departures_00            // Erste Abfahrt
+│       │   ├── Departure            // Tatsächliche Abfahrtszeit
+│       │   ├── DeparturePlanned     // Geplante Abfahrtszeit
+│       │   ├── Delay                // Verspätung in Sekunden
+│       │   ├── DepartureDelayed     // Ist verspätet (boolean)
+│       │   ├── DepartureOnTime      // Ist pünktlich (boolean)
+│       │   ├── Platform             // Gleis/Steig
+│       │   ├── PlatformPlanned      // Geplantes Gleis/Steig
+│       │   ├── Direction            // Richtung/Endziel
+│       │   ├── Name                 // Linienname (z.B. "891")
+│       │   ├── Product              // Produkttyp (z.B. "bus")
+│       │   ├── Operator             // Betreibername
+│       │   ├── Mode                 // Verkehrsmitteltyp (bus, train, etc.)
+│       │   ├── Remarks              // Bemerkungen und Meldungen
+│       │   │   ├── Hint             // Allgemeine Hinweise
+│       │   │   ├── Status           // Statusmeldungen
+│       │   │   └── Warning          // Warnungen
+│       │   └── Stop                 // Haltestellen-Info
+│       │       ├── Id               // Haltestellen-ID
+│       │       ├── Name             // Haltestellenname
+│       │       └── Type             // Haltestellentyp (z.B. "stop")
+│       ├── Departures_01            // Zweite Abfahrt
+│       │   └── ...
+│       └── ...
+```
+
+### Verbindungs-Datenstruktur
+
+Für jede konfigurierte Verbindung erstellt der Adapter folgende Struktur:
+
+```
+public-transport.0
+├── Journeys
+│   └── journey_<ID>                     // Verbindungskonfigurations-ID
+│       ├── Journey_00                   // Erste Verbindungsoption
+│       │   ├── json                     // Rohdaten der Verbindung (JSON)
+│       │   ├── Arrival                  // Ankunftszeit am Ziel
+│       │   ├── ArrivalPlanned           // Geplante Ankunftszeit
+│       │   ├── ArrivalDelay             // Verspätung Ankunft in Sekunden
+│       │   ├── ArrivalDelayed           // Verspätete Ankunft (boolean)
+│       │   ├── ArrivalOnTime            // Pünktliche Ankunft (boolean)
+│       │   ├── Departure                // Abfahrtszeit vom Start
+│       │   ├── DeparturePlanned         // Geplante Abfahrtszeit
+│       │   ├── DepartureDelay           // Verspätung Abfahrt in Sekunden
+│       │   ├── DepartureDelayed         // Verspätete Abfahrt (boolean)
+│       │   ├── DepartureOnTime          // Pünktliche Abfahrt (boolean)
+│       │   ├── Changes                  // Anzahl der Umstiege
+│       │   ├── DurationMinutes          // Reisedauer in Minuten
+│       │   ├── Leg_00                   // Erste Teilstrecke
+│       │   │   ├── json                 // Rohdaten der Teilstrecke (JSON)
+│       │   │   ├── Arrival              // Ankunftszeit des Abschnitts
+│       │   │   ├── ArrivalPlanned       // Geplante Ankunft des Abschnitts
+│       │   │   ├── ArrivalDelay         // Verspätung Ankunft (Sekunden)
+│       │   │   ├── ArrivalDelayed       // Verspätete Ankunft (boolean)
+│       │   │   ├── ArrivalOnTime        // Pünktliche Ankunft (boolean)
+│       │   │   ├── Departure            // Abfahrtszeit des Abschnitts
+│       │   │   ├── DeparturePlanned     // Geplante Abfahrt des Abschnitts
+│       │   │   ├── DepartureDelay       // Verspätung Abfahrt (Sekunden)
+│       │   │   ├── DepartureDelayed     // Verspätete Abfahrt (boolean)
+│       │   │   ├── DepartureOnTime      // Pünktliche Abfahrt (boolean)
+│       │   │   ├── Distance             // Entfernung in Metern
+│       │   │   ├── Reachable            // Abschnitt erreichbar (boolean)
+│       │   │   ├── Line                 // Linieninformationen
+│       │   │   │   ├── Direction        // Richtung/Endziel
+│       │   │   │   ├── Mode             // Verkehrsmitteltyp (train, bus, etc.)
+│       │   │   │   ├── Name             // Linienname (z.B. "RE3")
+│       │   │   │   ├── Operator         // Verkehrsbetreiber
+│       │   │   │   └── Product          // Produkttyp (z.B. "regional")
+│       │   │   └── Remarks              // Hinweise und Meldungen
+│       │   │       ├── Hints            // Allgemeine Hinweise
+│       │   │       ├── Status           // Statusmeldungen
+│       │   │       └── Warnings         // Warnungen
+│       │   ├── Leg_01                   // Zweite Teilstrecke
+│       │   │   └── ...
+│       │   └── ...
+│       ├── Journey_01                   // Zweite Verbindungsoption
+│       │   └── ...
+│       └── ...
 ```
 
 ### Datentypen und Beispielwerte
