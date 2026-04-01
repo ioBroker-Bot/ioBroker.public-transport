@@ -1,6 +1,6 @@
 {
     "type": "tabs",
-    "i18n": true,
+    "i18n": "custom/i18n",
     "items": {
         "_configTabs": {
             "type": "panel",

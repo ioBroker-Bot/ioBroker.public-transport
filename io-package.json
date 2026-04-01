@@ -114,6 +114,7 @@
     "profile": "vbb",
     "clientName": "",
     "pollInterval": 5,
+    "logUnknownTokens": false,
     "suppressInfoLogs": false
   },
   "objects": [],
