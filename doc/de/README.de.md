@@ -13,7 +13,7 @@
 
 ## Öffentlicher Nahverkehr Adapter für ioBroker
 
-Der public-transport Adapter ermöglicht die nahtlose Integration von Echtzeitfahrplaninformationen des öffentlichen Nahverkehrs in Ihre ioBroker-Smart-Home-Umgebung. Mit diesem Adapter können Sie Abfahrtszeiten von Haltestellen verschiedener Verkehrsbetriebe in Deutschland, Österreich und anderen Ländern abrufen und für Automatisierungen nutzen.
+Der public-transport Adapter ermöglicht die Integration von Echtzeitfahrplaninformationen des öffentlichen Nahverkehrs in Ihre ioBroker-Smart-Home-Umgebung. Mit diesem Adapter können Sie Abfahrtszeiten von Haltestellen verschiedener Verkehrsbetriebe in Deutschland, Österreich und anderen Ländern abrufen und für Automatisierungen nutzen.
 
 [🇬🇧 English Documentation](../README.md)
 
@@ -28,15 +28,14 @@ Der public-transport Adapter ermöglicht die nahtlose Integration von Echtzeitfa
 
 ## Hauptfunktionen
 
-- **Mehrere Transport-Services**: Vollständige Unterstützung für HAFAS und DB Vendo APIs
-- **Flexible Station-Konfiguration**: Konfigurieren Sie beliebig viele Haltestellen gleichzeitig
+- **Mehrere Transport-Services**: Unterstützung für HAFAS und DB Vendo APIs
+- **Flexible Station-Konfiguration**: Konfiguration von beliebig viele Haltestellen
 - **Echtzeitdaten**: Abruf von Live-Abfahrtszeiten mit Verspätungsinformationen
 - **Automatische Aktualisierung**: Regelmäßige Abfrage der Abfahrtszeiten im frei konfigurierbaren Intervall
-- **Umfangreiche Filteroptionen**: Filtern Sie nach Verkehrsmitteln (Bus, Bahn, S-Bahn, U-Bahn, Tram, Fähre, etc.)
-- **Flexibler Zeitoffset**: Zeigen Sie Abfahrten ab einem bestimmten Zeitpunkt in der Zukunft an
-- **Anpassbare Abfrageanzahl**: Bestimmen Sie, wie viele Abfahrten pro Station angezeigt werden sollen
-- **Benutzerdefinierte Namen**: Vergeben Sie individuelle Namen für Ihre Haltestellen
-- **Zeitraum-Filterung**: Definieren Sie einen Zeitraum, in dem Abfahrten angezeigt werden sollen
+- **Umfangreiche Filteroptionen**: Filtern nach Verkehrsmitteln (Bus, Bahn, S-Bahn, U-Bahn, Tram, Fähre, etc.)
+- **Flexibler Zeitoffset**: Zeigt Abfahrten ab einem bestimmten Zeitpunkt in der Zukunft an
+- **Anpassbare Abfrageanzahl**: Bestimmt wie viele Abfahrten pro Station angezeigt werden sollen
+- **Benutzerdefinierte Namen**: Individuelle Namen für Ihre Haltestellen und Verbindungen
 
 ## Installation
 
@@ -65,11 +64,9 @@ Der Adapter nutzt die HAFAS (HaCon Fahrplan-Auskunfts-System) API und unterstüt
 #### Österreich
 - **ÖBB** - Österreichische Bundesbahnen (bundesweit)
 
-- Und weitere internationale Profile
+### Vendo
 
-### DB Vendo
-
-Zusätzliche Unterstützung für Verkehrsbetriebe, die die DB Vendo API verwenden. Diese API wird von verschiedenen regionalen Verkehrsbetrieben eingesetzt.
+Vendo API für den Abruf der Daten von der Deutschen Bahn (DB)  
 
 ## Konfiguration
 
@@ -80,7 +77,7 @@ Zusätzliche Unterstützung für Verkehrsbetriebe, die die DB Vendo API verwende
 
 2. **Profil wählen** (nur bei HAFAS)
    - Wählen Sie das entsprechende Verkehrsverbund-Profil aus der Dropdown-Liste
-   - Beispiel: "db" für Deutsche Bahn, "vbb" für Berlin-Brandenburg
+   - Beispiel: "vbb" für Berlin-Brandenburg
 
 3. **Abfrageintervall**
    - Legen Sie fest, wie oft die Daten aktualisiert werden sollen (in Minuten)
@@ -93,12 +90,8 @@ Für jede Haltestelle können folgende Parameter konfiguriert werden:
 
 #### Konfigurationsparameter
 
-- **Station-ID** (erforderlich)
-  - Die eindeutige ID der Haltestelle
-
 - **Benutzerdefinierter Name** (optional)
   - Ein individueller Name für die Station in ioBroker
-  - Wird als Objektname verwendet
   - Beispiel: "Bushaltestelle_Arbeit" statt der offiziellen Bezeichnung
 
 - **Anzahl der Abfahrten**
