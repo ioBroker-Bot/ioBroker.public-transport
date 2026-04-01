@@ -15,7 +15,7 @@ $.extend(true, systemDictionary, {
 
 // Widget Binding
 vis.binds['public-transportConnections'] = {
-    version: '0.0.1',
+    version: '0.0.2',
 
     showVersion: function () {
         if (vis.binds['public-transportConnections'].version) {
@@ -49,7 +49,7 @@ vis.binds['public-transportConnections'] = {
 
         // HTML-Struktur erstellen
         let html = '';
-        html += '<div class="pub-trans-conn-container ' + data.class + '" style="width: 100%; height: 100%;">';
+        html += '<div class="pub-trans-conn-container ' + data.class + '">';
 
         // Header
         html += '<div class="pub-trans-conn-header">';

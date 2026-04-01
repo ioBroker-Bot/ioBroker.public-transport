@@ -26,24 +26,24 @@
 }
 
 /* Zeile mit Spaltenüberschriften */
-.pub-trans-deptt-column-header .with-remarks {
+.pub-trans-deptt-column-header.no-remarks {
     background-color: #2c2c2c;
     color: #ffcc00;
     padding: 8px 10px;
     display: grid;
-    grid-template-columns: 80px minmax(150px, 300px) 100px 80px minmax(150px, 1fr);
+    grid-template-columns: 80px minmax(150px, 300px) 100px 80px;
     gap: 10px;
     font-size: 13px;
     font-weight: bold;
     border-bottom: 2px solid #444;
 }
 
-.pub-trans-deptt-column-header .no-remarks {
+.pub-trans-deptt-column-header.remarks {
     background-color: #2c2c2c;
     color: #ffcc00;
     padding: 8px 10px;
     display: grid;
-    grid-template-columns: 80px minmax(150px, 300px) 100px 80px;
+    grid-template-columns: 80px minmax(150px, 300px) 100px 80px minmax(150px, 1fr);
     gap: 10px;
     font-size: 13px;
     font-weight: bold;
@@ -75,9 +75,9 @@
 }
 
 /* Einzelne Abfahrtszeile */
-.pub-trans-deptt-row .with-remarks{
+.pub-trans-deptt-row.no-remarks{
     display: grid;
-    grid-template-columns: 80px minmax(150px, 300px) 100px 80px minmax(150px, 1fr);
+    grid-template-columns: 80px minmax(150px, 300px) 100px 80px;
     gap: 10px;
     padding: 10px;
     border-bottom: 1px solid #333;
@@ -86,9 +86,9 @@
     transition: background-color 0.2s;
 }
 
-.pub-trans-deptt-row .no-remarks {
+.pub-trans-deptt-row.remarks {
     display: grid;
-    grid-template-columns: 80px minmax(150px, 300px) 100px 80px;
+    grid-template-columns: 80px minmax(150px, 300px) 100px 80px minmax(150px, 1fr);
     gap: 10px;
     padding: 10px;
     border-bottom: 1px solid #333;

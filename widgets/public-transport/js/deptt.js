@@ -19,7 +19,7 @@ $.extend(true, systemDictionary, {
 
 // Widget Binding
 vis.binds['public-transportDepTt'] = {
-    version: '0.0.1',
+    version: '0.0.2',
 
     showVersion: function () {
         if (vis.binds['public-transportDepTt'].version) {
@@ -59,7 +59,7 @@ vis.binds['public-transportDepTt'] = {
 
         // HTML-Struktur erstellen
         let html = '';
-        html += '<div class="pub-trans-deptt-container ' + data.class + '" style="width: 100%; height: 100%;">';
+        html += '<div class="pub-trans-deptt-container ' + data.class + '">';
 
         // Header
         html += '<div class="pub-trans-deptt-header">';
@@ -71,16 +71,22 @@ vis.binds['public-transportDepTt'] = {
 
         // Spaltenüberschriften
 
-        html += '<div class="pub-trans-deptt-column-header' + (hasRemarks ? ' with-remarks' : ' no-remarks') + '">';
+        if (hasRemarks) {
+            console.log('[DepTt] Mindestens eine Remark aktiviert - zeige Info-Spalte');
+            html += '<div class="pub-trans-deptt-column-header remarks">';
+        } else {
+            console.log('[DepTt] Keine Remark aktiviert - zeige keine Info-Spalte');
+            html += '<div class="pub-trans-deptt-column-header no-remarks">';
+        }
         html += '<div class="col-time">Zeit</div>';
         html += '<div class="col-line">Linie  / Ziel</div>';
         html += '<div class="col-delay">Verspätung</div>';
         html += '<div class="col-platform">Gleis</div>';
         if (hasRemarks) {
-            console.log('[DepTt] Remark aktiviert - zeige Info-Spalte');
+            console.log('[DepTt] Remark aktiviert - zeige Info-Überschrift');
             html += '<div class="col-info">Info</div>';
         } else {
-            console.log('[DepTt] Keine Remark aktiviert - zeige keine Info-Spalte');
+            console.log('[DepTt] Keine Remark aktiviert - zeige keine Info-Überschrift');
         }
         html += '</div>';
 
@@ -201,7 +207,13 @@ vis.binds['public-transportDepTt'] = {
                     }
                 }
 
-                html += '<div class="pub-trans-deptt-row' + (hasRemark ? ' with-remarks' : ' no-remarks') + '">';
+                if (hasRemark) {
+                    console.log('[DepTt - Zeilen] Remark aktiviert - zeige Info-Spalte');
+                    html += '<div class="pub-trans-deptt-row remarks">';
+                } else {
+                    console.log('[DepTt - Zeilen] Keine Remark aktiviert - zeige keine Info-Spalte');
+                    html += '<div class="pub-trans-deptt-row no-remarks">';
+                }
                 html += '<div class="pub-trans-deptt-time">' + displayTime + '</div>';
 
                 html += '<div class="pub-trans-deptt-line">';
@@ -215,7 +227,7 @@ vis.binds['public-transportDepTt'] = {
                     '</div>';
                 html += '<div class="pub-trans-deptt-platform' + (changedPlatform ? ' changed' : '') + '">' + platform + '</div>';
                 if (hasRemark) {
-                    console.log('[DepTt] Remark aktiviert - zeige Info-Spalte');
+                    console.log('[DepTt - Zeilen] Remark aktiviert - zeige Info-Spalte');
                     html += '<div>' + (cancelled ? 'Fällt aus' : remarksText) + '</div>';
                 } else {
                     console.log('[DepTt - Zeilen] Keine Remark aktiviert - zeige keine Info-Spalte');
