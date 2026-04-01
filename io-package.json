@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "public-transport",
-    "version": "0.0.6",
+    "version": "0.1.0",
     "news": {
+      "0.1.0": {
+        "en": "begin beta-test",
+        "de": "Beginn der Beta-Tests",
+        "ru": "начать бета-тестирование",
+        "pt": "iniciar o teste beta",
+        "nl": "begin beta-test",
+        "fr": "commencer l'essai bêta",
+        "it": "iniziare beta-test",
+        "es": "empezar el examen beta-test",
+        "pl": "rozpocząć test beta",
+        "uk": "початок бета-тест",
+        "zh-cn": "开始β测试"
+      },
       "0.0.6": {
         "en": "Widget for Journey\nRefactor admin UI: convert class components to functional components",
         "de": "Widget für die Verbindungen\nRefactor admin UI: Klassenkomponenten in Funktionskomponenten umwandeln",
