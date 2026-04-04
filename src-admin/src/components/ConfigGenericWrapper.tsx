@@ -24,7 +24,7 @@ export interface ConfigComponentProps {
 export function withConfigGeneric(
     Component: React.ComponentType<ConfigComponentProps>,
     options: { useRenderItem?: boolean } = {},
-): React.ComponentClass {
+): React.ComponentClass<ConfigGenericProps> {
     const { useRenderItem = true } = options;
 
     class ConfigWrapper extends ConfigGeneric<ConfigGenericProps, ConfigGenericState> {
@@ -76,5 +76,5 @@ export function withConfigGeneric(
         }
     }
 
-    return ConfigWrapper as any;
+    return ConfigWrapper;
 }

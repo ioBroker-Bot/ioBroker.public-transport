@@ -2,7 +2,7 @@
 import { StyledEngineProvider, ThemeProvider } from '@mui/material/styles';
 import React from 'react';
 
-import { Box } from '@mui/material';
+import { Box, Tab, Tabs } from '@mui/material';
 
 import {
     GenericApp,
@@ -12,6 +12,10 @@ import {
     type GenericAppState,
     type IobTheme,
 } from '@iobroker/adapter-react-v5';
+
+import ClientConfig from './components/ClientConfig';
+import DepartureManager from './components/DepartureManager';
+import JourneyManager from './components/JourneyManager';
 
 import deLocal from './i18n/de.json';
 import enLocal from './i18n/en.json';
@@ -30,16 +34,20 @@ const styles: Record<string, any> = {
         backgroundColor: theme.palette.background.default,
         color: theme.palette.text.primary,
         height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
     }),
-    item: {
-        padding: 50,
-        width: 400,
+    TabContent: {
+        padding: 24,
+        flex: 1,
+        overflow: 'auto',
     },
 };
 
 interface AppState extends GenericAppState {
     data: Record<string, any>;
     originalData: Record<string, any>;
+    activeTab: number;
 }
 
 class App extends GenericApp<GenericAppProps, AppState> {
@@ -49,9 +57,11 @@ class App extends GenericApp<GenericAppProps, AppState> {
 
         this.state = {
             ...this.state,
+            loaded: true,
             data: { myCustomAttribute: 'red' },
             originalData: { myCustomAttribute: 'red' },
             theme: this.createTheme(),
+            activeTab: 0,
         };
         const translations = {
             en: enLocal,
@@ -83,13 +93,104 @@ class App extends GenericApp<GenericAppProps, AppState> {
             );
         }
 
+        const oCtx = {
+            adapterName: 'public-transport',
+            socket: this.socket,
+            instance: 0,
+            themeType: this.state.theme.palette.mode,
+            isFloatComma: true,
+            dateFormat: '',
+            forceUpdate: () => {},
+            systemConfig: {} as ioBroker.SystemConfigCommon,
+            theme: this.state.theme,
+            _themeName: this.state.themeName,
+            onCommandRunning: (_commandRunning: boolean): void => {},
+        };
+
+        const commonProps = {
+            oContext: oCtx,
+            alive: true,
+            changed: JSON.stringify(this.state.originalData) !== JSON.stringify(this.state.data),
+            themeName: this.state.theme.palette.mode,
+            themeType: this.state.theme.palette.mode as any,
+            theme: this.state.theme,
+            common: {} as ioBroker.InstanceCommon,
+            data: this.state.data,
+            originalData: this.state.originalData,
+            onError: (): void => {},
+            onChange: (attrOrData: string | Record<string, any>): void => {
+                if (typeof attrOrData === 'object') {
+                    this.setState({ data: attrOrData });
+                }
+            },
+        };
+
+        const tabs: { label: string; content: React.JSX.Element }[] = [
+            {
+                label: 'client_config',
+                content: (
+                    <ClientConfig
+                        {...commonProps}
+                        attr="myCustomAttribute"
+                        schema={{
+                            url: '',
+                            i18n: true,
+                            name: 'AdminComponentEasyAccessSet/Components/ClientConfig',
+                            type: 'custom',
+                        }}
+                    />
+                ),
+            },
+            {
+                label: 'departure_manager',
+                content: (
+                    <DepartureManager
+                        {...commonProps}
+                        attr="myCustomAttribute"
+                        schema={{
+                            url: '',
+                            i18n: true,
+                            name: 'AdminComponentEasyAccessSet/Components/DepartureManager',
+                            type: 'custom',
+                        }}
+                    />
+                ),
+            },
+            {
+                label: 'journey_manager',
+                content: (
+                    <JourneyManager
+                        {...commonProps}
+                        attr="myCustomAttribute"
+                        schema={{
+                            url: '',
+                            i18n: true,
+                            name: 'AdminComponentEasyAccessSet/Components/JourneyManager',
+                            type: 'custom',
+                        }}
+                    />
+                ),
+            },
+        ];
+
         return (
             <StyledEngineProvider injectFirst>
                 <ThemeProvider theme={this.state.theme}>
                     <Box sx={styles.app}>
-                        <div style={styles.item}>{I18n.t('Welcome to public-transport admin interface')}</div>
-                        <div style={styles.item}>Admin-UI Simulation für public-transport</div>
-                        <div style={styles.item}>{I18n.t('This is where you can configure the adapter settings.')}</div>
+                        <Tabs
+                            value={this.state.activeTab}
+                            onChange={(_e, v: number) => this.setState({ activeTab: v })}
+                            variant="scrollable"
+                            scrollButtons="auto"
+                        >
+                            {tabs.map(t => (
+                                <Tab
+                                    key={t.label}
+                                    label={t.label}
+                                />
+                            ))}
+                        </Tabs>
+                        <Box style={styles.tabContent}>{tabs[this.state.activeTab].content}</Box>
                     </Box>
                 </ThemeProvider>
             </StyledEngineProvider>
