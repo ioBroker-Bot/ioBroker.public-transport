@@ -268,6 +268,9 @@ For Vis1, there is a widget available for displaying departures. The JSON data i
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**  
+* (tt-tom17) fix App.tsx
+
 ### 0.1.0 (2026-04-01)  
 * (tt-tom17) begin beta-test
 
