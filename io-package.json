@@ -113,13 +113,14 @@
     ],
     "globalDependencies": [
       {
-        "admin": ">=7.6.17"
+        "admin": ">=7.6.20"
       }
     ],
     "messagebox": true,
     "tier": 3,
     "restartAdapters": [
-      "vis"
+      "vis",
+      "vis-2"
     ]
   },
   "native": {
