@@ -30,6 +30,36 @@ export class JourneyPolling extends PollingManager<JourneyConfig> {
     }
 
     /**
+     * Setzt die States von deaktivierten Journeys auf Standardwerte zurück.
+     *
+     * @param configs Alle Journey-Konfigurationen
+     */
+    protected async handleDisabledConfigs(configs: JourneyConfig[] | undefined): Promise<void> {
+        if (!configs || configs.length === 0) {
+            return;
+        }
+
+        const disabledConfigs = configs.filter(config => config.enabled === false);
+
+        for (const config of disabledConfigs) {
+            if (!config.id) {
+                continue;
+            }
+
+            this.adapter.log.debug(
+                `Setze States für deaktivierte Journey zurück: ${config.customName || ''} (${config.id})`,
+            );
+
+            // Verwende garbageColleting um States auf Standardwerte zu setzen
+            await this.adapter.library.garbageColleting(
+                `Journeys.${config.id}.`,
+                2000, // offset = 0 bedeutet: alle States sofort zurücksetzen
+                false, // del = false: States zurücksetzen, nicht löschen
+            );
+        }
+    }
+
+    /**
      * Erstellt die Optionen für eine Journey-Anfrage.
      *
      * @param config Die Journey-Konfiguration

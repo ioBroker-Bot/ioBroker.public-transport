@@ -63,6 +63,14 @@ export abstract class PollingManager<T extends PollingConfig> {
     protected abstract queryConfig(config: T, service: ITransportService): Promise<boolean>;
 
     /**
+     * Setzt die States von deaktivierten Konfigurationen auf Standardwerte zurück.
+     * Muss von Subklassen implementiert werden, da der Präfix unterschiedlich ist.
+     *
+     * @param configs Alle Konfigurationen
+     */
+    protected abstract handleDisabledConfigs(configs: T[] | undefined): Promise<void>;
+
+    /**
      * Führt Abfragen für alle Konfigurationen durch.
      *
      * @param configs Die Konfigurationen
@@ -156,6 +164,9 @@ export abstract class PollingManager<T extends PollingConfig> {
 
         const pollInterval = pollIntervalMinutes * 60 * 1000;
 
+        // Behandle deaktivierte Stationen (setze States auf Standardwerte)
+        await this.handleDisabledConfigs(configs);
+
         // Erste Abfrage sofort ausführen
         const { successCount, errorCount } = await this.queryConfigs(
             enabledConfigs,
@@ -169,6 +180,9 @@ export abstract class PollingManager<T extends PollingConfig> {
 
         // Starte Intervall für regelmäßige Abfragen
         this.pollInterval = this.adapter.setInterval(async () => {
+            // Behandle deaktivierte Stationen bei jedem Poll
+            await this.handleDisabledConfigs(configs);
+
             const { successCount, errorCount } = await this.queryConfigs(
                 enabledConfigs,
                 service,
@@ -186,7 +200,7 @@ export abstract class PollingManager<T extends PollingConfig> {
      */
     public stop(): void {
         if (this.pollInterval) {
-            clearInterval(this.pollInterval);
+            this.adapter.clearInterval(this.pollInterval);
             this.pollInterval = undefined;
         }
     }
