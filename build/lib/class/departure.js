@@ -142,7 +142,7 @@ class DepartureRequest extends import_library.BaseClass {
         (station) => station.enabled === true && station.id === stationId
       );
       if (!stationConfig) {
-        this.log.warn(`Station mit ID ${stationId} nicht gefunden oder nicht aktiviert`);
+        this.log.warn(this.library.translate("msg_departureStationNotFoundOrDisabled", stationId));
         return;
       }
       await this.library.writedp(`${this.adapter.namespace}.Stations.${stationConfig.id}`, void 0, {
@@ -207,7 +207,9 @@ class DepartureRequest extends import_library.BaseClass {
     var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
     for (const [index, obj] of response.entries()) {
       try {
-        this.log.info2(`=== Starte Objekt ${index + 1} von ${response.length} ===`);
+        this.log.info2(
+          this.library.translate("msg_departureStartProcessingObject", index + 1, response.length)
+        );
         const departureIndex = `Departures_${`00${index}`.slice(-2)}`;
         const [delayed, onTime] = await this.library.getDelayStatus(obj.delay, this.delayOffset);
         await this.library.writedp(
@@ -552,15 +554,15 @@ class DepartureRequest extends import_library.BaseClass {
           },
           true
         );
-        this.log.info2(`\u2713 Objekt ${index + 1} erfolgreich verarbeitet`);
+        this.log.info2(this.library.translate("msg_departureObjectProcessedSuccessfully", index + 1));
         if (index === countEntries) {
-          this.log.debug(
-            `=== Maximale Anzahl an Eintr\xE4gen erreicht (${countEntries}), weitere Abfahrten werden nicht verarbeitet ===`
-          );
+          this.log.debug(this.library.translate("msg_departureMaxEntriesReached", countEntries));
           break;
         }
       } catch (err) {
-        this.log.error(`\u2717 Fehler bei Objekt ${index + 1}:`, err.message);
+        this.log.error(
+          this.library.translate("msg_departureErrorProcessingObject", index + 1, err.message)
+        );
       }
     }
   }

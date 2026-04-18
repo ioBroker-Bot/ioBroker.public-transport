@@ -159,7 +159,7 @@ export class DepartureRequest extends BaseClass {
             );
 
             if (!stationConfig) {
-                this.log.warn(`Station mit ID ${stationId} nicht gefunden oder nicht aktiviert`);
+                this.log.warn(this.library.translate('msg_departureStationNotFoundOrDisabled', stationId));
                 return;
             }
 
@@ -233,7 +233,9 @@ export class DepartureRequest extends BaseClass {
     async writeBaseStates(response: DepartureState[], stationId: string, countEntries: number): Promise<void> {
         for (const [index, obj] of response.entries()) {
             try {
-                this.log.info2(`=== Starte Objekt ${index + 1} von ${response.length} ===`);
+                this.log.info2(
+                    this.library.translate('msg_departureStartProcessingObject', index + 1, response.length),
+                );
                 const departureIndex = `Departures_${`00${index}`.slice(-2)}`;
                 const [delayed, onTime] = await this.library.getDelayStatus(obj.delay, this.delayOffset);
                 // Erstelle Channel Departures_XX und darunter die States
@@ -599,15 +601,15 @@ export class DepartureRequest extends BaseClass {
                     },
                     true,
                 );
-                this.log.info2(`✓ Objekt ${index + 1} erfolgreich verarbeitet`);
+                this.log.info2(this.library.translate('msg_departureObjectProcessedSuccessfully', index + 1));
                 if (index === countEntries) {
-                    this.log.debug(
-                        `=== Maximale Anzahl an Einträgen erreicht (${countEntries}), weitere Abfahrten werden nicht verarbeitet ===`,
-                    );
+                    this.log.debug(this.library.translate('msg_departureMaxEntriesReached', countEntries));
                     break;
                 }
             } catch (err) {
-                this.log.error(`✗ Fehler bei Objekt ${index + 1}:`, (err as Error).message);
+                this.log.error(
+                    this.library.translate('msg_departureErrorProcessingObject', index + 1, (err as Error).message),
+                );
                 // Ohne throw: weiter zur nächsten Abfahrt ✅ (empfohlen)
                 // Mit throw: alle weiteren Abfahrten werden NICHT verarbeitet ❌
             }
