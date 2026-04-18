@@ -140,6 +140,7 @@
     "msg_journeyLegStationWriteError": "Помилка запису стану станції ноги. Повідомлення про помилку: %s",
     "msg_journeyListEntry": "- %s (від: %s, до: %s)",
     "msg_journeyNoFromTo": "Не вказано початкову або кінцеву станції",
+    "msg_journeyNotFoundOrDisabled": "Подорож з ідентифікатором %s не знайдено або не ввімкнено",
     "msg_journeyQueryCompleted": "Запит на подорож виконано: %s успішно, %s не вдалося",
     "msg_journeyQueryError": "Помилка запиту маршрутів від станції %s до %s: %s",
     "msg_journeyWriteError": "Помилка запису подорожей. Повідомлення про помилку: %s",

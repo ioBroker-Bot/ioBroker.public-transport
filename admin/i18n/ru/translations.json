@@ -140,6 +140,7 @@
     "msg_journeyLegStationWriteError": "Ошибка записи состояний станции ноги. Сообщение об ошибке: %s",
     "msg_journeyListEntry": "- %s (От: %s, Кому: %s)",
     "msg_journeyNoFromTo": "Станция отправления или назначения не указана.",
+    "msg_journeyNotFoundOrDisabled": "Путешествие с идентификатором %s не найдено или не включено.",
     "msg_journeyQueryCompleted": "Запрос путешествия завершен: %s успешно, %s не удалось",
     "msg_journeyQueryError": "Ошибка запроса маршрута от станции %s до %s: %s.",
     "msg_journeyWriteError": "Ошибка при написании поездок. Сообщение об ошибке: %s",

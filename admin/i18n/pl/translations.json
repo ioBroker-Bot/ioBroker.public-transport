@@ -140,6 +140,7 @@
     "msg_journeyLegStationWriteError": "Błąd podczas zapisywania stanów stacji odcinka. Komunikat o błędzie: %s",
     "msg_journeyListEntry": "- %s (Od: %s, Do: %s)",
     "msg_journeyNoFromTo": "Nie podano stacji początkowej ani docelowej",
+    "msg_journeyNotFoundOrDisabled": "Nie znaleziono lub nie włączono podróży o identyfikatorze %s",
     "msg_journeyQueryCompleted": "Zapytanie dotyczące podróży zakończone: %s pomyślne, %s nie powiodło się",
     "msg_journeyQueryError": "Błąd podczas sprawdzania podróży ze stacji %s do %s: %s",
     "msg_journeyWriteError": "Błąd podczas zapisywania podróży. Komunikat o błędzie: %s",

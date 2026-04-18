@@ -140,6 +140,7 @@
     "msg_journeyLegStationWriteError": "Erreur d'écriture des états de station de la jambe. Message d'erreur : %s",
     "msg_journeyListEntry": "- %s (De : %s, À : %s)",
     "msg_journeyNoFromTo": "Aucune station de départ ou de destination fournie",
+    "msg_journeyNotFoundOrDisabled": "Voyage avec l'ID %s introuvable ou non activé",
     "msg_journeyQueryCompleted": "Requête de parcours terminée : %s réussi, %s a échoué",
     "msg_journeyQueryError": "Erreur lors de l'interrogation des trajets de la station %s à %s : %s",
     "msg_journeyWriteError": "Erreur lors de l'écriture des voyages. Message d'erreur : %s",

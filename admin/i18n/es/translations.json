@@ -140,6 +140,7 @@
     "msg_journeyLegStationWriteError": "Error al escribir los estados de la estación del tramo. Mensaje de error: %s",
     "msg_journeyListEntry": "- %s (De: %s, Hasta: %s)",
     "msg_journeyNoFromTo": "No se proporciona ninguna estación de inicio o destino",
+    "msg_journeyNotFoundOrDisabled": "Viaje con ID %s no encontrado o no habilitado",
     "msg_journeyQueryCompleted": "Consulta de viaje completada: %s exitosa, %s fallida",
     "msg_journeyQueryError": "Error al consultar viajes desde la estación %s a %s: %s",
     "msg_journeyWriteError": "Error al escribir viajes. Mensaje de error: %s",

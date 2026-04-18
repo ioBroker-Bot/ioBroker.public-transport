@@ -140,6 +140,7 @@
     "msg_journeyLegStationWriteError": "Erro ao gravar os estados da estação do trecho. Mensagem de erro: %s",
     "msg_journeyListEntry": "- %s (De: %s, Para: %s)",
     "msg_journeyNoFromTo": "Nenhuma estação de partida ou destino fornecida",
+    "msg_journeyNotFoundOrDisabled": "Jornada com ID %s não encontrada ou não ativada",
     "msg_journeyQueryCompleted": "Consulta de jornada concluída: %s bem-sucedida, %s falhada",
     "msg_journeyQueryError": "Erro ao consultar viagens da estação %s para %s: %s",
     "msg_journeyWriteError": "Erro ao escrever jornadas. Mensagem de erro: %s",

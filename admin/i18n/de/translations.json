@@ -140,6 +140,7 @@
     "msg_journeyLegStationWriteError": "Fehler beim Schreiben der Stations States der Teilstrecke. Fehlermeldung: %s",
     "msg_journeyListEntry": "  - %s (Von: %s, Nach: %s)",
     "msg_journeyNoFromTo": "Keine Start- oder Zielstation übergeben",
+    "msg_journeyNotFoundOrDisabled": "Journey mit ID %s nicht gefunden oder nicht aktiviert",
     "msg_journeyQueryCompleted": "Verbindungsabfrage abgeschlossen: %s erfolgreich, %s fehlgeschlagen",
     "msg_journeyQueryError": "Fehler bei der Abfrage der Verbindungen für Station %s nach %s: %s",
     "msg_journeyWriteError": "Fehler beim Schreiben der Verbindungen. Fehlermeldung: %s",

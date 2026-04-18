@@ -140,6 +140,7 @@
     "msg_journeyLegStationWriteError": "写入支路的站状态时出错。错误消息：%s",
     "msg_journeyListEntry": "- %s（发件人：%s，收件人：%s）",
     "msg_journeyNoFromTo": "没有提供出发站或目的地站",
+    "msg_journeyNotFoundOrDisabled": "未找到或未启用 ID 为 %s 的旅程",
     "msg_journeyQueryCompleted": "旅程查询已完成：%s 成功，%s 失败",
     "msg_journeyQueryError": "查询从车站 %s 到 %s 的行程时出错：%s",
     "msg_journeyWriteError": "书写旅程时出错。错误消息：%s",

@@ -140,6 +140,7 @@
     "msg_journeyLegStationWriteError": "Error writing station states of the leg. Error message: %s",
     "msg_journeyListEntry": "  - %s (From: %s, To: %s)",
     "msg_journeyNoFromTo": "No start or destination station provided",
+    "msg_journeyNotFoundOrDisabled": "Journey with ID %s not found or not enabled",
     "msg_journeyQueryCompleted": "Journey query completed: %s successful, %s failed",
     "msg_journeyQueryError": "Error querying journeys from station %s to %s: %s",
     "msg_journeyWriteError": "Error writing journeys. Error message: %s",
