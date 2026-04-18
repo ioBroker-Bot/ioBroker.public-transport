@@ -141,50 +141,52 @@ export class JourneysRequest extends BaseClass {
      */
     async writeJourneysStates(journeyId: string, journeys: Hafas.Journeys, client_profile?: string): Promise<void> {
         try {
-            if (this.adapter.config.journeyConfig) {
-                for (const journey of this.adapter.config.journeyConfig) {
-                    // Erstelle Verbindungs-Ordner, falls nicht vorhanden
-                    await this.library.writedp(`${this.adapter.namespace}.Journeys.${journey.id}`, undefined, {
-                        _id: 'nicht_definieren',
-                        type: 'folder',
-                        common: {
-                            name: journey.customName,
-                            statusStates: { onlineId: `${this.adapter.namespace}.Journeys.${journey.id}.enabled` },
-                        },
-                        native: {},
-                    });
-                    // Schreibe, ob die Verbindung aktiviert ist
-                    await this.library.writedp(
-                        `${this.adapter.namespace}.Journeys.${journey.id}.enabled`,
-                        journey.enabled,
-                        {
-                            _id: 'nicht_definieren',
-                            type: 'state',
-                            common: {
-                                name: this.library.translate('journey_enabled'),
-                                type: 'boolean',
-                                role: 'indicator',
-                                read: true,
-                                write: false,
-                            },
-                            native: {},
-                        },
-                    );
-                    // Vor dem Schreiben alte States löschen
-                    await this.library.garbageColleting(`${this.adapter.namespace}.Routes.${journeyId}.`, 2000);
-                    // JSON in die States schreiben
-                    if (journey.enabled === true && journey.id === journeyId) {
-                        // Filtere nach Produkten, falls angegeben
-                        //const filteredDepartures = products ? this.filterByProducts(departures, products) : departures;
-
-                        await this.writesBaseStates(
-                            `${this.adapter.namespace}.Journeys.${journeyId}`,
-                            journeys,
-                            client_profile,
-                        );
-                    }
-                }
+            if (!this.adapter.config.journeyConfig) {
+                return;
             }
+
+            // Finde die Journey-Konfiguration direkt anhand der journeyId
+            const journeyConfig = this.adapter.config.journeyConfig.find(j => j.enabled === true && j.id === journeyId);
+
+            if (!journeyConfig) {
+                this.log.warn(`Journey mit ID ${journeyId} nicht gefunden oder nicht aktiviert`);
+                return;
+            }
+
+            // Erstelle Verbindungs-Ordner
+            await this.library.writedp(`${this.adapter.namespace}.Journeys.${journeyConfig.id}`, undefined, {
+                _id: 'nicht_definieren',
+                type: 'folder',
+                common: {
+                    name: journeyConfig.customName,
+                    statusStates: { onlineId: `${this.adapter.namespace}.Journeys.${journeyConfig.id}.enabled` },
+                },
+                native: {},
+            });
+
+            // Schreibe enabled-State
+            await this.library.writedp(
+                `${this.adapter.namespace}.Journeys.${journeyConfig.id}.enabled`,
+                journeyConfig.enabled,
+                {
+                    _id: 'nicht_definieren',
+                    type: 'state',
+                    common: {
+                        name: this.library.translate('journey_enabled'),
+                        type: 'boolean',
+                        role: 'indicator',
+                        read: true,
+                        write: false,
+                    },
+                    native: {},
+                },
+            );
+
+            // Garbage Collection (nur einmal!)
+            //await this.library.garbageColleting(`${this.adapter.namespace}.Routes.${journeyId}.`, 2000);
+
+            // Schreibe die Journey-Daten
+            await this.writesBaseStates(`${this.adapter.namespace}.Journeys.${journeyId}`, journeys, client_profile);
         } catch (err) {
             this.log.error(this.library.translate('msg_journeyWriteError', (err as Error).message));
         }
