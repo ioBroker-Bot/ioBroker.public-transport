@@ -77,7 +77,7 @@ export class DepartureRequest extends BaseClass {
             // Antwort vom Tranport-Client als vollständiger Typ
             const response = await service.getDepartures(stationId, mergedOptions);
             // Vollständiges JSON für Debugging
-            //this.adapter.log.debug(JSON.stringify(response.departures, null, 1));
+            this.adapter.log.debug(JSON.stringify(response.departures, null, 1));
             // Schreibe die Abfahrten in die States
             await this.writeDepartureStates(stationId, response.departures, products, countEntries);
             return true;
@@ -149,63 +149,75 @@ export class DepartureRequest extends BaseClass {
         countEntries: number = 10,
     ): Promise<void> {
         try {
-            if (this.adapter.config.stationConfig) {
-                for (const departure of this.adapter.config.stationConfig) {
-                    // Erstelle Station
-                    await this.library.writedp(`${this.adapter.namespace}.Stations.${departure.id}`, undefined, {
-                        _id: 'nicht_definieren',
-                        type: 'folder',
-                        common: {
-                            name: departure.customName || departure.name || 'Station',
-                            statusStates: { onlineId: `${this.adapter.namespace}.Stations.${departure.id}.enabled` },
-                        },
-                        native: {},
-                    });
-                    await this.library.writedp(
-                        `${this.adapter.namespace}.Stations.${departure.id}.json`,
-                        departure.enabled ? JSON.stringify(departures) : '',
-                        {
-                            _id: 'nicht_definieren',
-                            type: 'state',
-                            common: {
-                                name: this.library.translate('raw_departure_data'),
-                                type: 'string',
-                                role: 'json',
-                                read: true,
-                                write: false,
-                            },
-                            native: {},
-                        },
-                    );
-                    await this.library.writedp(
-                        `${this.adapter.namespace}.Stations.${departure.id}.enabled`,
-                        departure.enabled,
-                        {
-                            _id: 'nicht_definieren',
-                            type: 'state',
-                            common: {
-                                name: this.library.translate('station_enabled'),
-                                type: 'boolean',
-                                role: 'indicator',
-                                read: true,
-                                write: false,
-                            },
-                            native: {},
-                        },
-                    );
-
-                    // Vor dem Schreiben alte States löschen
-                    await this.library.garbageColleting(`${this.adapter.namespace}.Stations.${departure.id}.`, 2000);
-                    if (departure.enabled === true && departure.id === stationId) {
-                        // Filtere nach Produkten, falls angegeben
-                        const filteredDepartures = products ? this.filterByProducts(departures, products) : departures;
-                        // Konvertiere zu reduzierten States
-                        const departureStates: DepartureState[] = mapDeparturesToDepartureStates(filteredDepartures);
-                        // JSON in die States schreiben
-                        await this.writeBaseStates(departureStates, stationId, countEntries);
-                    }
-                }
+            if (!this.adapter.config.stationConfig) {
+                return;
             }
+
+            // Finde die Station-Konfiguration direkt (OHNE Schleife!)
+            const stationConfig = this.adapter.config.stationConfig.find(
+                station => station.enabled === true && station.id === stationId,
+            );
+
+            if (!stationConfig) {
+                this.log.warn(this.library.translate('msg_departureStationNotFoundOrDisabled', stationId));
+                return;
+            }
+
+            // Erstelle Station
+            await this.library.writedp(`${this.adapter.namespace}.Stations.${stationConfig.id}`, undefined, {
+                _id: 'nicht_definieren',
+                type: 'folder',
+                common: {
+                    name: stationConfig.customName || stationConfig.name || 'Station',
+                    statusStates: {
+                        onlineId: `${this.adapter.namespace}.Stations.${stationConfig.id}.enabled`,
+                    },
+                },
+                native: {},
+            });
+
+            await this.library.writedp(
+                `${this.adapter.namespace}.Stations.${stationConfig.id}.json`,
+                JSON.stringify(departures),
+                {
+                    _id: 'nicht_definieren',
+                    type: 'state',
+                    common: {
+                        name: this.library.translate('raw_departure_data'),
+                        type: 'string',
+                        role: 'json',
+                        read: true,
+                        write: false,
+                    },
+                    native: {},
+                },
+            );
+
+            await this.library.writedp(
+                `${this.adapter.namespace}.Stations.${stationConfig.id}.enabled`,
+                stationConfig.enabled,
+                {
+                    _id: 'nicht_definieren',
+                    type: 'state',
+                    common: {
+                        name: this.library.translate('station_enabled'),
+                        type: 'boolean',
+                        role: 'indicator',
+                        read: true,
+                        write: false,
+                    },
+                    native: {},
+                },
+            );
+            // Garbage Collection (nur einmal!)
+            await this.library.garbageColleting(`${this.adapter.namespace}.Stations.${stationConfig.id}.`, 2000);
+
+            // Filtere nach Produkten, falls angegeben
+            const filteredDepartures = products ? this.filterByProducts(departures, products) : departures;
+            // Konvertiere zu reduzierten States
+            const departureStates: DepartureState[] = mapDeparturesToDepartureStates(filteredDepartures);
+            // JSON in die States schreiben
+            await this.writeBaseStates(departureStates, stationId, countEntries);
         } catch (err) {
             this.log.error(this.library.translate('msg_departureWriteError', (err as Error).message));
         }
@@ -221,7 +233,9 @@ export class DepartureRequest extends BaseClass {
     async writeBaseStates(response: DepartureState[], stationId: string, countEntries: number): Promise<void> {
         for (const [index, obj] of response.entries()) {
             try {
-                this.log.info2(`=== Starte Objekt ${index + 1} von ${response.length} ===`);
+                this.log.info2(
+                    this.library.translate('msg_departureStartProcessingObject', index + 1, response.length),
+                );
                 const departureIndex = `Departures_${`00${index}`.slice(-2)}`;
                 const [delayed, onTime] = await this.library.getDelayStatus(obj.delay, this.delayOffset);
                 // Erstelle Channel Departures_XX und darunter die States
@@ -587,15 +601,15 @@ export class DepartureRequest extends BaseClass {
                     },
                     true,
                 );
-                this.log.info2(`✓ Objekt ${index + 1} erfolgreich verarbeitet`);
+                this.log.info2(this.library.translate('msg_departureObjectProcessedSuccessfully', index + 1));
                 if (index === countEntries) {
-                    this.log.debug(
-                        `=== Maximale Anzahl an Einträgen erreicht (${countEntries}), weitere Abfahrten werden nicht verarbeitet ===`,
-                    );
+                    this.log.debug(this.library.translate('msg_departureMaxEntriesReached', countEntries));
                     break;
                 }
             } catch (err) {
-                this.log.error(`✗ Fehler bei Objekt ${index + 1}:`, (err as Error).message);
+                this.log.error(
+                    this.library.translate('msg_departureErrorProcessingObject', index + 1, (err as Error).message),
+                );
                 // Ohne throw: weiter zur nächsten Abfahrt ✅ (empfohlen)
                 // Mit throw: alle weiteren Abfahrten werden NICHT verarbeitet ❌
             }

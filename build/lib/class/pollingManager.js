@@ -126,6 +126,7 @@ class PollingManager {
     }
     this.logConfigs(enabledConfigs, messages.count, messages.entry);
     const pollInterval = pollIntervalMinutes * 60 * 1e3;
+    await this.handleDisabledConfigs(configs);
     const { successCount, errorCount } = await this.queryConfigs(
       enabledConfigs,
       service,
@@ -136,6 +137,7 @@ class PollingManager {
     this.adapter.log.info(this.adapter.library.translate(messages.firstCompleted, successCount, errorCount));
     this.adapter.log.info(this.adapter.library.translate(messages.waiting, pollIntervalMinutes));
     this.pollInterval = this.adapter.setInterval(async () => {
+      await this.handleDisabledConfigs(configs);
       const { successCount: successCount2, errorCount: errorCount2 } = await this.queryConfigs(
         enabledConfigs,
         service,
@@ -152,7 +154,7 @@ class PollingManager {
    */
   stop() {
     if (this.pollInterval) {
-      clearInterval(this.pollInterval);
+      this.adapter.clearInterval(this.pollInterval);
       this.pollInterval = void 0;
     }
   }

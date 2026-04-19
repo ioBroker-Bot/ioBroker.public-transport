@@ -136,43 +136,40 @@ class JourneysRequest extends import_library.BaseClass {
    */
   async writeJourneysStates(journeyId, journeys, client_profile) {
     try {
-      if (this.adapter.config.journeyConfig) {
-        for (const journey of this.adapter.config.journeyConfig) {
-          await this.library.writedp(`${this.adapter.namespace}.Journeys.${journey.id}`, void 0, {
-            _id: "nicht_definieren",
-            type: "folder",
-            common: {
-              name: journey.customName,
-              statusStates: { onlineId: `${this.adapter.namespace}.Journeys.${journey.id}.enabled` }
-            },
-            native: {}
-          });
-          await this.library.writedp(
-            `${this.adapter.namespace}.Journeys.${journey.id}.enabled`,
-            journey.enabled,
-            {
-              _id: "nicht_definieren",
-              type: "state",
-              common: {
-                name: this.library.translate("journey_enabled"),
-                type: "boolean",
-                role: "indicator",
-                read: true,
-                write: false
-              },
-              native: {}
-            }
-          );
-          await this.library.garbageColleting(`${this.adapter.namespace}.Routes.${journeyId}.`, 2e3);
-          if (journey.enabled === true && journey.id === journeyId) {
-            await this.writesBaseStates(
-              `${this.adapter.namespace}.Journeys.${journeyId}`,
-              journeys,
-              client_profile
-            );
-          }
-        }
+      if (!this.adapter.config.journeyConfig) {
+        return;
       }
+      const journeyConfig = this.adapter.config.journeyConfig.find((j) => j.enabled === true && j.id === journeyId);
+      if (!journeyConfig) {
+        this.log.warn(this.library.translate("msg_journeyNotFoundOrDisabled", journeyId));
+        return;
+      }
+      await this.library.writedp(`${this.adapter.namespace}.Journeys.${journeyConfig.id}`, void 0, {
+        _id: "nicht_definieren",
+        type: "folder",
+        common: {
+          name: journeyConfig.customName,
+          statusStates: { onlineId: `${this.adapter.namespace}.Journeys.${journeyConfig.id}.enabled` }
+        },
+        native: {}
+      });
+      await this.library.writedp(
+        `${this.adapter.namespace}.Journeys.${journeyConfig.id}.enabled`,
+        journeyConfig.enabled,
+        {
+          _id: "nicht_definieren",
+          type: "state",
+          common: {
+            name: this.library.translate("journey_enabled"),
+            type: "boolean",
+            role: "indicator",
+            read: true,
+            write: false
+          },
+          native: {}
+        }
+      );
+      await this.writesBaseStates(`${this.adapter.namespace}.Journeys.${journeyId}`, journeys, client_profile);
     } catch (err) {
       this.log.error(this.library.translate("msg_journeyWriteError", err.message));
     }

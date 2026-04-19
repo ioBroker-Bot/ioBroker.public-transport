@@ -77,6 +77,7 @@ class DepartureRequest extends import_library.BaseClass {
       this.validateClientProfile(client_profile);
       const mergedOptions = { ...import_types.defaultDepartureOpt, ...options };
       const response = await service.getDepartures(stationId, mergedOptions);
+      this.adapter.log.debug(JSON.stringify(response.departures, null, 1));
       await this.writeDepartureStates(stationId, response.departures, products, countEntries);
       return true;
     } catch (error) {
@@ -134,57 +135,63 @@ class DepartureRequest extends import_library.BaseClass {
    */
   async writeDepartureStates(stationId, departures, products, countEntries = 10) {
     try {
-      if (this.adapter.config.stationConfig) {
-        for (const departure of this.adapter.config.stationConfig) {
-          await this.library.writedp(`${this.adapter.namespace}.Stations.${departure.id}`, void 0, {
-            _id: "nicht_definieren",
-            type: "folder",
-            common: {
-              name: departure.customName || departure.name || "Station",
-              statusStates: { onlineId: `${this.adapter.namespace}.Stations.${departure.id}.enabled` }
-            },
-            native: {}
-          });
-          await this.library.writedp(
-            `${this.adapter.namespace}.Stations.${departure.id}.json`,
-            departure.enabled ? JSON.stringify(departures) : "",
-            {
-              _id: "nicht_definieren",
-              type: "state",
-              common: {
-                name: this.library.translate("raw_departure_data"),
-                type: "string",
-                role: "json",
-                read: true,
-                write: false
-              },
-              native: {}
-            }
-          );
-          await this.library.writedp(
-            `${this.adapter.namespace}.Stations.${departure.id}.enabled`,
-            departure.enabled,
-            {
-              _id: "nicht_definieren",
-              type: "state",
-              common: {
-                name: this.library.translate("station_enabled"),
-                type: "boolean",
-                role: "indicator",
-                read: true,
-                write: false
-              },
-              native: {}
-            }
-          );
-          await this.library.garbageColleting(`${this.adapter.namespace}.Stations.${departure.id}.`, 2e3);
-          if (departure.enabled === true && departure.id === stationId) {
-            const filteredDepartures = products ? this.filterByProducts(departures, products) : departures;
-            const departureStates = (0, import_mapper.mapDeparturesToDepartureStates)(filteredDepartures);
-            await this.writeBaseStates(departureStates, stationId, countEntries);
-          }
-        }
+      if (!this.adapter.config.stationConfig) {
+        return;
       }
+      const stationConfig = this.adapter.config.stationConfig.find(
+        (station) => station.enabled === true && station.id === stationId
+      );
+      if (!stationConfig) {
+        this.log.warn(this.library.translate("msg_departureStationNotFoundOrDisabled", stationId));
+        return;
+      }
+      await this.library.writedp(`${this.adapter.namespace}.Stations.${stationConfig.id}`, void 0, {
+        _id: "nicht_definieren",
+        type: "folder",
+        common: {
+          name: stationConfig.customName || stationConfig.name || "Station",
+          statusStates: {
+            onlineId: `${this.adapter.namespace}.Stations.${stationConfig.id}.enabled`
+          }
+        },
+        native: {}
+      });
+      await this.library.writedp(
+        `${this.adapter.namespace}.Stations.${stationConfig.id}.json`,
+        JSON.stringify(departures),
+        {
+          _id: "nicht_definieren",
+          type: "state",
+          common: {
+            name: this.library.translate("raw_departure_data"),
+            type: "string",
+            role: "json",
+            read: true,
+            write: false
+          },
+          native: {}
+        }
+      );
+      await this.library.writedp(
+        `${this.adapter.namespace}.Stations.${stationConfig.id}.enabled`,
+        stationConfig.enabled,
+        {
+          _id: "nicht_definieren",
+          type: "state",
+          common: {
+            name: this.library.translate("station_enabled"),
+            type: "boolean",
+            role: "indicator",
+            read: true,
+            write: false
+          },
+          native: {}
+        }
+      );
+      await this.library.garbageColleting(`${this.adapter.namespace}.Stations.${stationConfig.id}.`, 2e3);
+      const filteredDepartures = products ? this.filterByProducts(departures, products) : departures;
+      const departureStates = (0, import_mapper.mapDeparturesToDepartureStates)(filteredDepartures);
+      await this.writeBaseStates(departureStates, stationId, countEntries);
     } catch (err) {
       this.log.error(this.library.translate("msg_departureWriteError", err.message));
     }
@@ -200,7 +207,9 @@ class DepartureRequest extends import_library.BaseClass {
     var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
     for (const [index, obj] of response.entries()) {
       try {
-        this.log.info2(`=== Starte Objekt ${index + 1} von ${response.length} ===`);
+        this.log.info2(
+          this.library.translate("msg_departureStartProcessingObject", index + 1, response.length)
+        );
         const departureIndex = `Departures_${`00${index}`.slice(-2)}`;
         const [delayed, onTime] = await this.library.getDelayStatus(obj.delay, this.delayOffset);
         await this.library.writedp(
@@ -545,15 +554,15 @@ class DepartureRequest extends import_library.BaseClass {
           },
           true
         );
-        this.log.info2(`\u2713 Objekt ${index + 1} erfolgreich verarbeitet`);
+        this.log.info2(this.library.translate("msg_departureObjectProcessedSuccessfully", index + 1));
         if (index === countEntries) {
-          this.log.debug(
-            `=== Maximale Anzahl an Eintr\xE4gen erreicht (${countEntries}), weitere Abfahrten werden nicht verarbeitet ===`
-          );
+          this.log.debug(this.library.translate("msg_departureMaxEntriesReached", countEntries));
           break;
         }
       } catch (err) {
-        this.log.error(`\u2717 Fehler bei Objekt ${index + 1}:`, err.message);
+        this.log.error(
+          this.library.translate("msg_departureErrorProcessingObject", index + 1, err.message)
+        );
       }
     }
   }
