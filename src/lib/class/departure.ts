@@ -78,6 +78,15 @@ export class DepartureRequest extends BaseClass {
             const response = await service.getDepartures(stationId, mergedOptions);
             // Vollständiges JSON für Debugging
             this.adapter.log.debug(JSON.stringify(response.departures, null, 1));
+            if (!response.departures || response.departures.length === 0) {
+                this.log.info(
+                    this.library.translate(
+                        'msg_departureNoDepartures',
+                        stationId,
+                        client_profile || 'kein Profil angegeben',
+                    ),
+                );
+            }
             // Schreibe die Abfahrten in die States
             await this.writeDepartureStates(stationId, response.departures, products, countEntries);
             return true;
@@ -175,7 +184,7 @@ export class DepartureRequest extends BaseClass {
                 },
                 native: {},
             });
-
+            // JSON
             await this.library.writedp(
                 `${this.adapter.namespace}.Stations.${stationConfig.id}.json`,
                 JSON.stringify(departures),
@@ -192,7 +201,7 @@ export class DepartureRequest extends BaseClass {
                     native: {},
                 },
             );
-
+            // Enabled State
             await this.library.writedp(
                 `${this.adapter.namespace}.Stations.${stationConfig.id}.enabled`,
                 stationConfig.enabled,
@@ -209,8 +218,26 @@ export class DepartureRequest extends BaseClass {
                     native: {},
                 },
             );
+            // count Departures State
+            await this.library.writedp(
+                `${this.adapter.namespace}.Stations.${stationConfig.id}.countDepartures`,
+                departures.length,
+                {
+                    _id: 'nicht_definieren',
+                    type: 'state',
+                    common: {
+                        name: this.library.translate('departure_count'),
+                        type: 'number',
+                        role: 'value',
+                        read: true,
+                        write: false,
+                    },
+                    native: {},
+                },
+            );
+
             // Garbage Collection (nur einmal!)
-            await this.library.garbageColleting(`${this.adapter.namespace}.Stations.${stationConfig.id}.`, 2000);
+            //await this.library.garbageColleting(`Stations.${stationConfig.id}.`);
 
             // Filtere nach Produkten, falls angegeben
             const filteredDepartures = products ? this.filterByProducts(departures, products) : departures;

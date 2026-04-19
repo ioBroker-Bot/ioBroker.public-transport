@@ -78,6 +78,15 @@ class DepartureRequest extends import_library.BaseClass {
       const mergedOptions = { ...import_types.defaultDepartureOpt, ...options };
       const response = await service.getDepartures(stationId, mergedOptions);
       this.adapter.log.debug(JSON.stringify(response.departures, null, 1));
+      if (!response.departures || response.departures.length === 0) {
+        this.log.info(
+          this.library.translate(
+            "msg_departureNoDepartures",
+            stationId,
+            client_profile || "kein Profil angegeben"
+          )
+        );
+      }
       await this.writeDepartureStates(stationId, response.departures, products, countEntries);
       return true;
     } catch (error) {
@@ -188,7 +197,22 @@ class DepartureRequest extends import_library.BaseClass {
           native: {}
         }
       );
-      await this.library.garbageColleting(`${this.adapter.namespace}.Stations.${stationConfig.id}.`, 2e3);
+      await this.library.writedp(
+        `${this.adapter.namespace}.Stations.${stationConfig.id}.countDepartures`,
+        departures.length,
+        {
+          _id: "nicht_definieren",
+          type: "state",
+          common: {
+            name: this.library.translate("departure_count"),
+            type: "number",
+            role: "value",
+            read: true,
+            write: false
+          },
+          native: {}
+        }
+      );
       const filteredDepartures = products ? this.filterByProducts(departures, products) : departures;
       const departureStates = (0, import_mapper.mapDeparturesToDepartureStates)(filteredDepartures);
       await this.writeBaseStates(departureStates, stationId, countEntries);

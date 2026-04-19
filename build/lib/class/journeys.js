@@ -83,6 +83,16 @@ class JourneysRequest extends import_library.BaseClass {
       const mergedOptions = { ...import_types.defaultJourneyOpt, ...options };
       const response = await this.service.getJourneys(from, to, mergedOptions);
       this.adapter.log.debug(JSON.stringify(response, null, 1));
+      if (!response.journeys || response.journeys.length === 0) {
+        this.log.info(
+          this.library.translate(
+            "msg_journeyNoJourneys",
+            from,
+            to,
+            client_profile || "kein Profil angegeben"
+          )
+        );
+      }
       await this.writeJourneysStates(journeyId, response, client_profile);
       return true;
     } catch (error) {

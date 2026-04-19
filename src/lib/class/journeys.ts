@@ -85,6 +85,16 @@ export class JourneysRequest extends BaseClass {
             const response: Hafas.Journeys = await this.service.getJourneys(from, to, mergedOptions);
             // Vollständiges JSON für Debugging
             this.adapter.log.debug(JSON.stringify(response, null, 1));
+            if (!response.journeys || response.journeys.length === 0) {
+                this.log.info(
+                    this.library.translate(
+                        'msg_journeyNoJourneys',
+                        from,
+                        to,
+                        client_profile || 'kein Profil angegeben',
+                    ),
+                );
+            }
             // Schreibe die Verbindungen in die States
             await this.writeJourneysStates(journeyId, response, client_profile);
             return true;
@@ -183,7 +193,7 @@ export class JourneysRequest extends BaseClass {
             );
 
             // Garbage Collection (nur einmal!)
-            //await this.library.garbageColleting(`${this.adapter.namespace}.Routes.${journeyId}.`, 2000);
+            //await this.library.garbageColleting(`${this.adapter.namespace}.Routes.${journeyId}.`);
 
             // Schreibe die Journey-Daten
             await this.writesBaseStates(`${this.adapter.namespace}.Journeys.${journeyId}`, journeys, client_profile);
