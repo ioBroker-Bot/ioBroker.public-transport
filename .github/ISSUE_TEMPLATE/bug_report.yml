@@ -38,6 +38,31 @@ body:
     validations:
       required: true
 
+  - type: input
+    id: client
+    attributes:
+      label: Client (API provider)
+      description: Which client/API provider are you using?
+      placeholder: e.g., Hafas:vbb
+    validations:
+      required: true
+
+  - type: input
+    id: query-type
+    attributes:
+      label: Query type
+      description: Are you querying a connection or a departure board?
+      placeholder: e.g., Departure (Abfahrt) or Connection (Verbindung)
+    validations:
+      required: true
+
+  - type: input
+    id: station-id
+    attributes:
+      label: Station ID (if applicable)
+      description: The station ID used in your configuration, if relevant to the bug.
+      placeholder: e.g., 900000100003
+
   - type: textarea
     id: reproduce
     attributes:
