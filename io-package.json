@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "public-transport",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "news": {
+      "0.1.1": {
+        "en": "fix App.tsx\nFix [Bug]: Departure JSON remains empty or all entries are identical [#28](https://github.com/tt-tom17/ioBroker.public-transport/issues/28)",
+        "de": "fix App.tsx\nFix [Fehler]: Abfahrten-JSON bleibt leer oder alle gleich [#28](https://github.com/tt-tom17/ioBroker.public-transport/issues/28)",
+        "ru": "исправить App.tsx\nИсправление [Буг]: Departure JSON remains empty or all entries are identical [#28] (https://github.com/tt-tom17/ioBroker.public-transport/issues/28)",
+        "pt": "corrigir App.tsx\nCorrigir [Bug]: Departure JSON remains empty or all entries are identical [#28](https://github.com/tt-tom17/ioBroker.public-transport/issues/28)",
+        "nl": "app.tsx herstellen\nFix [Bug]: Departure JSON remains empty or all entries are identical [#28](https://github.com/tt-tom17/ioBroker.public-transport/issues/28)",
+        "fr": "correction App.tsx\nFix [Bug]: Departure JSON remains empty or all entries are identical [#28](https://github.com/tt-tom17/ioBroker.public-transport/issues/28)",
+        "it": "correzione App.tsx\n[Bug]: Departure JSON remains empty or all entries are identical [#28](https://github.com/tt-tom17/ioBroker.public-transport/issues/28)",
+        "es": "fijar App.tsx\nFix [Bug]: Departure JSON remains empty or all entries are identical [#28](https://github.com/ttt-tom17/ioBroker.public-transport/issues/28)",
+        "pl": "fix App.tsx\nFix [Bug]: Departure JSON remains empty or all entries are identical [#28] (https://github.com/tt-tom17/ioBroker.public-transport/issues/28)",
+        "uk": "завантажити App.tsx\n[Bug]: Departure JSON remains empty or all entries are identical [#28] (https://github.com/tt-tom17/ioBroker.public-transport/issues/28)",
+        "zh-cn": "修复 App.tsx\nFix [Bug]: Departure JSON remains empty or all entries are identical [#28] (https://github.com/tt-tom17/ioBroker.public-transport/issues/28) (中文(简体) )"
+      },
       "0.1.0": {
         "en": "begin beta-test",
         "de": "Beginn der Beta-Tests",
