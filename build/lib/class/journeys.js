@@ -145,6 +145,7 @@ class JourneysRequest extends import_library.BaseClass {
    * @param client_profile Das Client-Profil für die Abfrage (z.B. "hafas:vbb", "vendo:db")
    */
   async writeJourneysStates(journeyId, journeys, client_profile) {
+    var _a;
     try {
       if (!this.adapter.config.journeyConfig) {
         return;
@@ -173,6 +174,22 @@ class JourneysRequest extends import_library.BaseClass {
             name: this.library.translate("journey_enabled"),
             type: "boolean",
             role: "indicator",
+            read: true,
+            write: false
+          },
+          native: {}
+        }
+      );
+      await this.library.writedp(
+        `${this.adapter.namespace}.Journeys.${journeyConfig.id}.countJourneys`,
+        (_a = journeys.journeys) == null ? void 0 : _a.length,
+        {
+          _id: "nicht_definieren",
+          type: "state",
+          common: {
+            name: this.library.translate("journey_count"),
+            type: "number",
+            role: "value",
             read: true,
             write: false
           },

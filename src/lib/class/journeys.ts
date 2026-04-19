@@ -192,6 +192,24 @@ export class JourneysRequest extends BaseClass {
                 },
             );
 
+            // Count Journey State
+            await this.library.writedp(
+                `${this.adapter.namespace}.Journeys.${journeyConfig.id}.countJourneys`,
+                journeys.journeys?.length,
+                {
+                    _id: 'nicht_definieren',
+                    type: 'state',
+                    common: {
+                        name: this.library.translate('journey_count'),
+                        type: 'number',
+                        role: 'value',
+                        read: true,
+                        write: false,
+                    },
+                    native: {},
+                },
+            );
+
             // Garbage Collection (nur einmal!)
             //await this.library.garbageColleting(`${this.adapter.namespace}.Routes.${journeyId}.`);
 
