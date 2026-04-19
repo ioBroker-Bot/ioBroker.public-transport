@@ -141,7 +141,7 @@ class JourneysRequest extends import_library.BaseClass {
       }
       const journeyConfig = this.adapter.config.journeyConfig.find((j) => j.enabled === true && j.id === journeyId);
       if (!journeyConfig) {
-        this.log.warn(`Journey mit ID ${journeyId} nicht gefunden oder nicht aktiviert`);
+        this.log.warn(this.library.translate("msg_journeyNotFoundOrDisabled", journeyId));
         return;
       }
       await this.library.writedp(`${this.adapter.namespace}.Journeys.${journeyConfig.id}`, void 0, {
