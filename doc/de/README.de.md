@@ -60,7 +60,6 @@ Der Adapter nutzt die HAFAS (HaCon Fahrplan-Auskunfts-System) API und unterstüt
 #### Deutschland
 - **VBB** - Verkehrsverbund Berlin-Brandenburg
 
-
 #### Österreich
 - **ÖBB** - Österreichische Bundesbahnen (bundesweit)
 
