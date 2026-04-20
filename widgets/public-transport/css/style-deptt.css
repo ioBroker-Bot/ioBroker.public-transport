@@ -71,12 +71,12 @@
     background-color: #000000;
     overflow-y: auto;
     overflow-x: auto; /* Ermöglicht horizontales Scrollen bei Bedarf */
-    max-height: calc(100% - 100px);
+    max-height: 500px;
     height: auto;
 }
 
 /* Einzelne Abfahrtszeile */
-.pub-trans-deptt-row.no-remarks{
+.pub-trans-deptt-row.no-remarks {
     display: grid;
     grid-template-columns: 80px minmax(150px, 300px) 100px 80px;
     gap: 10px;
