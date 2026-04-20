@@ -62,7 +62,6 @@ The adapter uses the HAFAS (HaCon Timetable Information System) API and supports
 #### Germany
 - **VBB** - Verkehrsverbund Berlin-Brandenburg
 
-
 #### Austria
 - **ÖBB** - Österreichische Bundesbahnen (nationwide)
 
@@ -268,6 +267,9 @@ For Vis1, there is a widget available for displaying departures. The JSON data i
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**  
+* (tt-tom17) Widget departure added popup for remarks
+
 ### 0.1.1 (2026-04-19)   
 * (tt-tom17) fix App.tsx
 * (tt-tom17) Fix [Bug]: Abfahrten-JSON bleibt leer oder alle gleich [#28](https://github.com/tt-tom17/ioBroker.public-transport/issues/28)
