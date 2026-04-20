@@ -70,6 +70,7 @@
 .pub-trans-deptt-content {
     background-color: #000000;
     overflow-y: auto;
+    overflow-x: auto; /* Ermöglicht horizontales Scrollen bei Bedarf */
     max-height: calc(100% - 100px);
     height: auto;
 }
@@ -398,4 +399,19 @@
 
 .pub-trans-deptt-row a:visited {
     color: #0099cc; /* Dunkleres Blau für besuchte Links */
+}
+
+/* Link-Styling im Modal */
+.pub-trans-deptt-modal-text a {
+    color: #00ccff;
+    text-decoration: underline;
+}
+
+.pub-trans-deptt-modal-text a:hover {
+    color: #ffcc00;
+    text-decoration: none;
+}
+
+.pub-trans-deptt-modal-text a:visited {
+    color: #0099cc;
 }

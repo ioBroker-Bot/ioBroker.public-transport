@@ -61,6 +61,7 @@ The adapter uses the HAFAS (HaCon Timetable Information System) API and supports
 
 #### Germany
 - **VBB** - Verkehrsverbund Berlin-Brandenburg
+- **VBN** - Verkehrsverbund Bremen / Niedersachsen
 
 
 #### Austria
@@ -270,6 +271,7 @@ For Vis1, there is a widget available for displaying departures. The JSON data i
 -->
 ### **WORK IN PROGRESS**  
 * (tt-tom17) Widget departure added popup for remarks
+* (tt-tom17) Add HAFAS Profil VBN Bremen/Niedersachsen
 
 ### 0.1.1 (2026-04-19)   
 * (tt-tom17) fix App.tsx
