@@ -19,7 +19,7 @@ $.extend(true, systemDictionary, {
 
 // Widget Binding
 vis.binds['public-transportDepTt'] = {
-    version: '0.0.2',
+    version: '0.0.5',
 
     showVersion: function () {
         if (vis.binds['public-transportDepTt'].version) {
@@ -56,6 +56,11 @@ vis.binds['public-transportDepTt'] = {
         const useFilter = data.useFilter === true;
 
         const hasRemarks = showRemarkHint || showRemarkWarning || showRemarkStatus;
+
+        // SVG-Icons für Remark-Typen
+        const SVG_WARNING = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" class="pub-trans-deptt-remark-icon"><circle cx="12" cy="12" r="11" fill="#cc0000"/><text x="12" y="17" text-anchor="middle" fill="white" font-size="16" font-weight="bold" font-family="Arial,sans-serif">!</text></svg>';
+        const SVG_HINT    = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 26" width="22" height="20" class="pub-trans-deptt-remark-icon"><polygon points="14,1 27,25 1,25" fill="#ffcc00"/><text x="14" y="22" text-anchor="middle" fill="#000000" font-size="13" font-weight="bold" font-family="Arial,sans-serif">!</text></svg>';
+        const SVG_STATUS  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" class="pub-trans-deptt-remark-icon"><circle cx="12" cy="12" r="11" fill="#0066b3"/><text x="12" y="17" text-anchor="middle" fill="white" font-size="14" font-style="italic" font-weight="bold" font-family="Arial,sans-serif">i</text></svg>';
 
         // HTML-Struktur erstellen
         let html = '';
@@ -95,9 +100,30 @@ vis.binds['public-transportDepTt'] = {
         html += '<div class="pub-trans-deptt-loading">Lade Daten</div>';
         html += '</div>';
 
+        // Modal für Remark-Details (Pattern wie connections.js)
+        html += '<div class="pub-trans-deptt-modal" id="modal-deptt-' + widgetID + '">';
+        html += '<div class="pub-trans-deptt-modal-content">';
+        html += '<div class="pub-trans-deptt-modal-header">';
+        html += '<span class="pub-trans-deptt-modal-close" id="close-modal-deptt-' + widgetID + '">&times;</span>';
+        html += 'Hinweise';
+        html += '</div>';
+        html += '<div id="modal-body-deptt-' + widgetID + '"></div>';
+        html += '</div>';
+        html += '</div>';
+
         html += '</div>';
 
         $div.html(html);
+
+        // Modal-Close Handler (wie connections.js)
+        $('#close-modal-deptt-' + widgetID).on('click', function() {
+            $('#modal-deptt-' + widgetID).removeClass('active');
+        });
+        $('#modal-deptt-' + widgetID).on('click', function(e) {
+            if (e.target.id === 'modal-deptt-' + widgetID) {
+                $('#modal-deptt-' + widgetID).removeClass('active');
+            }
+        });
 
         // Funktionen zum Aktualisieren der Anzeige
         function updateClock() {
@@ -156,6 +182,31 @@ vis.binds['public-transportDepTt'] = {
             }
         }
 
+        function showPopup(remarkData) {
+            let modalHtml = '';
+            if (remarkData.warning) {
+                modalHtml += '<div class="pub-trans-deptt-modal-section warning">';
+                modalHtml += SVG_WARNING;
+                modalHtml += '<span class="pub-trans-deptt-modal-text">' + remarkData.warning + '</span>';
+                modalHtml += '</div>';
+            }
+            if (remarkData.hint) {
+                modalHtml += '<div class="pub-trans-deptt-modal-section hint">';
+                modalHtml += SVG_HINT;
+                modalHtml += '<span class="pub-trans-deptt-modal-text">' + remarkData.hint + '</span>';
+                modalHtml += '</div>';
+            }
+            if (remarkData.status) {
+                modalHtml += '<div class="pub-trans-deptt-modal-section status">';
+                modalHtml += SVG_STATUS;
+                modalHtml += '<span class="pub-trans-deptt-modal-text">' + remarkData.status + '</span>';
+                modalHtml += '</div>';
+            }
+            if (!modalHtml) return;
+            $('#modal-body-deptt-' + widgetID).html(modalHtml);
+            $('#modal-deptt-' + widgetID).addClass('active');
+        }
+
         function renderDepartures(departuresToRender) {
             const $content = $('#content-' + widgetID);
 
@@ -167,8 +218,9 @@ vis.binds['public-transportDepTt'] = {
 
             console.log('[DepTt Render] Anzahl Abfahrten zu rendern:', displayDepartures.length);
 
+            const remarkDataList = [];
             let html = '';
-            displayDepartures.forEach(function (dep) {
+            displayDepartures.forEach(function (dep, depIdx) {
 
                 const time = dep.when || dep.time || dep.scheduledWhen || '--:--';
                 const line = dep.line.name || dep.lineName || dep.number || '?';
@@ -183,17 +235,22 @@ vis.binds['public-transportDepTt'] = {
 
                 const hasRemark = showRemarkHint || showRemarkWarning || showRemarkStatus;
 
-                // remarks formatieren
-                let remarksText = '';
+                // Icons für die Info-Spalte
+                let iconsHtml = '';
                 if (showRemarkWarning && remarks.warning) {
-                    remarksText += '<span class="pub-trans-deptt-remark-warning">' + remarks.warning + '</span><br>';
-                }
-                if (showRemarkStatus && remarks.status) {
-                    remarksText += '<span class="pub-trans-deptt-remark-status">' + remarks.status + '</span><br>';
+                    iconsHtml += SVG_WARNING;
                 }
                 if (showRemarkHint && remarks.hint) {
-                    remarksText += '<span class="pub-trans-deptt-remark-hint">' + remarks.hint + '</span>';
+                    iconsHtml += SVG_HINT;
                 }
+                if (showRemarkStatus && remarks.status) {
+                    iconsHtml += SVG_STATUS;
+                }
+                remarkDataList.push({
+                    warning: showRemarkWarning ? remarks.warning : undefined,
+                    hint: showRemarkHint ? remarks.hint : undefined,
+                    status: showRemarkStatus ? remarks.status : undefined,
+                });
 
                 // Zeit formatieren
                 let displayTime = time;
@@ -228,7 +285,7 @@ vis.binds['public-transportDepTt'] = {
                 html += '<div class="pub-trans-deptt-platform' + (changedPlatform ? ' changed' : '') + '">' + platform + '</div>';
                 if (hasRemark) {
                     console.log('[DepTt - Zeilen] Remark aktiviert - zeige Info-Spalte');
-                    html += '<div>' + (cancelled ? 'Fällt aus' : remarksText) + '</div>';
+                    html += '<div class="pub-trans-deptt-info-cell" data-remark-idx="' + depIdx + '">' + (cancelled ? '<span class="pub-trans-deptt-delay cancelled">Fällt aus</span>' : iconsHtml) + '</div>';
                 } else {
                     console.log('[DepTt - Zeilen] Keine Remark aktiviert - zeige keine Info-Spalte');
                 }
@@ -236,6 +293,14 @@ vis.binds['public-transportDepTt'] = {
             });
 
             $content.html(html);
+
+            // Click-Handler direkt auf Info-Zellen binden (wie connections.js)
+            $content.find('.pub-trans-deptt-info-cell').on('click', function() {
+                const idx = parseInt($(this).attr('data-remark-idx'), 10);
+                if (!isNaN(idx) && remarkDataList[idx]) {
+                    showPopup(remarkDataList[idx]);
+                }
+            });
         }
 
         function updateDepartures(e, newVal, oldVal) {

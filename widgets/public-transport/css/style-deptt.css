@@ -43,7 +43,7 @@
     color: #ffcc00;
     padding: 8px 10px;
     display: grid;
-    grid-template-columns: 80px minmax(150px, 300px) 100px 80px minmax(150px, 1fr);
+    grid-template-columns: 80px minmax(150px, 300px) 100px 80px 150px;
     gap: 10px;
     font-size: 13px;
     font-weight: bold;
@@ -88,7 +88,7 @@
 
 .pub-trans-deptt-row.remarks {
     display: grid;
-    grid-template-columns: 80px minmax(150px, 300px) 100px 80px minmax(150px, 1fr);
+    grid-template-columns: 80px minmax(150px, 300px) 100px 80px 150px;
     gap: 10px;
     padding: 10px;
     border-bottom: 1px solid #333;
@@ -98,6 +98,7 @@
 }
 
 
+/* Hover-Effekt für Abfahrtszeilen */
 .pub-trans-deptt-row:hover {
     background-color: #1a1a1a;
 }
@@ -115,12 +116,14 @@
     color: #00ff00;
 }
 
+/* Linien-Container (Icon + Richtung) */
 .pub-trans-deptt-line {
     display: flex;
     align-items: flex-start;
     gap: 8px;
 }
 
+/* Linien-Icon (Standard) */
 .pub-trans-deptt-line-icon {
     display: inline-block;
     padding: 4px 8px;
@@ -160,11 +163,13 @@
     color: #ffffff;
 }
 
+/* Richtungstext */
 .pub-trans-deptt-direction {
     color: #ffffff;
     font-size: 14px;
 }
 
+/* Verspätungsanzeige */
 .pub-trans-deptt-delay {
     text-align: left;
     font-weight: bold;
@@ -183,6 +188,7 @@
     text-decoration: line-through;
 }
 
+/* Gleis-Anzeige */
 .pub-trans-deptt-platform {
     text-align: left;
     font-size: 14px;
@@ -205,20 +211,116 @@
     }
 }
 
-/* Hinweise und Statusmeldungen */
-.pub-trans-deptt-remark-warning {
-    color: #ff4d00;
-    font-size: 14px;
+/* SVG-Icons in der Info-Spalte */
+.pub-trans-deptt-remark-icon {
+    cursor: pointer;
+    vertical-align: middle;
+    margin-right: 3px;
+    flex-shrink: 0;
 }
 
-.pub-trans-deptt-remark-status {
-    color: #ffee00;
-    font-size: 14px;
+/* Info-Zelle - klickbarer Bereich */
+.pub-trans-deptt-info-cell {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
-.pub-trans-deptt-remark-hint {
+/* Modal f\u00fcr Remark-Details (Pattern wie connections.css) */
+.pub-trans-deptt-modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Modal aktiv (sichtbar) */
+.pub-trans-deptt-modal.active {
+    display: block;
+}
+
+/* Modal-Inhalt */
+.pub-trans-deptt-modal-content {
+    background-color: #1a1a1a;
+    border: 2px solid #333;
+    border-radius: 4px;
+    margin: 5% auto;
+    padding: 20px;
+    width: 80%;
+    max-width: 400px;
+    max-height: 80%;
+    overflow-y: auto;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
+}
+
+/* Modal-Kopfzeile */
+.pub-trans-deptt-modal-header {
+    background: linear-gradient(180deg, #2c5aa0 0%, #1e3a6e 100%);
     color: #ffffff;
-    font-size: 14px;
+    padding: 15px;
+    margin: -20px -20px 20px -20px;
+    border-radius: 4px 4px 0 0;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 3px solid #ffcc00;
+}
+
+/* Schließen-Button */
+.pub-trans-deptt-modal-close {
+    color: #ffffff;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 20px;
+}
+
+.pub-trans-deptt-modal-close:hover,
+.pub-trans-deptt-modal-close:focus {
+    color: #ffcc00;
+}
+
+/* Abschnitte im Modal (je Remark-Typ) */
+.pub-trans-deptt-modal-section {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.pub-trans-deptt-modal-section:last-child {
+    margin-bottom: 0;
+}
+
+.pub-trans-deptt-modal-section.warning {
+    background-color: rgba(204, 0, 0, 0.2);
+    border-left: 3px solid #cc0000;
+}
+
+.pub-trans-deptt-modal-section.hint {
+    background-color: rgba(255, 204, 0, 0.1);
+    border-left: 3px solid #ffcc00;
+}
+
+.pub-trans-deptt-modal-section.status {
+    background-color: rgba(0, 102, 179, 0.15);
+    border-left: 3px solid #0066b3;
+}
+
+/* Remark-Text im Modal */
+.pub-trans-deptt-modal-text {
+    font-size: 13px;
+    line-height: 1.5;
+    color: #dddddd;
+    flex: 1;
 }
 
 /* Keine Daten Nachricht */
@@ -252,6 +354,7 @@
     animation: loading 1.5s infinite;
 }
 
+/* Ladeanimation (Punkte) */
 @keyframes loading {
     0% {
         content: '.';
