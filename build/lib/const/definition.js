@@ -739,19 +739,6 @@ const Products = {
       desc: "Is National Express transport included"
     },
     native: {}
-  },
-  nationalexpress: {
-    _id: "",
-    type: "state",
-    common: {
-      name: "Nationalexpress",
-      type: "boolean",
-      role: "indicator",
-      read: true,
-      write: false,
-      desc: "Is Nationalexpress transport included"
-    },
-    native: {}
   }
 };
 const genericStateObjects = {

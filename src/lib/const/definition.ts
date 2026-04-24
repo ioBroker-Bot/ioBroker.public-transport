@@ -742,19 +742,6 @@ const Products: ChangeTypeOfKeysForState<Products, ioBroker.StateObject> = {
         },
         native: {},
     },
-    nationalexpress: {
-        _id: '',
-        type: 'state',
-        common: {
-            name: 'Nationalexpress',
-            type: 'boolean',
-            role: 'indicator',
-            read: true,
-            write: false,
-            desc: 'Is Nationalexpress transport included',
-        },
-        native: {},
-    },
 };
 
 export const genericStateObjects: {
@@ -1173,5 +1160,4 @@ type Products = {
     regionalExpress?: boolean | undefined;
     national?: boolean | undefined;
     nationalExpress?: boolean | undefined;
-    nationalexpress?: boolean | undefined;
 };

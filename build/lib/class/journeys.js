@@ -731,7 +731,7 @@ class JourneysRequest extends import_library.BaseClass {
         common: {
           name: this.library.translate("station_name"),
           type: "string",
-          role: "info.name",
+          role: "text",
           read: true,
           write: false
         },
@@ -743,7 +743,7 @@ class JourneysRequest extends import_library.BaseClass {
         common: {
           name: this.library.translate("station_type"),
           type: "string",
-          role: "info.type",
+          role: "text",
           read: true,
           write: false
         },
@@ -755,7 +755,7 @@ class JourneysRequest extends import_library.BaseClass {
         common: {
           name: this.library.translate("station_id"),
           type: "string",
-          role: "info.id",
+          role: "value",
           read: true,
           write: false
         },
