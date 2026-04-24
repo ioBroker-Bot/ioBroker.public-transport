@@ -104,7 +104,7 @@ export class PublicTransport extends utils.Adapter {
 
         // Service basierend auf Konfiguration auswählen
         const serviceType = this.config.serviceType || 'hafas'; // 'hafas' oder 'vendo'
-        const clientName = this.config.clientName || 'iobroker-public-transport';
+        const clientName = `${this.config.clientName || 'iobroker-public-transport'}-${Math.floor(Math.random() * 1001)}`;
 
         try {
             if (serviceType === 'vendo') {
