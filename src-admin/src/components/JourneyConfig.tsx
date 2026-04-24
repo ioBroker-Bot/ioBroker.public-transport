@@ -2,7 +2,8 @@ import { I18n } from '@iobroker/adapter-react-v5';
 import type { ConfigGenericProps } from '@iobroker/json-config';
 import { Box, Button, Dialog, Divider, FormControlLabel, Paper, Switch, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
-import ProductSelector, { defaultProducts, filterAvailableProducts, type Products } from './ProductSelector';
+import { defaultProducts, type Products } from './Products';
+import ProductSelector, { filterAvailableProducts } from './ProductSelector';
 import StationSearch from './StationSearch';
 
 interface Journey {

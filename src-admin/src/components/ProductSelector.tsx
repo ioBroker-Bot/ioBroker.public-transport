@@ -1,38 +1,7 @@
 import { I18n } from '@iobroker/adapter-react-v5';
-import DirectionsBoatIcon from '@mui/icons-material/DirectionsBoat';
-import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
-import DirectionsRailwayIcon from '@mui/icons-material/DirectionsRailway';
-import SubwayIcon from '@mui/icons-material/Subway';
-import TrainIcon from '@mui/icons-material/Train';
-import TramIcon from '@mui/icons-material/Tram';
 import { Box, Checkbox, FormControlLabel, Paper, Typography } from '@mui/material';
 import React from 'react';
-
-export interface Products {
-    suburban?: boolean;
-    subway?: boolean;
-    tram?: boolean;
-    bus?: boolean;
-    ferry?: boolean;
-    regional?: boolean;
-    regionalExpress?: boolean;
-    nationalExpress?: boolean;
-    national?: boolean;
-    express?: boolean;
-}
-
-export const defaultProducts: Products = {
-    suburban: true,
-    subway: true,
-    tram: true,
-    bus: true,
-    ferry: true,
-    regional: true,
-    regionalExpress: true,
-    nationalExpress: true,
-    national: true,
-    express: true,
-};
+import { productConfig, type Products } from './Products';
 
 /**
  * Filtert availableProducts und behält nur Keys mit true Werten
@@ -61,19 +30,6 @@ interface ProductSelectorProps {
     disabled?: boolean;
     availableProducts?: Partial<Products>; // Definiert welche Produkte für diese Station/Journey verfügbar sind
 }
-
-const productConfig = [
-    { key: 'express', label: 'ice_ic_ec', icon: DirectionsRailwayIcon, color: '#EC0016' },
-    { key: 'nationalExpress', label: 'ice', icon: TrainIcon, color: '#FF6F00' },
-    { key: 'national', label: 'ic_ec', icon: TrainIcon, color: '#FF8F00' },
-    { key: 'regionalExpress', label: 're', icon: TrainIcon, color: '#709EBF' },
-    { key: 'regional', label: 're_rb', icon: TrainIcon, color: '#1455C0' },
-    { key: 'suburban', label: 's_bahn', icon: TrainIcon, color: '#008D4F' },
-    { key: 'subway', label: 'u_bahn', icon: SubwayIcon, color: '#0065AE' },
-    { key: 'tram', label: 'tram', icon: TramIcon, color: '#D5001C' },
-    { key: 'bus', label: 'bus', icon: DirectionsBusIcon, color: '#A5027D' },
-    { key: 'ferry', label: 'ferry', icon: DirectionsBoatIcon, color: '#0080C8' },
-] as const;
 
 const ProductSelector: React.FC<ProductSelectorProps> = ({
     products,

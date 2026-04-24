@@ -1,7 +1,8 @@
 import { I18n } from '@iobroker/adapter-react-v5';
 import { Box, Divider, FormControlLabel, Paper, Switch, TextField, Typography } from '@mui/material';
 import React from 'react';
-import ProductSelector, { defaultProducts, type Products } from './ProductSelector';
+import ProductSelector from './ProductSelector';
+import { defaultProducts, type Products } from './Products';
 
 interface Station {
     id: string;

@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { withConfigGeneric, type ConfigComponentProps } from './ConfigGenericWrapper';
 import JourneyConfig from './JourneyConfig';
 import JourneyList from './JourneyList';
-import { type Products } from './ProductSelector';
+import { type Products } from './Products';
 
 interface Journey {
     id: string;
