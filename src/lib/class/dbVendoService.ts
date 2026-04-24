@@ -1,5 +1,6 @@
 import { createClient } from 'db-vendo-client';
-import { profile as dbNavProfile } from 'db-vendo-client/p/dbnav/index.js';
+import { profile as dbNavProfile } from 'db-vendo-client/p/db/index.js';
+import { withThrottling } from 'db-vendo-client/throttle.js';
 import type * as Vendo from 'hafas-client';
 import type { ITransportService } from '../types/transportService';
 
@@ -25,7 +26,7 @@ export class VendoService implements ITransportService {
      */
     public init(): boolean {
         try {
-            this.navClient = createClient(dbNavProfile, this.clientName);
+            this.navClient = createClient(withThrottling(dbNavProfile), this.clientName);
             return true;
         } catch (error) {
             throw new Error(`db-vendo-Client konnte nicht initialisiert werden: ${(error as Error).message}`);

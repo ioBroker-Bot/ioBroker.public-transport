@@ -22,7 +22,8 @@ __export(dbVendoService_exports, {
 });
 module.exports = __toCommonJS(dbVendoService_exports);
 var import_db_vendo_client = require("db-vendo-client");
-var import_dbnav = require("db-vendo-client/p/dbnav/index.js");
+var import_db = require("db-vendo-client/p/db/index.js");
+var import_throttle = require("db-vendo-client/throttle.js");
 class VendoService {
   navClient = null;
   clientName;
@@ -43,7 +44,7 @@ class VendoService {
    */
   init() {
     try {
-      this.navClient = (0, import_db_vendo_client.createClient)(import_dbnav.profile, this.clientName);
+      this.navClient = (0, import_db_vendo_client.createClient)((0, import_throttle.withThrottling)(import_db.profile), this.clientName);
       return true;
     } catch (error) {
       throw new Error(`db-vendo-Client konnte nicht initialisiert werden: ${error.message}`);

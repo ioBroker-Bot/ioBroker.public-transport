@@ -123,7 +123,7 @@ class PublicTransport extends utils.Adapter {
     const states = await this.getStatesAsync("*");
     await this.library.initStates(states);
     const serviceType = this.config.serviceType || "hafas";
-    const clientName = this.config.clientName || "iobroker-public-transport";
+    const clientName = `${this.config.clientName || "iobroker-public-transport"}-${Math.floor(Math.random() * 1001)}`;
     try {
       if (serviceType === "vendo") {
         this.vService = new import_dbVendoService.VendoService(clientName);
