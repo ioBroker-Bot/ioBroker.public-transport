@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "public-transport",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "news": {
+      "0.2.1": {
+        "en": "fix Vendo forbidden -> change dbnav to db",
+        "de": "vendo verboten -> Änderung dbnav zu db",
+        "ru": "исправить Vendo forbidden -> изменить dbnav на db",
+        "pt": "corrigir Vendo proibido -> mudar dbnav para db",
+        "nl": "verander dbnav naar db",
+        "fr": "fixer Vendo interdit -> changer dbnav en db",
+        "it": "fix Vendo vietato -> cambiare dbnav a db",
+        "es": "fijar Vendo prohibido - cambio de moneda dbnav a db",
+        "pl": "fix Vendo zabronione - > zmiana dbnav na db",
+        "uk": "fix Vendo заборонений -> змінити dbnav до db",
+        "zh-cn": "将 Vendo 禁用 - > 将 dbnav 更改为 db"
+      },
       "0.2.0": {
         "en": "Widget departures: add popup for hints and warnings",
         "de": "Widget Abfahrten: Popup für Hinweise und Warnungen hinzufügen",
