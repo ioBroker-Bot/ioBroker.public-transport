@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "public-transport",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "news": {
+      "0.2.2": {
+        "en": "fix countEntries for journeys",
+        "de": "fix Anzahl der Verbindungen",
+        "ru": "обсуждение CountEntries for Journeys",
+        "pt": "corrigir contagemEntradas para viagens",
+        "nl": "countEntries voor reizen vast te stellen",
+        "fr": "fixer le nombreEntrées pour les voyages",
+        "it": "fix conteggioAttivi per viaggi",
+        "es": "conteo de fijaciónIntérpretes para viajes",
+        "pl": "fix countEntries for travel",
+        "uk": "фіксувати кількістьПереваги для подорожей",
+        "zh-cn": "固定行程的计数条目"
+      },
       "0.2.1": {
         "en": "fix Vendo forbidden -> change dbnav to db",
         "de": "vendo verboten -> Änderung dbnav zu db",
@@ -80,19 +93,6 @@
         "pl": "Ulepszenie zależności",
         "uk": "Підвищення залежності",
         "zh-cn": "提升依赖性"
-      },
-      "0.0.4": {
-        "en": "optimization react pages",
-        "de": "Optimierung von React-Seiten",
-        "ru": "Оптимизация страниц React",
-        "pt": "Otimização de páginas React",
-        "nl": "Optimalisatie van React-pagina's",
-        "fr": "Optimisation des pages React",
-        "it": "Ottimizzazione delle pagine React",
-        "es": "Optimización de páginas React",
-        "pl": "Optymalizacja stron React",
-        "uk": "Оптимізація сторінок React",
-        "zh-cn": "优化React页面"
       }
     },
     "titleLang": {

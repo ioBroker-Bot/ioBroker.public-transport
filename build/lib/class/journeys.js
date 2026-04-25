@@ -460,7 +460,7 @@ class JourneysRequest extends import_library.BaseClass {
         }
       }
     } catch (err) {
-      this.log.error(this.library.translate("msg_journeyStateWriteError ", err.message));
+      this.log.error(this.library.translate("msg_journeyStateWriteError", err.message));
     }
   }
   /**
