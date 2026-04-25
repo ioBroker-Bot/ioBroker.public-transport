@@ -325,7 +325,7 @@ class JourneysRequest extends import_library.BaseClass {
               common: {
                 name: this.library.translate("journey_arrival_delay"),
                 type: "number",
-                role: "value",
+                role: "time",
                 read: true,
                 write: false
               },
@@ -386,7 +386,7 @@ class JourneysRequest extends import_library.BaseClass {
             common: {
               name: this.library.translate("journey_departure_delay"),
               type: "number",
-              role: "value",
+              role: "time",
               read: true,
               write: false
             },
@@ -524,7 +524,7 @@ class JourneysRequest extends import_library.BaseClass {
               common: {
                 name: this.library.translate("journey_arrival_delay"),
                 type: "number",
-                role: "value",
+                role: "time",
                 read: true,
                 write: false
               },
@@ -584,7 +584,7 @@ class JourneysRequest extends import_library.BaseClass {
               common: {
                 name: this.library.translate("journey_departure_delay"),
                 type: "number",
-                role: "value",
+                role: "time",
                 read: true,
                 write: false
               },
@@ -678,7 +678,7 @@ class JourneysRequest extends import_library.BaseClass {
               common: {
                 name: this.library.translate("journey_distance_meters"),
                 type: "number",
-                role: "value",
+                role: "value.distance",
                 read: true,
                 write: false
               },
