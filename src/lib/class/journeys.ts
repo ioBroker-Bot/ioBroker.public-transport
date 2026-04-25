@@ -511,7 +511,7 @@ export class JourneysRequest extends BaseClass {
                 }
             }
         } catch (err) {
-            this.log.error(this.library.translate('msg_journeyStateWriteError ', (err as Error).message));
+            this.log.error(this.library.translate('msg_journeyStateWriteError', (err as Error).message));
         }
     }
 
