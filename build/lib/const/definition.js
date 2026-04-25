@@ -82,7 +82,7 @@ const Departure = {
     common: {
       name: "Delay",
       type: "number",
-      role: "value",
+      role: "time",
       read: true,
       write: false,
       desc: "Delay in seconds"
@@ -378,7 +378,7 @@ const Leg = {
     common: {
       name: "Departure Delay",
       type: "number",
-      role: "value",
+      role: "time",
       read: true,
       write: false,
       desc: "Departure Delay in seconds"
@@ -417,7 +417,7 @@ const Leg = {
     common: {
       name: "Arrival Delay",
       type: "number",
-      role: "value",
+      role: "time",
       read: true,
       write: false,
       desc: "Arrival Delay in seconds"
@@ -601,7 +601,7 @@ const AlternativeTrip = {
     common: {
       name: "Delay",
       type: "number",
-      role: "value",
+      role: "time",
       read: true,
       write: false,
       desc: "Delay in seconds"
