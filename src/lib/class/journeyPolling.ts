@@ -141,7 +141,20 @@ export class JourneyPolling extends PollingManager<JourneyConfig> {
         }
 
         const options = this.createJourneyOptions(config);
+        const products = config.products ?? undefined;
+        const countEntries = config.numResults ?? 5;
         const client_profile = config.client_profile ?? undefined;
+
+        this.adapter.log.debug(
+            `id: ${config.id},
+             fromId: ${config.fromStationId},
+             toId: ${config.toStationId},
+             service: ${JSON.stringify(service)},
+             option: ${JSON.stringify(options)},
+             countEntires: ${countEntries},
+             products: ${JSON.stringify(products)},
+             client_profil: ${client_profile}`,
+        );
 
         try {
             return await this.adapter.journeysRequest.getJourneys(
@@ -150,6 +163,8 @@ export class JourneyPolling extends PollingManager<JourneyConfig> {
                 config.toStationId,
                 service,
                 options,
+                countEntries,
+                products,
                 client_profile,
             );
         } catch (error) {

@@ -79,7 +79,9 @@ class StationRequest extends import_library.BaseClass {
       }
       this.validateClientProfile(client_profile);
       const station = await service.getStop(stationId, options);
-      this.adapter.log.debug(JSON.stringify(station, null, 1));
+      if (this.adapter.config.logCompletelyJSON) {
+        this.adapter.log.debug(JSON.stringify(station, null, 1));
+      }
       return station;
     } catch (err) {
       this.log.error(this.library.translate("msg_stationQueryError", stationId, err.message));

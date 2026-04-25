@@ -70,10 +70,12 @@ class JourneysRequest extends import_library.BaseClass {
    * @param to            Die Zielstation.
    * @param service       Der Service für die Abfrage.
    * @param options       Zusätzliche Optionen für die Abfrage.
+   * @param countEntries  Die maximale Anzahl der Verbindungen, die geschrieben werden sollen.
+   * @param products      Die aktivierten Produkte (true = erlaubt)
    * @param client_profile Das Client-Profil für die Abfrage (z.B. "hafas:vbb", "vendo:db")
    * @returns             true bei Erfolg, sonst false.
    */
-  async getJourneys(journeyId, from, to, service, options = {}, client_profile) {
+  async getJourneys(journeyId, from, to, service, options = {}, countEntries = 5, products, client_profile) {
     try {
       if (!from || !to) {
         throw new Error(this.library.translate("msg_journeyNoFromTo"));
@@ -82,7 +84,9 @@ class JourneysRequest extends import_library.BaseClass {
       this.service = service;
       const mergedOptions = { ...import_types.defaultJourneyOpt, ...options };
       const response = await this.service.getJourneys(from, to, mergedOptions);
-      this.adapter.log.debug(JSON.stringify(response, null, 1));
+      if (this.adapter.config.logCompletelyJSON) {
+        this.adapter.log.debug(JSON.stringify(response, null, 1));
+      }
       if (!response.journeys || response.journeys.length === 0) {
         this.log.info(
           this.library.translate(
@@ -93,7 +97,7 @@ class JourneysRequest extends import_library.BaseClass {
           )
         );
       }
-      await this.writeJourneysStates(journeyId, response, client_profile);
+      await this.writeJourneysStates(journeyId, response, countEntries, client_profile);
       return true;
     } catch (error) {
       this.log.error(this.library.translate("msg_journeyQueryError", from, to, error.message));
@@ -142,9 +146,10 @@ class JourneysRequest extends import_library.BaseClass {
    *
    * @param journeyId     Die ID der Verbindung, für die die Teilstrecken/Legs geschrieben werden sollen.
    * @param journeys      Die Verbindungen, die geschrieben werden sollen.
+   * @param countEntries  Die maximale Anzahl der Verbindungen, die geschrieben werden sollen.
    * @param client_profile Das Client-Profil für die Abfrage (z.B. "hafas:vbb", "vendo:db")
    */
-  async writeJourneysStates(journeyId, journeys, client_profile) {
+  async writeJourneysStates(journeyId, journeys, countEntries, client_profile) {
     var _a;
     try {
       if (!this.adapter.config.journeyConfig) {
@@ -196,7 +201,12 @@ class JourneysRequest extends import_library.BaseClass {
           native: {}
         }
       );
-      await this.writesBaseStates(`${this.adapter.namespace}.Journeys.${journeyId}`, journeys, client_profile);
+      await this.writesBaseStates(
+        `${this.adapter.namespace}.Journeys.${journeyId}`,
+        journeys,
+        countEntries,
+        client_profile
+      );
     } catch (err) {
       this.log.error(this.library.translate("msg_journeyWriteError", err.message));
     }
@@ -206,9 +216,10 @@ class JourneysRequest extends import_library.BaseClass {
    *
    * @param basePath Basis-Pfad für die States
    * @param journeys Verbindungsdaten als Array von Hafas.Journeys
+   * @param countEntries Anzahl der definierten Verbindungen
    * @param client_profile Das Client-Profil für die Abfrage (z.B. "hafas:vbb", "vendo:db")
    */
-  async writesBaseStates(basePath, journeys, client_profile) {
+  async writesBaseStates(basePath, journeys, countEntries, client_profile) {
     var _a, _b, _c, _d;
     try {
       await this.library.writedp(`${basePath}.json`, JSON.stringify(journeys), {
@@ -236,7 +247,7 @@ class JourneysRequest extends import_library.BaseClass {
         await this.station.writeStationData(`${basePath}.StationFrom`, stationFrom);
         await this.station.writeStationData(`${basePath}.StationTo`, stationTo);
       }
-      await this.writeJourneyStates(basePath, journeys);
+      await this.writeJourneyStates(basePath, journeys, countEntries);
     } catch (err) {
       this.log.error(this.library.translate("msg_journeyBaseStateWriteError", err.message));
     }
@@ -246,8 +257,9 @@ class JourneysRequest extends import_library.BaseClass {
    *
    * @param basePath Basis-Pfad für die States
    * @param journeys Verbindungsdaten als Array von Hafas.Journeys
+   * @param countEntries Anzahl der definierten Verbindungen
    */
-  async writeJourneyStates(basePath, journeys) {
+  async writeJourneyStates(basePath, journeys, countEntries) {
     try {
       if (Array.isArray(journeys.journeys) && journeys.journeys.length > 0) {
         for (const [index, journey] of journeys.journeys.entries()) {
@@ -268,7 +280,7 @@ class JourneysRequest extends import_library.BaseClass {
             _id: "nicht_definieren",
             type: "channel",
             common: {
-              name: this.library.translate("journey", index + 1)
+              name: this.library.translate("journey")
             },
             native: {}
           });
@@ -276,7 +288,7 @@ class JourneysRequest extends import_library.BaseClass {
             _id: "nicht_definieren",
             type: "state",
             common: {
-              name: this.library.translate("raw_journey_data", index + 1),
+              name: this.library.translate("raw_journey_data"),
               type: "string",
               role: "json",
               read: true,
@@ -441,6 +453,9 @@ class JourneysRequest extends import_library.BaseClass {
             native: {}
           });
           await this.writeLegStates(journeyPath, journey.legs);
+          if (index === countEntries - 1) {
+            break;
+          }
         }
       }
     } catch (err) {

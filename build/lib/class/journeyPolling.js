@@ -118,13 +118,25 @@ class JourneyPolling extends import_pollingManager.PollingManager {
    * @returns true wenn erfolgreich, false sonst
    */
   async queryConfig(config, service) {
-    var _a;
+    var _a, _b, _c;
     if (!config.fromStationId || !config.toStationId) {
       this.adapter.log.warn(this.adapter.library.translate("msg_journeyNoFromTo", config.customName || ""));
       return false;
     }
     const options = this.createJourneyOptions(config);
-    const client_profile = (_a = config.client_profile) != null ? _a : void 0;
+    const products = (_a = config.products) != null ? _a : void 0;
+    const countEntries = (_b = config.numResults) != null ? _b : 5;
+    const client_profile = (_c = config.client_profile) != null ? _c : void 0;
+    this.adapter.log.debug(
+      `id: ${config.id},
+             fromId: ${config.fromStationId},
+             toId: ${config.toStationId},
+             service: ${JSON.stringify(service)},
+             option: ${JSON.stringify(options)},
+             countEntires: ${countEntries},
+             products: ${JSON.stringify(products)},
+             client_profil: ${client_profile}`
+    );
     try {
       return await this.adapter.journeysRequest.getJourneys(
         config.id,
@@ -132,6 +144,8 @@ class JourneyPolling extends import_pollingManager.PollingManager {
         config.toStationId,
         service,
         options,
+        countEntries,
+        products,
         client_profile
       );
     } catch (error) {

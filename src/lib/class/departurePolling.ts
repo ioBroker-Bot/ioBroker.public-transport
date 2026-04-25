@@ -82,6 +82,14 @@ export class DeparturePolling extends PollingManager<DepartureConfig> {
         const products = config.products ?? undefined;
         const countEntries = config.numDepartures ?? 10;
         const client_profile = config.client_profile ?? undefined;
+        this.adapter.log.debug(
+            `id: ${config.id},
+             service: ${JSON.stringify(service)},
+             option: ${JSON.stringify(options)},
+             countEntries: ${countEntries},
+             products: ${JSON.stringify(products)},
+             client_profil: ${client_profile}`,
+        );
 
         return await this.adapter.depRequest.getDepartures(
             config.id,
