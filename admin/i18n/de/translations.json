@@ -135,6 +135,7 @@
     "msg_firstQueryFor": "Erste Abfrage für: %s (%s)",
     "msg_hafasClientInitialized": "HAFAS-Client initialisiert mit Profil: %s",
     "msg_hafasRequestFailed": "Abfrage Abfahrten fehlgeschlagen. Fehlermeldung: %s",
+    "msg_journeyMaxEntriesReached": "=== Maximale Anzahl an Verbindungen erreicht (%s), weitere Verbindungen werden nicht verarbeitet ===",
     "msg_journeyBaseStateWriteError": "Fehler beim Schreiben der Basis States der Verbindung. Fehlermeldung: %s",
     "msg_journeyLegLineWriteError": "Fehler beim Schreiben der Linien States der Teilstrecke. Fehlermeldung: %s",
     "msg_journeyLegStateWriteError": "Fehler beim Schreiben der Teilstrecken States der Verbindung. Fehlermeldung: %s",

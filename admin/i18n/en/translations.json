@@ -135,6 +135,7 @@
     "msg_firstQueryFor": "First query for: %s (%s)",
     "msg_hafasClientInitialized": "HAFAS client initialized with profile: %s",
     "msg_hafasRequestFailed": "Query for departures failed. Error message: %s",
+    "msg_journeyMaxEntriesReached": "=== Maximum number of journeys reached (%s), further journeys will not be processed ===",
     "msg_journeyBaseStateWriteError": "Error writing base states of the journey. Error message: %s",
     "msg_journeyLegLineWriteError": "Error writing line states of the leg. Error message: %s",
     "msg_journeyLegStateWriteError": "Error writing leg states of the journey. Error message: %s",

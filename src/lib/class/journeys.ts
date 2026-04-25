@@ -505,6 +505,7 @@ export class JourneysRequest extends BaseClass {
                     // Teilstrecken/Legs der Verbindung
                     await this.writeLegStates(journeyPath, journey.legs);
                     if (index === countEntries - 1) {
+                        this.log.debug(this.library.translate('msg_journeyMaxEntriesReached', countEntries));
                         break; // Schleife verlassen, wenn die gewünschte Anzahl an Verbindungen erreicht ist
                     }
                 }
