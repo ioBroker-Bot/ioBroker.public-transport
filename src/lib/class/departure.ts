@@ -74,10 +74,12 @@ export class DepartureRequest extends BaseClass {
             // Validiere Client und Profil
             this.validateClientProfile(client_profile);
             const mergedOptions = { ...defaultDepartureOpt, ...options };
-            // Antwort vom Tranport-Client als vollständiger Typ
+            // Antwort vom Transport-Client als vollständiger Typ
             const response = await service.getDepartures(stationId, mergedOptions);
             // Vollständiges JSON für Debugging
-            this.adapter.log.debug(JSON.stringify(response.departures, null, 1));
+            if (this.adapter.config.logCompletelyJSON) {
+                this.adapter.log.debug(JSON.stringify(response.departures, null, 1));
+            }
             if (!response.departures || response.departures.length === 0) {
                 this.log.info(
                     this.library.translate(
@@ -88,7 +90,7 @@ export class DepartureRequest extends BaseClass {
                 );
             }
             // Schreibe die Abfahrten in die States
-            await this.writeDepartureStates(stationId, response.departures, products, countEntries);
+            await this.writeDepartureStates(stationId, response.departures, countEntries, products);
             return true;
         } catch (error) {
             this.log.error(this.library.translate('msg_departureQueryError', stationId, (error as Error).message));
@@ -148,14 +150,14 @@ export class DepartureRequest extends BaseClass {
      *
      * @param stationId     Die ID der Station, für die die Abfahrten geschrieben werden sollen.
      * @param departures    Die Abfahrten, die geschrieben werden sollen.
-     * @param products      Die aktivierten Produkte (true = erlaubt)
      * @param countEntries  Die maximale Anzahl der Einträge, die geschrieben werden sollen.
+     * @param products      Die aktivierten Produkte (true = erlaubt)
      */
     async writeDepartureStates(
         stationId: string,
         departures: Hafas.Alternative[],
+        countEntries: number,
         products?: Partial<Products>,
-        countEntries: number = 10,
     ): Promise<void> {
         try {
             if (!this.adapter.config.stationConfig) {
@@ -629,7 +631,7 @@ export class DepartureRequest extends BaseClass {
                     true,
                 );
                 this.log.info2(this.library.translate('msg_departureObjectProcessedSuccessfully', index + 1));
-                if (index === countEntries) {
+                if (index === countEntries - 1) {
                     this.log.debug(this.library.translate('msg_departureMaxEntriesReached', countEntries));
                     break;
                 }

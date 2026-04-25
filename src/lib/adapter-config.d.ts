@@ -13,6 +13,7 @@ declare global {
 			suppressInfoLogs?: boolean;
 			delayOffset?: number;
 			logUnknownTokens?: boolean;
+			logCompletelyJSON?: boolean;
 		}
 		
 		interface StationConfig {

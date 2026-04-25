@@ -77,7 +77,9 @@ class DepartureRequest extends import_library.BaseClass {
       this.validateClientProfile(client_profile);
       const mergedOptions = { ...import_types.defaultDepartureOpt, ...options };
       const response = await service.getDepartures(stationId, mergedOptions);
-      this.adapter.log.debug(JSON.stringify(response.departures, null, 1));
+      if (this.adapter.config.logCompletelyJSON) {
+        this.adapter.log.debug(JSON.stringify(response.departures, null, 1));
+      }
       if (!response.departures || response.departures.length === 0) {
         this.log.info(
           this.library.translate(
@@ -87,7 +89,7 @@ class DepartureRequest extends import_library.BaseClass {
           )
         );
       }
-      await this.writeDepartureStates(stationId, response.departures, products, countEntries);
+      await this.writeDepartureStates(stationId, response.departures, countEntries, products);
       return true;
     } catch (error) {
       this.log.error(this.library.translate("msg_departureQueryError", stationId, error.message));
@@ -139,10 +141,10 @@ class DepartureRequest extends import_library.BaseClass {
    *
    * @param stationId     Die ID der Station, für die die Abfahrten geschrieben werden sollen.
    * @param departures    Die Abfahrten, die geschrieben werden sollen.
-   * @param products      Die aktivierten Produkte (true = erlaubt)
    * @param countEntries  Die maximale Anzahl der Einträge, die geschrieben werden sollen.
+   * @param products      Die aktivierten Produkte (true = erlaubt)
    */
-  async writeDepartureStates(stationId, departures, products, countEntries = 10) {
+  async writeDepartureStates(stationId, departures, countEntries, products) {
     try {
       if (!this.adapter.config.stationConfig) {
         return;
@@ -579,7 +581,7 @@ class DepartureRequest extends import_library.BaseClass {
           true
         );
         this.log.info2(this.library.translate("msg_departureObjectProcessedSuccessfully", index + 1));
-        if (index === countEntries) {
+        if (index === countEntries - 1) {
           this.log.debug(this.library.translate("msg_departureMaxEntriesReached", countEntries));
           break;
         }

@@ -168,7 +168,8 @@
     "clientName": "",
     "pollInterval": 5,
     "logUnknownTokens": false,
-    "suppressInfoLogs": false
+    "suppressInfoLogs": false,
+    "logCompletelyJSON": false
   },
   "objects": [],
   "instanceObjects": []
