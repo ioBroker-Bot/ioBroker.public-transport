@@ -454,6 +454,7 @@ class JourneysRequest extends import_library.BaseClass {
           });
           await this.writeLegStates(journeyPath, journey.legs);
           if (index === countEntries - 1) {
+            this.log.debug(this.library.translate("msg_journeyMaxEntriesReached", countEntries));
             break;
           }
         }
