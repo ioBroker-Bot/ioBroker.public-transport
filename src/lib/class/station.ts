@@ -77,7 +77,9 @@ export class StationRequest extends BaseClass {
             this.validateClientProfile(client_profile);
             const station: Hafas.Station | Hafas.Stop = await service.getStop(stationId, options);
             // Vollständiges JSON für Debugging
-            this.adapter.log.debug(JSON.stringify(station, null, 1));
+            if (this.adapter.config.logCompletelyJSON) {
+                this.adapter.log.debug(JSON.stringify(station, null, 1));
+            }
             return station;
         } catch (err) {
             this.log.error(this.library.translate('msg_stationQueryError', stationId, (err as Error).message));
