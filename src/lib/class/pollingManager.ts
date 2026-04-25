@@ -27,14 +27,14 @@ export abstract class PollingManager<T extends PollingConfig> {
      */
     protected getEnabledConfigs(configs: T[] | undefined, noConfigMsg: string, noEnabledMsg: string): T[] | undefined {
         if (!configs || configs.length === 0) {
-            this.adapter.log.debug(this.adapter.library.translate(noConfigMsg));
+            this.adapter.log.debug(noConfigMsg);
             return undefined;
         }
 
         const enabledConfigs = configs.filter(config => config.enabled);
 
         if (enabledConfigs.length === 0) {
-            this.adapter.log.debug(this.adapter.library.translate(noEnabledMsg));
+            this.adapter.log.debug(noEnabledMsg);
             return undefined;
         }
 
@@ -48,12 +48,14 @@ export abstract class PollingManager<T extends PollingConfig> {
      * @param countMsg Der Übersetzungsschlüssel für die Anzahl
      * @param entryMsg Der Übersetzungsschlüssel für jeden Eintrag
      */
-    protected logConfigs(configs: T[], countMsg: string, entryMsg: string): void {
-        this.adapter.log.info(this.adapter.library.translate(countMsg, configs.length));
+    protected logConfigs(
+        configs: T[],
+        countMsg: (n: number) => string,
+        entryMsg: (name: string, id: string) => string,
+    ): void {
+        this.adapter.log.info(countMsg(configs.length));
         for (const config of configs) {
-            this.adapter.log.info(
-                this.adapter.library.translate(entryMsg, config.customName || config.name || '', config.id ?? ''),
-            );
+            this.adapter.log.info(entryMsg(config.customName || config.name || '', config.id ?? ''));
         }
     }
 
@@ -83,9 +85,9 @@ export abstract class PollingManager<T extends PollingConfig> {
     private async queryConfigs(
         configs: T[],
         service: ITransportService,
-        fetchingMsg: string,
-        updatedMsg: string,
-        failedMsg: string,
+        fetchingMsg: (name: string, id: string) => string,
+        updatedMsg: (name: string, id: string) => string,
+        failedMsg: (name: string, id: string) => string,
     ): Promise<{ successCount: number; errorCount: number }> {
         let successCount = 0;
         let errorCount = 0;
@@ -93,27 +95,21 @@ export abstract class PollingManager<T extends PollingConfig> {
         for (const config of configs) {
             if (!config.id) {
                 this.adapter.log.warn(
-                    this.adapter.library.translate('msg_stationNoValidId', config.customName || config.name || ''),
+                    `Station "${config.customName || config.name || ''}" has no valid ID, skipping...`,
                 );
                 continue;
             }
 
-            this.adapter.log.info(
-                this.adapter.library.translate(fetchingMsg, config.customName || config.name || '', config.id),
-            );
+            this.adapter.log.info(fetchingMsg(config.customName || config.name || '', config.id));
 
             const success = await this.queryConfig(config, service);
 
             if (success) {
                 successCount++;
-                this.adapter.log.info(
-                    this.adapter.library.translate(updatedMsg, config.customName || config.name || '', config.id),
-                );
+                this.adapter.log.info(updatedMsg(config.customName || config.name || '', config.id));
             } else {
                 errorCount++;
-                this.adapter.log.warn(
-                    this.adapter.library.translate(failedMsg, config.customName || config.name || '', config.id),
-                );
+                this.adapter.log.warn(failedMsg(config.customName || config.name || '', config.id));
             }
         }
 
@@ -143,14 +139,14 @@ export abstract class PollingManager<T extends PollingConfig> {
         messages: {
             noConfig: string;
             noEnabled: string;
-            count: string;
-            entry: string;
-            fetching: string;
-            updated: string;
-            failed: string;
-            firstCompleted: string;
-            queryCompleted: string;
-            waiting: string;
+            count: (n: number) => string;
+            entry: (name: string, id: string) => string;
+            fetching: (name: string, id: string) => string;
+            updated: (name: string, id: string) => string;
+            failed: (name: string, id: string) => string;
+            firstCompleted: (success: number, error: number) => string;
+            queryCompleted: (success: number, error: number) => string;
+            waiting: (minutes: number) => string;
         },
     ): Promise<void> {
         const service = this.adapter.getActiveService();
@@ -175,8 +171,8 @@ export abstract class PollingManager<T extends PollingConfig> {
             messages.updated,
             messages.failed,
         );
-        this.adapter.log.info(this.adapter.library.translate(messages.firstCompleted, successCount, errorCount));
-        this.adapter.log.info(this.adapter.library.translate(messages.waiting, pollIntervalMinutes));
+        this.adapter.log.info(messages.firstCompleted(successCount, errorCount));
+        this.adapter.log.info(messages.waiting(pollIntervalMinutes));
 
         // Starte Intervall für regelmäßige Abfragen
         this.pollInterval = this.adapter.setInterval(async () => {
@@ -190,8 +186,8 @@ export abstract class PollingManager<T extends PollingConfig> {
                 messages.updated,
                 messages.failed,
             );
-            this.adapter.log.info(this.adapter.library.translate(messages.queryCompleted, successCount, errorCount));
-            this.adapter.log.info(this.adapter.library.translate(messages.waiting, pollIntervalMinutes));
+            this.adapter.log.info(messages.queryCompleted(successCount, errorCount));
+            this.adapter.log.info(messages.waiting(pollIntervalMinutes));
         }, pollInterval);
     }
 

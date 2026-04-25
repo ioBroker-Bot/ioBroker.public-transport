@@ -50,14 +50,14 @@ class JourneysRequest extends import_library.BaseClass {
     const currentServiceType = this.adapter.config.serviceType || "hafas";
     if (currentServiceType !== expectedServiceType) {
       throw new Error(
-        this.library.translate("msg_wrongClientType", expectedServiceType, currentServiceType, client_profile)
+        `Wrong client type: Expected '${expectedServiceType}', but '${currentServiceType}' is initialized (client_profile: ${client_profile})`
       );
     }
     if (expectedServiceType === "hafas" && expectedProfile) {
       const currentProfile = this.adapter.config.profile || "";
       if (currentProfile !== expectedProfile) {
         throw new Error(
-          this.library.translate("msg_wrongProfile", expectedProfile, currentProfile, client_profile)
+          `Wrong profile: Expected '${expectedProfile}', but '${currentProfile}' is configured (client_profile: ${client_profile})`
         );
       }
     }
@@ -78,7 +78,7 @@ class JourneysRequest extends import_library.BaseClass {
   async getJourneys(journeyId, from, to, service, options = {}, countEntries = 5, products, client_profile) {
     try {
       if (!from || !to) {
-        throw new Error(this.library.translate("msg_journeyNoFromTo"));
+        throw new Error("No start or destination station provided");
       }
       this.validateClientProfile(client_profile);
       this.service = service;
@@ -89,18 +89,13 @@ class JourneysRequest extends import_library.BaseClass {
       }
       if (!response.journeys || response.journeys.length === 0) {
         this.log.info(
-          this.library.translate(
-            "msg_journeyNoJourneys",
-            from,
-            to,
-            client_profile || "kein Profil angegeben"
-          )
+          `No journeys found from station ${from} to ${to}, client_profile: ${client_profile || "kein Profil angegeben"}`
         );
       }
       await this.writeJourneysStates(journeyId, response, countEntries, client_profile);
       return true;
     } catch (error) {
-      this.log.error(this.library.translate("msg_journeyQueryError", from, to, error.message));
+      this.log.error(`Error querying journeys from station ${from} to ${to}: ${error.message}`);
       return false;
     }
   }
@@ -157,7 +152,7 @@ class JourneysRequest extends import_library.BaseClass {
       }
       const journeyConfig = this.adapter.config.journeyConfig.find((j) => j.enabled === true && j.id === journeyId);
       if (!journeyConfig) {
-        this.log.warn(this.library.translate("msg_journeyNotFoundOrDisabled", journeyId));
+        this.log.warn(`Journey with ID ${journeyId} not found or not enabled`);
         return;
       }
       await this.library.writedp(`${this.adapter.namespace}.Journeys.${journeyConfig.id}`, void 0, {
@@ -208,7 +203,7 @@ class JourneysRequest extends import_library.BaseClass {
         client_profile
       );
     } catch (err) {
-      this.log.error(this.library.translate("msg_journeyWriteError", err.message));
+      this.log.error(`Error writing journeys. Error message: ${err.message}`);
     }
   }
   /**
@@ -454,13 +449,15 @@ class JourneysRequest extends import_library.BaseClass {
           });
           await this.writeLegStates(journeyPath, journey.legs);
           if (index === countEntries - 1) {
-            this.log.debug(this.library.translate("msg_journeyMaxEntriesReached", countEntries));
+            this.log.debug(
+              `=== Maximum number of journeys reached (${countEntries}), further journeys will not be processed ===`
+            );
             break;
           }
         }
       }
     } catch (err) {
-      this.log.error(this.library.translate("msg_journeyStateWriteError", err.message));
+      this.log.error(`Error writing journey states. Error message: ${err.message}`);
     }
   }
   /**
@@ -476,9 +473,9 @@ class JourneysRequest extends import_library.BaseClass {
         for (const [index, leg] of legs.entries()) {
           const legPath = `${basePath}.Leg_${`00${index}`.slice(-2)}`;
           const description = leg.walking === true ? this.library.translate("journey_walking") : this.library.translate("journey_leg");
-          const stationFrom = ((_a = leg.origin) == null ? void 0 : _a.name) || this.library.translate("unknown_station");
-          const stationTo = ((_b = leg.destination) == null ? void 0 : _b.name) || this.library.translate("unknown_station");
-          const name = leg.walking ? this.library.translate(`journey_change`, stationFrom) : this.library.translate(`journey_leg_FromTo`, stationFrom, stationTo);
+          const stationFrom = ((_a = leg.origin) == null ? void 0 : _a.name) || "unknown_station";
+          const stationTo = ((_b = leg.destination) == null ? void 0 : _b.name) || "unknown_station";
+          const name = leg.walking ? this.library.translate("journey_Change") : this.library.translate("journey_leg_FromTo", stationFrom, stationTo);
           const [arrivalDelayed, arrivalOnTime] = await this.library.getDelayStatus(leg.arrivalDelay, 0);
           const [departureDelayed, departureOnTime] = await this.library.getDelayStatus(
             leg.departureDelay,
@@ -704,7 +701,7 @@ class JourneysRequest extends import_library.BaseClass {
         }
       }
     } catch (err) {
-      this.log.error(this.library.translate("msg_journeyLegStateWriteError", err.message));
+      this.log.error(`Error writing leg states of the journey. Error message: ${err.message}`);
     }
   }
   /**
@@ -806,7 +803,7 @@ class JourneysRequest extends import_library.BaseClass {
         }
       );
     } catch (err) {
-      this.log.error(this.library.translate("msg_journeyLegStationWriteError", err.message));
+      this.log.error(`Error writing station states of the leg. Error message: ${err.message}`);
     }
   }
   /**
@@ -891,7 +888,7 @@ class JourneysRequest extends import_library.BaseClass {
         });
       }
     } catch (err) {
-      this.log.error(this.library.translate("msg_journeyLegLineWriteError", err.message));
+      this.log.error(`Error writing line states of the leg. Error message: ${err.message}`);
     }
   }
 }

@@ -46,9 +46,7 @@ export class JourneyPolling extends PollingManager<JourneyConfig> {
                 continue;
             }
 
-            this.adapter.log.debug(
-                `Setze States für deaktivierte Journey zurück: ${config.customName || ''} (${config.id})`,
-            );
+            this.adapter.log.debug(`Reset states for deactivated journey: ${config.customName || ''} (${config.id})`);
 
             // Verwende garbageColleting um States auf Standardwerte zu setzen
             await this.adapter.library.garbageColleting(
@@ -111,18 +109,17 @@ export class JourneyPolling extends PollingManager<JourneyConfig> {
      *
      * @param configs Die Journey-Konfigurationen
      * @param countMsg Der Übersetzungsschlüssel für die Anzahl
-     * @param entryMsg Der Übersetzungsschlüssel für jeden Eintrag
+     * @param _entryMsg Der Übersetzungsschlüssel für jeden Eintrag
      */
-    protected logConfigs(configs: JourneyConfig[], countMsg: string, entryMsg: string): void {
-        this.adapter.log.info(this.adapter.library.translate(countMsg, configs.length));
+    protected logConfigs(
+        configs: JourneyConfig[],
+        countMsg: (n: number) => string,
+        _entryMsg: (name: string, id: string) => string,
+    ): void {
+        this.adapter.log.info(countMsg(configs.length));
         for (const config of configs) {
             this.adapter.log.info(
-                this.adapter.library.translate(
-                    entryMsg,
-                    config.customName || '',
-                    config.fromStationName || config.fromStationId || '',
-                    config.toStationName || config.toStationId || '',
-                ),
+                `  - ${config.customName || ''} (From: ${config.fromStationName || config.fromStationId || ''}, To: ${config.toStationName || config.toStationId || ''})`,
             );
         }
     }
@@ -136,7 +133,7 @@ export class JourneyPolling extends PollingManager<JourneyConfig> {
      */
     protected async queryConfig(config: JourneyConfig, service: ITransportService): Promise<boolean> {
         if (!config.fromStationId || !config.toStationId) {
-            this.adapter.log.warn(this.adapter.library.translate('msg_journeyNoFromTo', config.customName || ''));
+            this.adapter.log.warn('No start or destination station provided');
             return false;
         }
 
@@ -168,13 +165,7 @@ export class JourneyPolling extends PollingManager<JourneyConfig> {
                 client_profile,
             );
         } catch (error) {
-            this.adapter.log.error(
-                this.adapter.library.translate(
-                    'msg_journeyQueryFailed',
-                    config.customName || '',
-                    (error as Error).message,
-                ),
-            );
+            this.adapter.log.error(`Error querying journey "${config.customName || ''}": ${(error as Error).message}`);
             return false;
         }
     }
@@ -186,16 +177,16 @@ export class JourneyPolling extends PollingManager<JourneyConfig> {
      */
     public async startJourneys(pollIntervalMinutes: number): Promise<void> {
         await this.start(this.adapter.config.journeyConfig as JourneyConfig[], pollIntervalMinutes, {
-            noConfig: 'msg_noJourneysConfigured',
-            noEnabled: 'msg_noEnabledJourneys',
-            count: 'msg_activeJourneysFound',
-            entry: 'msg_journeyListEntry',
-            fetching: 'msg_fetchingJourneys',
-            updated: 'msg_journeysUpdated',
-            failed: 'msg_journeysUpdateFailed',
-            firstCompleted: 'msg_firstJourneyQueryCompleted',
-            queryCompleted: 'msg_journeyQueryCompleted',
-            waiting: 'msg_waitingForNextJourneyQuery',
+            noConfig: 'No journeys found in configuration. Please configure in Admin UI.',
+            noEnabled: 'No enabled journeys found. Please enable at least one journey.',
+            count: n => `${n} active journey(s) found:`,
+            entry: (name, id) => `  - ${name} (ID: ${id})`,
+            fetching: (name, id) => `Fetching journeys for: ${name} (${id})`,
+            updated: (name, id) => `Journeys updated for: ${name} (${id})`,
+            failed: (name, id) => `Journeys could not be updated for: ${name} (${id})`,
+            firstCompleted: (s, f) => `First journey query completed: ${s} successful, ${f} failed`,
+            queryCompleted: (s, f) => `Journey query completed: ${s} successful, ${f} failed`,
+            waiting: m => `Waiting for next journey query in ${m} minutes...`,
         });
     }
 }

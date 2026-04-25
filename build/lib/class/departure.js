@@ -46,14 +46,14 @@ class DepartureRequest extends import_library.BaseClass {
     const currentServiceType = this.adapter.config.serviceType || "hafas";
     if (currentServiceType !== expectedServiceType) {
       throw new Error(
-        this.library.translate("msg_wrongClientType", expectedServiceType, currentServiceType, client_profile)
+        `Wrong client type: Expected '${expectedServiceType}', but '${currentServiceType}' is initialized (client_profile: ${client_profile})`
       );
     }
     if (expectedServiceType === "hafas" && expectedProfile) {
       const currentProfile = this.adapter.config.profile || "";
       if (currentProfile !== expectedProfile) {
         throw new Error(
-          this.library.translate("msg_wrongProfile", expectedProfile, currentProfile, client_profile)
+          `Wrong profile: Expected '${expectedProfile}', but '${currentProfile}' is configured (client_profile: ${client_profile})`
         );
       }
     }
@@ -72,7 +72,7 @@ class DepartureRequest extends import_library.BaseClass {
   async getDepartures(stationId, service, options = {}, countEntries = 10, products, client_profile) {
     try {
       if (!stationId) {
-        throw new Error(this.library.translate("msg_departureNoStationId"));
+        throw new Error("No stationId provided");
       }
       this.validateClientProfile(client_profile);
       const mergedOptions = { ...import_types.defaultDepartureOpt, ...options };
@@ -82,17 +82,13 @@ class DepartureRequest extends import_library.BaseClass {
       }
       if (!response.departures || response.departures.length === 0) {
         this.log.info(
-          this.library.translate(
-            "msg_departureNoDepartures",
-            stationId,
-            client_profile || "kein Profil angegeben"
-          )
+          `No departures found for station ${stationId}, client_profile: ${client_profile || "kein Profil angegeben"}`
         );
       }
       await this.writeDepartureStates(stationId, response.departures, countEntries, products);
       return true;
     } catch (error) {
-      this.log.error(this.library.translate("msg_departureQueryError", stationId, error.message));
+      this.log.error(`Error querying departures for station ${stationId}: ${error.message}`);
       return false;
     }
   }
@@ -114,23 +110,14 @@ class DepartureRequest extends import_library.BaseClass {
       const lineProduct = (_a = departure.line) == null ? void 0 : _a.product;
       if (!lineProduct) {
         this.log.info2(
-          this.library.translate(
-            "msg_departureFilterNoProduct",
-            ((_b = departure.line) == null ? void 0 : _b.name) || "unbekannt / unknown",
-            (_c = departure.direction) != null ? _c : "unbekannt / unknown"
-          )
+          `Departure ${((_b = departure.line) == null ? void 0 : _b.name) || "unbekannt / unknown"} to ${(_c = departure.direction) != null ? _c : "unbekannt / unknown"} filtered: No product info available`
         );
         return false;
       }
       const isEnabled = enabledProducts.includes(lineProduct);
       if (!isEnabled) {
         this.log.info2(
-          this.library.translate(
-            "msg_departureFilterProductDisabled",
-            ((_d = departure.line) == null ? void 0 : _d.name) || "unbekannt / unknown",
-            (_e = departure.direction) != null ? _e : "unbekannt / unknown",
-            lineProduct
-          )
+          `Departure ${((_d = departure.line) == null ? void 0 : _d.name) || "unbekannt / unknown"} to ${(_e = departure.direction) != null ? _e : "unbekannt / unknown"} filtered: Product "${lineProduct}" not enabled`
         );
       }
       return isEnabled;
@@ -153,7 +140,7 @@ class DepartureRequest extends import_library.BaseClass {
         (station) => station.enabled === true && station.id === stationId
       );
       if (!stationConfig) {
-        this.log.warn(this.library.translate("msg_departureStationNotFoundOrDisabled", stationId));
+        this.log.warn(`Station with ID ${stationId} not found or not enabled`);
         return;
       }
       await this.library.writedp(`${this.adapter.namespace}.Stations.${stationConfig.id}`, void 0, {
@@ -219,7 +206,7 @@ class DepartureRequest extends import_library.BaseClass {
       const departureStates = (0, import_mapper.mapDeparturesToDepartureStates)(filteredDepartures);
       await this.writeBaseStates(departureStates, stationId, countEntries);
     } catch (err) {
-      this.log.error(this.library.translate("msg_departureWriteError", err.message));
+      this.log.error(`Error writing departures: ${err.message}`);
     }
   }
   /**
@@ -233,9 +220,7 @@ class DepartureRequest extends import_library.BaseClass {
     var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
     for (const [index, obj] of response.entries()) {
       try {
-        this.log.info2(
-          this.library.translate("msg_departureStartProcessingObject", index + 1, response.length)
-        );
+        this.log.info2(`=== Starting object ${index + 1} of ${response.length} ===`);
         const departureIndex = `Departures_${`00${index}`.slice(-2)}`;
         const [delayed, onTime] = await this.library.getDelayStatus(obj.delay, this.delayOffset);
         await this.library.writedp(
@@ -580,15 +565,15 @@ class DepartureRequest extends import_library.BaseClass {
           },
           true
         );
-        this.log.info2(this.library.translate("msg_departureObjectProcessedSuccessfully", index + 1));
+        this.log.info2(`\u2713 Object ${index + 1} processed successfully`);
         if (index === countEntries - 1) {
-          this.log.debug(this.library.translate("msg_departureMaxEntriesReached", countEntries));
+          this.log.debug(
+            `=== Maximum number of entries reached (${countEntries}), further departures will not be processed ===`
+          );
           break;
         }
       } catch (err) {
-        this.log.error(
-          this.library.translate("msg_departureErrorProcessingObject", index + 1, err.message)
-        );
+        this.log.error(`\u2717 Error processing object ${index + 1}: ${err.message}`);
       }
     }
   }

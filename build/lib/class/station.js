@@ -48,14 +48,14 @@ class StationRequest extends import_library.BaseClass {
     const currentServiceType = this.adapter.config.serviceType || "hafas";
     if (currentServiceType !== expectedServiceType) {
       throw new Error(
-        this.library.translate("msg_wrongClientType", expectedServiceType, currentServiceType, client_profile)
+        `Wrong client type: Expected '${expectedServiceType}', but '${currentServiceType}' is initialized (client_profile: ${client_profile})`
       );
     }
     if (expectedServiceType === "hafas" && expectedProfile) {
       const currentProfile = this.adapter.config.profile || "";
       if (currentProfile !== expectedProfile) {
         throw new Error(
-          this.library.translate("msg_wrongProfile", expectedProfile, currentProfile, client_profile)
+          `Wrong profile: Expected '${expectedProfile}', but '${currentProfile}' is configured (client_profile: ${client_profile})`
         );
       }
     }
@@ -72,10 +72,10 @@ class StationRequest extends import_library.BaseClass {
   async getStation(stationId, service, options, client_profile) {
     try {
       if (!stationId) {
-        throw new Error(this.library.translate("msg_departureNoStationId"));
+        throw new Error("No stationId provided");
       }
       if (!service) {
-        throw new Error(this.library.translate("msg_noServices"));
+        throw new Error("No service provided");
       }
       this.validateClientProfile(client_profile);
       const station = await service.getStop(stationId, options);
@@ -84,7 +84,7 @@ class StationRequest extends import_library.BaseClass {
       }
       return station;
     } catch (err) {
-      this.log.error(this.library.translate("msg_stationQueryError", stationId, err.message));
+      this.log.error(`Error querying stations. Error message: ${stationId}: ${err.message}`);
       throw err;
     }
   }
@@ -117,7 +117,7 @@ class StationRequest extends import_library.BaseClass {
       }
       await this.library.garbageColleting(`${basePath}.`, 2e3);
     } catch (err) {
-      this.log.error(this.library.translate("msg_stationWriteError", err.message));
+      this.log.error(`Error writing station data: ${err.message}`);
     }
   }
 }
