@@ -77,7 +77,7 @@ const Departure: ChangeTypeOfKeysForState<Departure, ioBroker.StateObject> = {
         common: {
             name: 'Delay',
             type: 'number',
-            role: 'value',
+            role: 'time',
             read: true,
             write: false,
             desc: 'Delay in seconds',
@@ -378,7 +378,7 @@ const Leg: ChangeTypeOfKeysForState<Leg, ioBroker.StateObject> = {
         common: {
             name: 'Departure Delay',
             type: 'number',
-            role: 'value',
+            role: 'time',
             read: true,
             write: false,
             desc: 'Departure Delay in seconds',
@@ -417,7 +417,7 @@ const Leg: ChangeTypeOfKeysForState<Leg, ioBroker.StateObject> = {
         common: {
             name: 'Arrival Delay',
             type: 'number',
-            role: 'value',
+            role: 'time',
             read: true,
             write: false,
             desc: 'Arrival Delay in seconds',
@@ -602,7 +602,7 @@ const AlternativeTrip: ChangeTypeOfKeysForState<AlternativeTrip, ioBroker.StateO
         common: {
             name: 'Delay',
             type: 'number',
-            role: 'value',
+            role: 'time',
             read: true,
             write: false,
             desc: 'Delay in seconds',
@@ -739,19 +739,6 @@ const Products: ChangeTypeOfKeysForState<Products, ioBroker.StateObject> = {
             read: true,
             write: false,
             desc: 'Is National Express transport included',
-        },
-        native: {},
-    },
-    nationalexpress: {
-        _id: '',
-        type: 'state',
-        common: {
-            name: 'Nationalexpress',
-            type: 'boolean',
-            role: 'indicator',
-            read: true,
-            write: false,
-            desc: 'Is Nationalexpress transport included',
         },
         native: {},
     },
@@ -1173,5 +1160,4 @@ type Products = {
     regionalExpress?: boolean | undefined;
     national?: boolean | undefined;
     nationalExpress?: boolean | undefined;
-    nationalexpress?: boolean | undefined;
 };

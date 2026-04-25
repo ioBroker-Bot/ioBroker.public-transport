@@ -34,7 +34,7 @@ export class PublicTransport extends utils.Adapter {
         });
         this.library = new Library(this);
         this.on('ready', this.onReady.bind(this));
-        this.on('stateChange', this.onStateChange.bind(this));
+        // this.on('stateChange', this.onStateChange.bind(this));
         // this.on('objectChange', this.onObjectChange.bind(this));
         this.on('message', this.onMessage.bind(this));
         this.on('unload', this.onUnload.bind(this));
@@ -175,16 +175,17 @@ export class PublicTransport extends utils.Adapter {
      *
      * @param id The id of the state that changed
      * @param state The new state object or null/undefined if deleted
+     *
+     * private onStateChange(id: string, state: ioBroker.State | null | undefined): void {
+     *   if (state) {
+     *       // The state was changed
+     *       this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
+     *   } else {
+     *       // The state was deleted
+     *       this.log.info(`state ${id} deleted`);
+     *   }
+     * }
      */
-    private onStateChange(id: string, state: ioBroker.State | null | undefined): void {
-        if (state) {
-            // The state was changed
-            this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
-        } else {
-            // The state was deleted
-            this.log.info(`state ${id} deleted`);
-        }
-    }
 
     /**
      * Some message was sent to this instance over message box. Used by email, pushover, text2speech, ...
