@@ -37,12 +37,12 @@ class PollingManager {
    */
   getEnabledConfigs(configs, noConfigMsg, noEnabledMsg) {
     if (!configs || configs.length === 0) {
-      this.adapter.log.debug(this.adapter.library.translate(noConfigMsg));
+      this.adapter.log.debug(noConfigMsg);
       return void 0;
     }
     const enabledConfigs = configs.filter((config) => config.enabled);
     if (enabledConfigs.length === 0) {
-      this.adapter.log.debug(this.adapter.library.translate(noEnabledMsg));
+      this.adapter.log.debug(noEnabledMsg);
       return void 0;
     }
     return enabledConfigs;
@@ -56,11 +56,9 @@ class PollingManager {
    */
   logConfigs(configs, countMsg, entryMsg) {
     var _a;
-    this.adapter.log.info(this.adapter.library.translate(countMsg, configs.length));
+    this.adapter.log.info(countMsg(configs.length));
     for (const config of configs) {
-      this.adapter.log.info(
-        this.adapter.library.translate(entryMsg, config.customName || config.name || "", (_a = config.id) != null ? _a : "")
-      );
+      this.adapter.log.info(entryMsg(config.customName || config.name || "", (_a = config.id) != null ? _a : ""));
     }
   }
   /**
@@ -79,24 +77,18 @@ class PollingManager {
     for (const config of configs) {
       if (!config.id) {
         this.adapter.log.warn(
-          this.adapter.library.translate("msg_stationNoValidId", config.customName || config.name || "")
+          `Station "${config.customName || config.name || ""}" has no valid ID, skipping...`
         );
         continue;
       }
-      this.adapter.log.info(
-        this.adapter.library.translate(fetchingMsg, config.customName || config.name || "", config.id)
-      );
+      this.adapter.log.info(fetchingMsg(config.customName || config.name || "", config.id));
       const success = await this.queryConfig(config, service);
       if (success) {
         successCount++;
-        this.adapter.log.info(
-          this.adapter.library.translate(updatedMsg, config.customName || config.name || "", config.id)
-        );
+        this.adapter.log.info(updatedMsg(config.customName || config.name || "", config.id));
       } else {
         errorCount++;
-        this.adapter.log.warn(
-          this.adapter.library.translate(failedMsg, config.customName || config.name || "", config.id)
-        );
+        this.adapter.log.warn(failedMsg(config.customName || config.name || "", config.id));
       }
     }
     return { successCount, errorCount };
@@ -134,8 +126,8 @@ class PollingManager {
       messages.updated,
       messages.failed
     );
-    this.adapter.log.info(this.adapter.library.translate(messages.firstCompleted, successCount, errorCount));
-    this.adapter.log.info(this.adapter.library.translate(messages.waiting, pollIntervalMinutes));
+    this.adapter.log.info(messages.firstCompleted(successCount, errorCount));
+    this.adapter.log.info(messages.waiting(pollIntervalMinutes));
     this.pollInterval = this.adapter.setInterval(async () => {
       await this.handleDisabledConfigs(configs);
       const { successCount: successCount2, errorCount: errorCount2 } = await this.queryConfigs(
@@ -145,8 +137,8 @@ class PollingManager {
         messages.updated,
         messages.failed
       );
-      this.adapter.log.info(this.adapter.library.translate(messages.queryCompleted, successCount2, errorCount2));
-      this.adapter.log.info(this.adapter.library.translate(messages.waiting, pollIntervalMinutes));
+      this.adapter.log.info(messages.queryCompleted(successCount2, errorCount2));
+      this.adapter.log.info(messages.waiting(pollIntervalMinutes));
     }, pollInterval);
   }
   /**

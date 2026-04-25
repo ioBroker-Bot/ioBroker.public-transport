@@ -92,7 +92,7 @@
     "journey_duration_minutes": "Dauer Minuten",
     "journey_enabled": "Verbindung aktiviert",
     "journey_leg": "Teilstrecke",
-    "journey_leg_FromTo": "Teilstrecke Von %s Nach %s",
+    "journey_leg_FromTo": "Teilstrecke von %s nach %s",
     "journey_line_info": "Linieninfo",
     "journey_manager": "Verbindungen erstellen",
     "journey_mode": "Modus",

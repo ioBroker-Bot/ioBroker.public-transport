@@ -75,7 +75,7 @@ class PublicTransport extends utils.Adapter {
    */
   getActiveService() {
     if (!this.activeService) {
-      throw new Error(this.library.translate("msg_transportServiceNotInitialized"));
+      throw new Error("Transport service has not been initialized.");
     }
     return this.activeService;
   }
@@ -87,20 +87,20 @@ class PublicTransport extends utils.Adapter {
       return;
     }
     if (!this.config.stationConfig || this.config.stationConfig.length === 0) {
-      this.log.debug(this.library.translate("msg_noStationsConfiguredForStationInfo"));
+      this.log.debug(
+        "No stations found in configuration for station info queries. Please configure in Admin UI."
+      );
       return;
     }
     const enabledStations = this.config.stationConfig.filter((station) => station.enabled);
     if (enabledStations.length === 0) {
-      this.log.debug(this.library.translate("msg_noEnabledStations"));
+      this.log.debug("No enabled stations found. Please enable at least one station.");
       return;
     }
-    this.log.info(this.library.translate("msg_activeStationsFound", enabledStations.length));
+    this.log.info(`${enabledStations.length} active station(s) found:`);
     for (const station of enabledStations) {
       if (station.id) {
-        this.log.info(
-          this.library.translate("msg_fetchingStationInfo", station.customName || station.name, station.id)
-        );
+        this.log.info(`Querying info for: ${station.customName || station.name} (${station.id})...`);
         const stationData = await this.stationRequest.getStation(
           station.id,
           this.activeService,
@@ -128,16 +128,18 @@ class PublicTransport extends utils.Adapter {
         this.vService = new import_dbVendoService.VendoService(clientName);
         this.vService.init();
         this.activeService = this.vService;
-        this.log.info(this.library.translate("msg_vendoServiceInitialized", clientName));
+        this.log.info(`VendoService initialized with ClientName: ${clientName}`);
       } else {
         const profileName = this.config.profile || "unknown";
         this.hService = new import_hafasService.HafasService(clientName, profileName);
         this.hService.init();
         this.activeService = this.hService;
-        this.log.info(this.library.translate("msg_hafasClientInitialized", profileName));
+        this.log.info(`HAFAS client initialized with profile: ${profileName}`);
       }
     } catch (error) {
-      this.log.error(this.library.translate("msg_transportServiceInitFailed", error.message));
+      this.log.error(
+        `Transport service (client) could not be initialized. Error message: ${error.message}`
+      );
       return;
     }
     this.depRequest = new import_departure.DepartureRequest(this);
@@ -149,17 +151,17 @@ class PublicTransport extends utils.Adapter {
     try {
       await this.departurePolling.startDepartures(pollInterval);
     } catch (err) {
-      this.log.error(this.library.translate("msg_hafasRequestFailed", err.message));
+      this.log.error(`Query for departures failed. Error message: ${err.message}`);
     }
     try {
       await this.journeyPolling.startJourneys(pollInterval);
     } catch (err) {
-      this.log.error(this.library.translate("msg_journeyQueryError", err.message));
+      this.log.error(`Error querying journeys: ${err.message}`);
     }
     try {
       await this.fetchStationInformation();
     } catch (err) {
-      this.log.error(this.library.translate("msg_stationQueryError", err.message));
+      this.log.error(`Error querying stations. Error message: ${err.message}`);
     }
   }
   /**
@@ -207,12 +209,7 @@ class PublicTransport extends utils.Adapter {
           const query = message.query;
           if (!query || query.length < 2) {
             if (obj.callback) {
-              this.sendTo(
-                obj.from,
-                obj.command,
-                { error: this.library.translate("msg_queryTooShort") },
-                obj.callback
-              );
+              this.sendTo(obj.from, obj.command, { error: "Query too short" }, obj.callback);
             }
             return;
           }
@@ -231,7 +228,7 @@ class PublicTransport extends utils.Adapter {
             this.sendTo(obj.from, obj.command, stations, obj.callback);
           }
         } catch (error) {
-          this.log.error(this.library.translate("msg_locationSearchFailed", error.message));
+          this.log.error(`Location search failed. Error message: ${error.message}`);
           if (obj.callback) {
             this.sendTo(obj.from, obj.command, { error: error.message }, obj.callback);
           }
