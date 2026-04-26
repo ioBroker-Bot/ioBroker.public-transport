@@ -29,7 +29,7 @@ export class VendoService implements ITransportService {
             this.navClient = createClient(withThrottling(dbNavProfile), this.clientName);
             return true;
         } catch (error) {
-            throw new Error(`db-vendo-Client konnte nicht initialisiert werden: ${(error as Error).message}`);
+            throw new Error(`The db-vendo client could not be initialized: ${(error as Error).message}`);
         }
     }
 
@@ -45,7 +45,7 @@ export class VendoService implements ITransportService {
      */
     private getNavClient(): ReturnType<typeof createClient> {
         if (!this.navClient) {
-            throw new Error('VendoService wurde noch nicht initialisiert. Bitte zuerst init() aufrufen.');
+            throw new Error('VendoService has not been initialized yet. Please call init() first.');
         }
         return this.navClient;
     }
