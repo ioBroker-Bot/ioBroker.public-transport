@@ -18,7 +18,7 @@ type departureOpt = {
 // Default-Werte
 export const defaultDepartureOpt: Partial<departureOpt> = {
     duration: 60,
-    results: 3,
+    results: 10,
     language: 'de',
 };
 
@@ -52,7 +52,7 @@ type journeyOpt = {
 
 // Default-Werte
 export const defaultJourneyOpt: Partial<journeyOpt> = {
-    results: 3,
+    results: 10,
     language: 'de',
 };
 
