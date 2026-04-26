@@ -36,7 +36,7 @@ export class JourneysRequest extends BaseClass {
         const currentServiceType = this.adapter.config.serviceType || 'hafas';
         if (currentServiceType !== expectedServiceType) {
             throw new Error(
-                this.library.translate('msg_wrongClientType', expectedServiceType, currentServiceType, client_profile),
+                `Wrong client type: Expected '${expectedServiceType}', but '${currentServiceType}' is initialized (client_profile: ${client_profile})`,
             );
         }
 
@@ -45,7 +45,7 @@ export class JourneysRequest extends BaseClass {
             const currentProfile = this.adapter.config.profile || '';
             if (currentProfile !== expectedProfile) {
                 throw new Error(
-                    this.library.translate('msg_wrongProfile', expectedProfile, currentProfile, client_profile),
+                    `Wrong profile: Expected '${expectedProfile}', but '${currentProfile}' is configured (client_profile: ${client_profile})`,
                 );
             }
         }
@@ -76,7 +76,7 @@ export class JourneysRequest extends BaseClass {
     ): Promise<boolean> {
         try {
             if (!from || !to) {
-                throw new Error(this.library.translate('msg_journeyNoFromTo'));
+                throw new Error('No start or destination station provided');
             }
 
             // Validiere Client und Profil
@@ -93,19 +93,14 @@ export class JourneysRequest extends BaseClass {
             }
             if (!response.journeys || response.journeys.length === 0) {
                 this.log.info(
-                    this.library.translate(
-                        'msg_journeyNoJourneys',
-                        from,
-                        to,
-                        client_profile || 'kein Profil angegeben',
-                    ),
+                    `No journeys found from station ${from} to ${to}, client_profile: ${client_profile || 'kein Profil angegeben'}`,
                 );
             }
             // Schreibe die Verbindungen in die States
             await this.writeJourneysStates(journeyId, response, countEntries, client_profile);
             return true;
         } catch (error) {
-            this.log.error(this.library.translate('msg_journeyQueryError', from, to, (error as Error).message));
+            this.log.error(`Error querying journeys from station ${from} to ${to}: ${(error as Error).message}`);
             return false;
         }
     }
@@ -171,7 +166,7 @@ export class JourneysRequest extends BaseClass {
             const journeyConfig = this.adapter.config.journeyConfig.find(j => j.enabled === true && j.id === journeyId);
 
             if (!journeyConfig) {
-                this.log.warn(this.library.translate('msg_journeyNotFoundOrDisabled', journeyId));
+                this.log.warn(`Journey with ID ${journeyId} not found or not enabled`);
                 return;
             }
 
@@ -233,7 +228,7 @@ export class JourneysRequest extends BaseClass {
                 client_profile,
             );
         } catch (err) {
-            this.log.error(this.library.translate('msg_journeyWriteError', (err as Error).message));
+            this.log.error(`Error writing journeys. Error message: ${(err as Error).message}`);
         }
     }
 
@@ -505,13 +500,15 @@ export class JourneysRequest extends BaseClass {
                     // Teilstrecken/Legs der Verbindung
                     await this.writeLegStates(journeyPath, journey.legs);
                     if (index === countEntries - 1) {
-                        this.log.debug(this.library.translate('msg_journeyMaxEntriesReached', countEntries));
+                        this.log.debug(
+                            `=== Maximum number of journeys reached (${countEntries}), further journeys will not be processed ===`,
+                        );
                         break; // Schleife verlassen, wenn die gewünschte Anzahl an Verbindungen erreicht ist
                     }
                 }
             }
         } catch (err) {
-            this.log.error(this.library.translate('msg_journeyStateWriteError', (err as Error).message));
+            this.log.error(`Error writing journey states. Error message: ${(err as Error).message}`);
         }
     }
 
@@ -530,11 +527,11 @@ export class JourneysRequest extends BaseClass {
                         leg.walking === true
                             ? this.library.translate('journey_walking')
                             : this.library.translate('journey_leg');
-                    const stationFrom = leg.origin?.name || this.library.translate('unknown_station');
-                    const stationTo = leg.destination?.name || this.library.translate('unknown_station');
+                    const stationFrom = leg.origin?.name || 'unknown_station';
+                    const stationTo = leg.destination?.name || 'unknown_station';
                     const name = leg.walking
-                        ? this.library.translate(`journey_change`, stationFrom)
-                        : this.library.translate(`journey_leg_FromTo`, stationFrom, stationTo);
+                        ? this.library.translate('journey_Change')
+                        : this.library.translate('journey_leg_FromTo', stationFrom, stationTo);
                     const [arrivalDelayed, arrivalOnTime] = await this.library.getDelayStatus(leg.arrivalDelay, 0);
                     const [departureDelayed, departureOnTime] = await this.library.getDelayStatus(
                         leg.departureDelay,
@@ -782,7 +779,7 @@ export class JourneysRequest extends BaseClass {
                 }
             }
         } catch (err) {
-            this.log.error(this.library.translate('msg_journeyLegStateWriteError', (err as Error).message));
+            this.log.error(`Error writing leg states of the journey. Error message: ${(err as Error).message}`);
         }
     }
 
@@ -891,7 +888,7 @@ export class JourneysRequest extends BaseClass {
                 },
             );
         } catch (err) {
-            this.log.error(this.library.translate('msg_journeyLegStationWriteError', (err as Error).message));
+            this.log.error(`Error writing station states of the leg. Error message: ${(err as Error).message}`);
         }
     }
 
@@ -982,7 +979,7 @@ export class JourneysRequest extends BaseClass {
                 });
             }
         } catch (err) {
-            this.log.error(this.library.translate('msg_journeyLegLineWriteError', (err as Error).message));
+            this.log.error(`Error writing line states of the leg. Error message: ${(err as Error).message}`);
         }
     }
 }

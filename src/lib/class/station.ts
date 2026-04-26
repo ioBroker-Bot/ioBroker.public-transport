@@ -35,7 +35,7 @@ export class StationRequest extends BaseClass {
         const currentServiceType = this.adapter.config.serviceType || 'hafas';
         if (currentServiceType !== expectedServiceType) {
             throw new Error(
-                this.library.translate('msg_wrongClientType', expectedServiceType, currentServiceType, client_profile),
+                `Wrong client type: Expected '${expectedServiceType}', but '${currentServiceType}' is initialized (client_profile: ${client_profile})`,
             );
         }
 
@@ -44,7 +44,7 @@ export class StationRequest extends BaseClass {
             const currentProfile = this.adapter.config.profile || '';
             if (currentProfile !== expectedProfile) {
                 throw new Error(
-                    this.library.translate('msg_wrongProfile', expectedProfile, currentProfile, client_profile),
+                    `Wrong profile: Expected '${expectedProfile}', but '${currentProfile}' is configured (client_profile: ${client_profile})`,
                 );
             }
         }
@@ -67,10 +67,10 @@ export class StationRequest extends BaseClass {
     ): Promise<Hafas.Station | Hafas.Stop> {
         try {
             if (!stationId) {
-                throw new Error(this.library.translate('msg_departureNoStationId'));
+                throw new Error('No stationId provided');
             }
             if (!service) {
-                throw new Error(this.library.translate('msg_noServices'));
+                throw new Error('No service provided');
             }
 
             // Validiere Client und Profil
@@ -82,7 +82,7 @@ export class StationRequest extends BaseClass {
             }
             return station;
         } catch (err) {
-            this.log.error(this.library.translate('msg_stationQueryError', stationId, (err as Error).message));
+            this.log.error(`Error querying stations. Error message: ${stationId}: ${(err as Error).message}`);
             throw err;
         }
     }
@@ -118,7 +118,7 @@ export class StationRequest extends BaseClass {
             // Vor dem Schreiben alte States löschen
             await this.library.garbageColleting(`${basePath}.`, 2000);
         } catch (err) {
-            this.log.error(this.library.translate('msg_stationWriteError', (err as Error).message));
+            this.log.error(`Error writing station data: ${(err as Error).message}`);
         }
     }
 }

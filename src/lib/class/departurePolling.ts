@@ -37,7 +37,7 @@ export class DeparturePolling extends PollingManager<DepartureConfig> {
             }
 
             this.adapter.log.debug(
-                `Setze States für deaktivierte Station zurück: ${config.customName || config.name || ''} (${config.id})`,
+                `Reset states for deactivated station: ${config.customName || config.name || ''} (${config.id})`,
             );
 
             // Verwende garbageColleting um States auf Standardwerte zu setzen
@@ -108,16 +108,16 @@ export class DeparturePolling extends PollingManager<DepartureConfig> {
      */
     public async startDepartures(pollIntervalMinutes: number): Promise<void> {
         await this.start(this.adapter.config.stationConfig as DepartureConfig[], pollIntervalMinutes, {
-            noConfig: 'msg_noStationsConfigured',
-            noEnabled: 'msg_noEnabledStations',
-            count: 'msg_activeStationsFound',
-            entry: 'msg_stationListEntry',
-            fetching: 'msg_fetchingDepartures',
-            updated: 'msg_departuresUpdated',
-            failed: 'msg_departuresUpdateFailed',
-            firstCompleted: 'msg_firstQueryCompleted',
-            queryCompleted: 'msg_queryCompleted',
-            waiting: 'msg_waitingForNextQuery',
+            noConfig: 'No stations found in configuration. Please configure in Admin UI.',
+            noEnabled: 'No enabled stations found. Please enable at least one station.',
+            count: n => `${n} active station(s) found:`,
+            entry: (name, id) => `  - ${name} (ID: ${id})`,
+            fetching: (name, id) => `Fetching departures for: ${name} (${id})`,
+            updated: (name, id) => `Departures updated for: ${name} (${id})`,
+            failed: (name, id) => `Departures could not be updated for: ${name} (${id})`,
+            firstCompleted: (s, f) => `First query completed: ${s} successful, ${f} failed`,
+            queryCompleted: (s, f) => `Query completed: ${s} successful, ${f} failed`,
+            waiting: m => `Waiting for next query in ${m} minutes...`,
         });
     }
 }

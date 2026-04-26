@@ -40,9 +40,7 @@ class JourneyPolling extends import_pollingManager.PollingManager {
       if (!config.id) {
         continue;
       }
-      this.adapter.log.debug(
-        `Setze States f\xFCr deaktivierte Journey zur\xFCck: ${config.customName || ""} (${config.id})`
-      );
+      this.adapter.log.debug(`Reset states for deactivated journey: ${config.customName || ""} (${config.id})`);
       await this.adapter.library.garbageColleting(
         `Journeys.${config.id}.`,
         2e3,
@@ -95,18 +93,13 @@ class JourneyPolling extends import_pollingManager.PollingManager {
    *
    * @param configs Die Journey-Konfigurationen
    * @param countMsg Der Übersetzungsschlüssel für die Anzahl
-   * @param entryMsg Der Übersetzungsschlüssel für jeden Eintrag
+   * @param _entryMsg Der Übersetzungsschlüssel für jeden Eintrag
    */
-  logConfigs(configs, countMsg, entryMsg) {
-    this.adapter.log.info(this.adapter.library.translate(countMsg, configs.length));
+  logConfigs(configs, countMsg, _entryMsg) {
+    this.adapter.log.info(countMsg(configs.length));
     for (const config of configs) {
       this.adapter.log.info(
-        this.adapter.library.translate(
-          entryMsg,
-          config.customName || "",
-          config.fromStationName || config.fromStationId || "",
-          config.toStationName || config.toStationId || ""
-        )
+        `  - ${config.customName || ""} (From: ${config.fromStationName || config.fromStationId || ""}, To: ${config.toStationName || config.toStationId || ""})`
       );
     }
   }
@@ -120,7 +113,7 @@ class JourneyPolling extends import_pollingManager.PollingManager {
   async queryConfig(config, service) {
     var _a, _b, _c;
     if (!config.fromStationId || !config.toStationId) {
-      this.adapter.log.warn(this.adapter.library.translate("msg_journeyNoFromTo", config.customName || ""));
+      this.adapter.log.warn("No start or destination station provided");
       return false;
     }
     const options = this.createJourneyOptions(config);
@@ -149,13 +142,7 @@ class JourneyPolling extends import_pollingManager.PollingManager {
         client_profile
       );
     } catch (error) {
-      this.adapter.log.error(
-        this.adapter.library.translate(
-          "msg_journeyQueryFailed",
-          config.customName || "",
-          error.message
-        )
-      );
+      this.adapter.log.error(`Error querying journey "${config.customName || ""}": ${error.message}`);
       return false;
     }
   }
@@ -166,16 +153,16 @@ class JourneyPolling extends import_pollingManager.PollingManager {
    */
   async startJourneys(pollIntervalMinutes) {
     await this.start(this.adapter.config.journeyConfig, pollIntervalMinutes, {
-      noConfig: "msg_noJourneysConfigured",
-      noEnabled: "msg_noEnabledJourneys",
-      count: "msg_activeJourneysFound",
-      entry: "msg_journeyListEntry",
-      fetching: "msg_fetchingJourneys",
-      updated: "msg_journeysUpdated",
-      failed: "msg_journeysUpdateFailed",
-      firstCompleted: "msg_firstJourneyQueryCompleted",
-      queryCompleted: "msg_journeyQueryCompleted",
-      waiting: "msg_waitingForNextJourneyQuery"
+      noConfig: "No journeys found in configuration. Please configure in Admin UI.",
+      noEnabled: "No enabled journeys found. Please enable at least one journey.",
+      count: (n) => `${n} active journey(s) found:`,
+      entry: (name, id) => `  - ${name} (ID: ${id})`,
+      fetching: (name, id) => `Fetching journeys for: ${name} (${id})`,
+      updated: (name, id) => `Journeys updated for: ${name} (${id})`,
+      failed: (name, id) => `Journeys could not be updated for: ${name} (${id})`,
+      firstCompleted: (s, f) => `First journey query completed: ${s} successful, ${f} failed`,
+      queryCompleted: (s, f) => `Journey query completed: ${s} successful, ${f} failed`,
+      waiting: (m) => `Waiting for next journey query in ${m} minutes...`
     });
   }
 }

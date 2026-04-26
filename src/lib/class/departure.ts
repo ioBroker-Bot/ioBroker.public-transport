@@ -32,7 +32,7 @@ export class DepartureRequest extends BaseClass {
         const currentServiceType = this.adapter.config.serviceType || 'hafas';
         if (currentServiceType !== expectedServiceType) {
             throw new Error(
-                this.library.translate('msg_wrongClientType', expectedServiceType, currentServiceType, client_profile),
+                `Wrong client type: Expected '${expectedServiceType}', but '${currentServiceType}' is initialized (client_profile: ${client_profile})`,
             );
         }
 
@@ -41,7 +41,7 @@ export class DepartureRequest extends BaseClass {
             const currentProfile = this.adapter.config.profile || '';
             if (currentProfile !== expectedProfile) {
                 throw new Error(
-                    this.library.translate('msg_wrongProfile', expectedProfile, currentProfile, client_profile),
+                    `Wrong profile: Expected '${expectedProfile}', but '${currentProfile}' is configured (client_profile: ${client_profile})`,
                 );
             }
         }
@@ -68,7 +68,7 @@ export class DepartureRequest extends BaseClass {
     ): Promise<boolean> {
         try {
             if (!stationId) {
-                throw new Error(this.library.translate('msg_departureNoStationId'));
+                throw new Error('No stationId provided');
             }
 
             // Validiere Client und Profil
@@ -82,18 +82,14 @@ export class DepartureRequest extends BaseClass {
             }
             if (!response.departures || response.departures.length === 0) {
                 this.log.info(
-                    this.library.translate(
-                        'msg_departureNoDepartures',
-                        stationId,
-                        client_profile || 'kein Profil angegeben',
-                    ),
+                    `No departures found for station ${stationId}, client_profile: ${client_profile || 'kein Profil angegeben'}`,
                 );
             }
             // Schreibe die Abfahrten in die States
             await this.writeDepartureStates(stationId, response.departures, countEntries, products);
             return true;
         } catch (error) {
-            this.log.error(this.library.translate('msg_departureQueryError', stationId, (error as Error).message));
+            this.log.error(`Error querying departures for station ${stationId}: ${(error as Error).message}`);
             return false;
         }
     }
@@ -122,23 +118,14 @@ export class DepartureRequest extends BaseClass {
             const lineProduct = departure.line?.product;
             if (!lineProduct) {
                 this.log.info2(
-                    this.library.translate(
-                        'msg_departureFilterNoProduct',
-                        departure.line?.name || 'unbekannt / unknown',
-                        departure.direction ?? 'unbekannt / unknown',
-                    ),
+                    `Departure ${departure.line?.name || 'unbekannt / unknown'} to ${departure.direction ?? 'unbekannt / unknown'} filtered: No product info available`,
                 );
                 return false;
             }
             const isEnabled = enabledProducts.includes(lineProduct);
             if (!isEnabled) {
                 this.log.info2(
-                    this.library.translate(
-                        'msg_departureFilterProductDisabled',
-                        departure.line?.name || 'unbekannt / unknown',
-                        departure.direction ?? 'unbekannt / unknown',
-                        lineProduct,
-                    ),
+                    `Departure ${departure.line?.name || 'unbekannt / unknown'} to ${departure.direction ?? 'unbekannt / unknown'} filtered: Product "${lineProduct}" not enabled`,
                 );
             }
             return isEnabled;
@@ -170,7 +157,7 @@ export class DepartureRequest extends BaseClass {
             );
 
             if (!stationConfig) {
-                this.log.warn(this.library.translate('msg_departureStationNotFoundOrDisabled', stationId));
+                this.log.warn(`Station with ID ${stationId} not found or not enabled`);
                 return;
             }
 
@@ -248,7 +235,7 @@ export class DepartureRequest extends BaseClass {
             // JSON in die States schreiben
             await this.writeBaseStates(departureStates, stationId, countEntries);
         } catch (err) {
-            this.log.error(this.library.translate('msg_departureWriteError', (err as Error).message));
+            this.log.error(`Error writing departures: ${(err as Error).message}`);
         }
     }
 
@@ -262,9 +249,7 @@ export class DepartureRequest extends BaseClass {
     async writeBaseStates(response: DepartureState[], stationId: string, countEntries: number): Promise<void> {
         for (const [index, obj] of response.entries()) {
             try {
-                this.log.info2(
-                    this.library.translate('msg_departureStartProcessingObject', index + 1, response.length),
-                );
+                this.log.info2(`=== Starting object ${index + 1} of ${response.length} ===`);
                 const departureIndex = `Departures_${`00${index}`.slice(-2)}`;
                 const [delayed, onTime] = await this.library.getDelayStatus(obj.delay, this.delayOffset);
                 // Erstelle Channel Departures_XX und darunter die States
@@ -630,15 +615,15 @@ export class DepartureRequest extends BaseClass {
                     },
                     true,
                 );
-                this.log.info2(this.library.translate('msg_departureObjectProcessedSuccessfully', index + 1));
+                this.log.info2(`✓ Object ${index + 1} processed successfully`);
                 if (index === countEntries - 1) {
-                    this.log.debug(this.library.translate('msg_departureMaxEntriesReached', countEntries));
+                    this.log.debug(
+                        `=== Maximum number of entries reached (${countEntries}), further departures will not be processed ===`,
+                    );
                     break;
                 }
             } catch (err) {
-                this.log.error(
-                    this.library.translate('msg_departureErrorProcessingObject', index + 1, (err as Error).message),
-                );
+                this.log.error(`✗ Error processing object ${index + 1}: ${(err as Error).message}`);
                 // Ohne throw: weiter zur nächsten Abfahrt ✅ (empfohlen)
                 // Mit throw: alle weiteren Abfahrten werden NICHT verarbeitet ❌
             }
