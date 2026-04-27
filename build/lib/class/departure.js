@@ -94,7 +94,10 @@ class DepartureRequest extends import_library.BaseClass {
   }
   /**
    * Filtert Abfahrten nach den gewählten Produkten.
-   * Es werden nur Abfahrten zurückgegeben, deren Produkt in den aktivierten Produkten enthalten ist.
+   * Die API liefert Produktnamen in kebab-case (z.B. "regional-express"),
+   * die Config-Keys sind camelCase (z.B. "regionalExpress") – daher wird
+   * der API-Wert vor dem Vergleich normalisiert. Über Funktion kebabToCamel()
+   * aus der library.ts wird die Normalisierung durchgeführt.
    *
    * @param departures    Die zu filternden Abfahrten
    * @param products      Die aktivierten Produkte (true = erlaubt)
@@ -114,10 +117,11 @@ class DepartureRequest extends import_library.BaseClass {
         );
         return false;
       }
-      const isEnabled = enabledProducts.includes(lineProduct);
+      const normalizedProduct = (0, import_library.kebabToCamel)(lineProduct);
+      const isEnabled = enabledProducts.includes(normalizedProduct);
       if (!isEnabled) {
         this.log.info2(
-          `Departure ${((_d = departure.line) == null ? void 0 : _d.name) || "unbekannt / unknown"} to ${(_e = departure.direction) != null ? _e : "unbekannt / unknown"} filtered: Product "${lineProduct}" not enabled`
+          `Departure ${((_d = departure.line) == null ? void 0 : _d.name) || "unbekannt / unknown"} to ${(_e = departure.direction) != null ? _e : "unbekannt / unknown"} filtered: Product "${lineProduct}" (normalized: "${normalizedProduct}") not enabled`
         );
       }
       return isEnabled;

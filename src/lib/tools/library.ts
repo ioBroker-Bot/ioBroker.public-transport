@@ -963,3 +963,14 @@ export class Library extends BaseClass {
         return [delayed, onTime];
     }
 }
+
+/**
+ * Konvertiert einen kebab-case String in camelCase.
+ * Beispiel: "regional-express" → "regionalExpress"
+ *
+ * @param str   kebab-case String
+ * @returns     camelCase String
+ */
+export function kebabToCamel(str: string): string {
+    return str.replace(/-([a-z])/g, (_, char: string) => char.toUpperCase());
+}

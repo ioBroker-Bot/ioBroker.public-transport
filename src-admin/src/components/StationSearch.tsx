@@ -102,6 +102,7 @@ const StationSearch: React.FC<StationSearchProps> = ({ oContext, onStationSelect
                 );
 
                 if (result && Array.isArray(result)) {
+                    console.log('Search result:', result);
                     const normalized = result.map((station: Station) => ({
                         ...station,
                         products: normalizeProducts(station.products as Record<string, boolean>),

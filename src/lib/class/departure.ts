@@ -1,6 +1,6 @@
 import type * as Hafas from 'hafas-client';
 import type { PublicTransport } from '../../main';
-import { BaseClass } from '../tools/library';
+import { BaseClass, kebabToCamel } from '../tools/library';
 import { mapDeparturesToDepartureStates } from '../tools/mapper';
 import { defaultDepartureOpt, type DepartureState, type Products } from '../types/types';
 
@@ -96,14 +96,17 @@ export class DepartureRequest extends BaseClass {
 
     /**
      * Filtert Abfahrten nach den gewählten Produkten.
-     * Es werden nur Abfahrten zurückgegeben, deren Produkt in den aktivierten Produkten enthalten ist.
+     * Die API liefert Produktnamen in kebab-case (z.B. "regional-express"),
+     * die Config-Keys sind camelCase (z.B. "regionalExpress") – daher wird
+     * der API-Wert vor dem Vergleich normalisiert. Über Funktion kebabToCamel()
+     * aus der library.ts wird die Normalisierung durchgeführt.
      *
      * @param departures    Die zu filternden Abfahrten
      * @param products      Die aktivierten Produkte (true = erlaubt)
      * @returns             Gefilterte Abfahrten
      */
     filterByProducts(departures: readonly Hafas.Alternative[], products: Partial<Products>): Hafas.Alternative[] {
-        // Erstelle eine Liste der aktivierten Produktnamen
+        // Erstelle eine Liste der aktivierten Produktnamen (camelCase)
         const enabledProducts = Object.entries(products)
             .filter(([_, enabled]) => enabled === true)
             .map(([productName, _]) => productName);
@@ -113,7 +116,7 @@ export class DepartureRequest extends BaseClass {
             return [...departures];
         }
 
-        // Filtere Abfahrten: behalte nur die, deren line.product in enabledProducts ist
+        // Filtere Abfahrten: normalisiere API-Produktnamen von kebab-case zu camelCase
         return departures.filter(departure => {
             const lineProduct = departure.line?.product;
             if (!lineProduct) {
@@ -122,10 +125,11 @@ export class DepartureRequest extends BaseClass {
                 );
                 return false;
             }
-            const isEnabled = enabledProducts.includes(lineProduct);
+            const normalizedProduct = kebabToCamel(lineProduct);
+            const isEnabled = enabledProducts.includes(normalizedProduct);
             if (!isEnabled) {
                 this.log.info2(
-                    `Departure ${departure.line?.name || 'unbekannt / unknown'} to ${departure.direction ?? 'unbekannt / unknown'} filtered: Product "${lineProduct}" not enabled`,
+                    `Departure ${departure.line?.name || 'unbekannt / unknown'} to ${departure.direction ?? 'unbekannt / unknown'} filtered: Product "${lineProduct}" (normalized: "${normalizedProduct}") not enabled`,
                 );
             }
             return isEnabled;
