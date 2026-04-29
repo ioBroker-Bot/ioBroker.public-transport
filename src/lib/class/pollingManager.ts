@@ -150,6 +150,11 @@ export abstract class PollingManager<T extends PollingConfig> {
         },
     ): Promise<void> {
         const service = this.adapter.getActiveService();
+
+        // Behandle deaktivierte Stationen (setze States auf Standardwerte)
+        // Muss vor dem Early Return passieren, damit auch der Fall "alle deaktiviert" behandelt wird
+        await this.handleDisabledConfigs(configs);
+
         const enabledConfigs = this.getEnabledConfigs(configs, messages.noConfig, messages.noEnabled);
 
         if (!enabledConfigs) {
@@ -159,9 +164,6 @@ export abstract class PollingManager<T extends PollingConfig> {
         this.logConfigs(enabledConfigs, messages.count, messages.entry);
 
         const pollInterval = pollIntervalMinutes * 60 * 1000;
-
-        // Behandle deaktivierte Stationen (setze States auf Standardwerte)
-        await this.handleDisabledConfigs(configs);
 
         // Erste Abfrage sofort ausführen
         const { successCount, errorCount } = await this.queryConfigs(

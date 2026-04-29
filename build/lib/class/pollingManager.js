@@ -112,13 +112,13 @@ class PollingManager {
    */
   async start(configs, pollIntervalMinutes, messages) {
     const service = this.adapter.getActiveService();
+    await this.handleDisabledConfigs(configs);
     const enabledConfigs = this.getEnabledConfigs(configs, messages.noConfig, messages.noEnabled);
     if (!enabledConfigs) {
       return;
     }
     this.logConfigs(enabledConfigs, messages.count, messages.entry);
     const pollInterval = pollIntervalMinutes * 60 * 1e3;
-    await this.handleDisabledConfigs(configs);
     const { successCount, errorCount } = await this.queryConfigs(
       enabledConfigs,
       service,
