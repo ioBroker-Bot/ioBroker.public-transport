@@ -272,6 +272,7 @@ For Vis1, there is a widget available for displaying departures. The JSON data i
 ### **WORK IN PROGRESS**
 * (tt-tom17) fix issues for latest Repo
 * (tt-tom17) fix deaktivieren von Verbindungen
+* (tt-tom17) Adapter requires node.js >= 22 now
 
 ### 0.2.2 (2026-04-25)
 * (tt-tom17) fix countEntries for journeys
