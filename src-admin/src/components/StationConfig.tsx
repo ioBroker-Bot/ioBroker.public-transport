@@ -13,6 +13,7 @@ interface Station {
     offsetTime?: number;
     products?: Products;
     availableProducts?: Partial<Products>; // Produkte die von HAFAS für diese Station zurückgegeben wurden
+    nativeProducts?: Partial<Products>; // Von HAFAS gemeldete Produkte der Station (unveränderlich)
     client_profile?: string;
 }
 
@@ -154,6 +155,7 @@ const StationConfig: React.FC<StationConfigProps> = ({ station, onUpdate, alive 
                             onChange={handleProductsChange}
                             disabled={station.enabled === false || !alive}
                             availableProducts={station.availableProducts}
+                            nativeProducts={station.nativeProducts}
                         />
                     </Box>
                 </Box>

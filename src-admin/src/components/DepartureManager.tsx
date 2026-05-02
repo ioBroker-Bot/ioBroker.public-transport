@@ -15,6 +15,7 @@ interface Station {
     numDepartures?: number;
     products?: Products;
     availableProducts?: Partial<Products>;
+    nativeProducts?: Partial<Products>; // Von HAFAS gemeldete Produkte der Station (unveränderlich)
     client_profile?: string;
 }
 
@@ -62,6 +63,7 @@ const DepartureManagerContent: React.FC<ConfigComponentProps> = ({ oContext, dat
                 numDepartures: 10,
                 products: Object.keys(initialProducts).length > 0 ? initialProducts : { ...defaultProducts },
                 availableProducts,
+                nativeProducts: stationProducts ?? availableProducts,
                 client_profile,
             };
 

@@ -8,6 +8,7 @@ interface ProductSelectorProps {
     onChange: (products: Products) => void;
     disabled?: boolean;
     availableProducts?: Partial<Products>; // Definiert welche Produkte für diese Station/Journey verfügbar sind
+    nativeProducts?: Partial<Products>; // Von HAFAS gemeldete Produkte – werden unterstrichen dargestellt
 }
 
 const ProductSelector: React.FC<ProductSelectorProps> = ({
@@ -15,6 +16,7 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
     onChange,
     disabled = false,
     availableProducts,
+    nativeProducts,
 }) => {
     const handleChange = (key: keyof Products, checked: boolean): void => {
         onChange({ ...products, [key]: checked });
@@ -55,6 +57,11 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
                                 <Typography
                                     variant="body2"
                                     color={disabled ? 'text.disabled' : 'text.primary'}
+                                    sx={
+                                        nativeProducts?.[key as keyof Products]
+                                            ? { textDecoration: 'underline' }
+                                            : undefined
+                                    }
                                 >
                                     {I18n.t(label)}
                                 </Typography>
