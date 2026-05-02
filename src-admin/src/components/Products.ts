@@ -2,6 +2,7 @@ import DirectionsBoatIcon from '@mui/icons-material/DirectionsBoat';
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import DirectionsCar from '@mui/icons-material/DirectionsCar';
 import DirectionsRailwayIcon from '@mui/icons-material/DirectionsRailway';
+import LocalTaxiIcon from '@mui/icons-material/LocalTaxi';
 import SubwayIcon from '@mui/icons-material/Subway';
 import TrainIcon from '@mui/icons-material/Train';
 import TramIcon from '@mui/icons-material/Tram';
@@ -23,6 +24,9 @@ export interface Products {
     localTrain?: boolean;
     watercraft?: boolean;
     dialARide?: boolean;
+    interregional?: boolean;
+    onCall?: boolean;
+    taxi?: boolean;
 }
 
 export const defaultProducts: Products = {
@@ -41,6 +45,9 @@ export const defaultProducts: Products = {
     localTrain: true,
     watercraft: true,
     dialARide: true,
+    interregional: true,
+    onCall: true,
+    taxi: true,
 };
 
 export const productConfig = [
@@ -58,8 +65,78 @@ export const productConfig = [
     { key: 'nationalTrain', label: 'ic_ec_cnl_ir', icon: TrainIcon, color: '#FF6F00' },
     { key: 'localTrain', label: 'nahv.', icon: TrainIcon, color: '#1455C0' },
     { key: 'watercraft', label: 'boat', icon: DirectionsBoatIcon, color: '#0080C8' },
-    { key: 'dialARide', label: 'ast', icon: DirectionsCar, color: '#0080C8' },
+    { key: 'dialARide', label: 'ast', icon: DirectionsCar, color: '#A5027D' },
+    { key: 'interregional', label: 'ir', icon: TrainIcon, color: '#FF8F00' },
+    { key: 'onCall', label: 'on_call', icon: DirectionsCar, color: '#6D4C41' },
+    { key: 'taxi', label: 'taxi', icon: LocalTaxiIcon, color: '#F9A825' },
 ] as const;
+
+/**
+ * Alle Produkte pro Profil. Schlüssel entsprechen dem Profilnamen
+ * aus der Konfiguration (z.B. 'vbb', 'vbn', 'oebb', 'db').
+ */
+export const PROFILE_PRODUCTS: Record<string, Partial<Products>> = {
+    // HAFAS – VBB (Berlin/Brandenburg)
+    vbb: {
+        suburban: true,
+        subway: true,
+        tram: true,
+        bus: true,
+        ferry: true,
+        express: true,
+        regional: true,
+    },
+    // HAFAS – VBN (Bremen/Niedersachsen)
+    vbn: {
+        expressTrain: true,
+        nationalTrain: true,
+        localTrain: true,
+        suburban: true,
+        bus: true,
+        watercraft: true,
+        subway: true,
+        tram: true,
+        dialARide: true,
+    },
+    // HAFAS – ÖBB (Österreich)
+    oebb: {
+        nationalExpress: true,
+        national: true,
+        interregional: true,
+        regional: true,
+        suburban: true,
+        bus: true,
+        ferry: true,
+        subway: true,
+        tram: true,
+        onCall: true,
+    },
+    // Vendo – Deutsche Bahn
+    db: {
+        nationalExpress: true,
+        national: true,
+        regionalExpress: true,
+        regional: true,
+        suburban: true,
+        bus: true,
+        ferry: true,
+        subway: true,
+        tram: true,
+        taxi: true,
+    },
+};
+
+/**
+ * Gibt alle Produkte (alle auf `true` gesetzt) für ein gegebenes Profil zurück.
+ * Fällt auf `defaultProducts` zurück, wenn das Profil unbekannt ist.
+ *
+ * @param serviceType - Dienst-Typ ('hafas' oder 'vendo')
+ * @param profile - Profilname ('vbb', 'vbn', 'oebb', 'db', ...)
+ */
+export const getProductsForProfile = (serviceType: string, profile: string): Partial<Products> => {
+    const key = profile || 'vbb';
+    return PROFILE_PRODUCTS[key] ?? defaultProducts;
+};
 
 /** Mapping von HAFAS-Produktnamen (mit Bindestrichen) zu camelCase-Keys */
 const HAFAS_PRODUCT_KEY_MAPPING: Record<string, string> = {

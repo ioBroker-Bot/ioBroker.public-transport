@@ -3,27 +3,6 @@ import { Box, Checkbox, FormControlLabel, Paper, Typography } from '@mui/materia
 import React from 'react';
 import { productConfig, type Products } from './Products';
 
-/**
- * Filtert availableProducts und behält nur Keys mit true Werten
- *
- * @param products - Die zu filternden Produkte
- * @returns Gefilterte Produkte nur mit true Werten
- */
-export const filterAvailableProducts = (products?: Partial<Products>): Partial<Products> | undefined => {
-    if (!products) {
-        return undefined;
-    }
-
-    const filtered: Partial<Products> = {};
-    Object.entries(products).forEach(([key, value]) => {
-        if (value === true) {
-            filtered[key as keyof Products] = true;
-        }
-    });
-
-    return Object.keys(filtered).length > 0 ? filtered : undefined;
-};
-
 interface ProductSelectorProps {
     products: Products;
     onChange: (products: Products) => void;

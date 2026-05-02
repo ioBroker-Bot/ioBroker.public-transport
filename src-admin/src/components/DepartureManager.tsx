@@ -2,8 +2,7 @@ import { ConfigGeneric } from '@iobroker/json-config';
 import { Box, Dialog } from '@mui/material';
 import React, { useCallback, useEffect, useState } from 'react';
 import { withConfigGeneric, type ConfigComponentProps } from './ConfigGenericWrapper';
-import { filterAvailableProducts } from './ProductSelector';
-import { defaultProducts, type Products } from './Products';
+import { defaultProducts, getProductsForProfile, type Products } from './Products';
 import StationConfig from './StationConfig';
 import StationList from './StationList';
 import StationSearch from './StationSearch';
@@ -39,12 +38,21 @@ const DepartureManagerContent: React.FC<ConfigComponentProps> = ({ oContext, dat
     }, []);
 
     const handleStationSelected = useCallback(
-        (stationId: string, stationName: string, availableProducts?: Partial<Products>): void => {
-            const filteredProducts = filterAvailableProducts(availableProducts);
-
+        (stationId: string, stationName: string, stationProducts?: Partial<Products>): void => {
             const serviceType = ConfigGeneric.getValue(data, 'serviceType') as string;
             const profile = ConfigGeneric.getValue(data, 'profile') as string;
             const client_profile = `${serviceType || 'unknown'}:${profile || 'unknown'}`;
+
+            // Alle Produkte des Profils als verfügbare Produkte (alle auf true)
+            const availableProducts = getProductsForProfile(serviceType, profile);
+
+            // Initiale Auswahl: true für Produkte, die die Station laut HAFAS bedient
+            const initialProducts: Products = {};
+            Object.keys(availableProducts).forEach(key => {
+                initialProducts[key as keyof Products] = stationProducts
+                    ? (stationProducts[key as keyof Products] ?? false)
+                    : true;
+            });
 
             const newStation: Station = {
                 id: stationId,
@@ -52,8 +60,8 @@ const DepartureManagerContent: React.FC<ConfigComponentProps> = ({ oContext, dat
                 customName: stationName,
                 enabled: true,
                 numDepartures: 10,
-                products: filteredProducts ? { ...filteredProducts } : { ...defaultProducts },
-                availableProducts: filteredProducts,
+                products: Object.keys(initialProducts).length > 0 ? initialProducts : { ...defaultProducts },
+                availableProducts,
                 client_profile,
             };
 

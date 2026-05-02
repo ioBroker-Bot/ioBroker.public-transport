@@ -2,8 +2,8 @@ import { I18n } from '@iobroker/adapter-react-v5';
 import type { ConfigGenericProps } from '@iobroker/json-config';
 import { Box, Button, Dialog, Divider, FormControlLabel, Paper, Switch, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
-import { defaultProducts, type Products } from './Products';
-import ProductSelector, { filterAvailableProducts } from './ProductSelector';
+import { defaultProducts, getProductsForProfile, type Products } from './Products';
+import ProductSelector from './ProductSelector';
 import StationSearch from './StationSearch';
 
 interface Journey {
@@ -25,11 +25,14 @@ interface JourneyConfigProps {
     onUpdate?: (journeyId: string, updates: Partial<Journey>) => void;
     oContext?: ConfigGenericProps['oContext'];
     alive: boolean;
+    serviceType?: string;
+    profile?: string;
 }
 
-const JourneyConfig: React.FC<JourneyConfigProps> = ({ journey, onUpdate, oContext, alive }) => {
+const JourneyConfig: React.FC<JourneyConfigProps> = ({ journey, onUpdate, oContext, alive, serviceType, profile }) => {
     const [showFromSearch, setShowFromSearch] = useState(false);
     const [showToSearch, setShowToSearch] = useState(false);
+    const profileProducts = getProductsForProfile(serviceType ?? '', profile ?? '');
 
     const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         if (journey && onUpdate) {
@@ -70,37 +73,21 @@ const JourneyConfig: React.FC<JourneyConfigProps> = ({ journey, onUpdate, oConte
         }
     };
 
-    const handleFromStationSelected = (
-        stationId: string,
-        stationName: string,
-        availableProducts?: Partial<Products>,
-    ): void => {
+    const handleFromStationSelected = (stationId: string, stationName: string): void => {
         if (journey && onUpdate) {
-            const filteredProducts = filterAvailableProducts(availableProducts);
             onUpdate(journey.id, {
                 fromStationId: stationId,
                 fromStationName: stationName,
-                availableProducts: filteredProducts,
             });
         }
         setShowFromSearch(false);
     };
 
-    const handleToStationSelected = (
-        stationId: string,
-        stationName: string,
-        availableProducts?: Partial<Products>,
-    ): void => {
+    const handleToStationSelected = (stationId: string, stationName: string): void => {
         if (journey && onUpdate) {
-            const filteredProducts = filterAvailableProducts(availableProducts);
-            // Merge die availableProducts von beiden Stationen
-            const mergedProducts = journey.availableProducts
-                ? filterAvailableProducts({ ...journey.availableProducts, ...filteredProducts })
-                : filteredProducts;
             onUpdate(journey.id, {
                 toStationId: stationId,
                 toStationName: stationName,
-                availableProducts: mergedProducts,
             });
         }
         setShowToSearch(false);
@@ -208,7 +195,7 @@ const JourneyConfig: React.FC<JourneyConfigProps> = ({ journey, onUpdate, oConte
                                 products={journey.products || defaultProducts}
                                 onChange={handleProductsChange}
                                 disabled={journey.enabled === false || !alive}
-                                availableProducts={journey.availableProducts}
+                                availableProducts={journey.availableProducts ?? profileProducts}
                             />
                         </Box>
                     </Box>

@@ -222,7 +222,9 @@ class PublicTransport extends utils.Adapter {
               latitude: location.location.latitude,
               longitude: location.location.longitude
             } : void 0,
-            products: location.products
+            products: location.products,
+            service: this.config.serviceType || "unknown",
+            profile: this.config.profile || "unknown"
           }));
           if (obj.callback) {
             this.sendTo(obj.from, obj.command, stations, obj.callback);
