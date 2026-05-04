@@ -142,16 +142,14 @@ export class JourneyPolling extends PollingManager<JourneyConfig> {
         const countEntries = config.numResults ?? 5;
         const client_profile = config.client_profile ?? undefined;
 
-        this.adapter.log.debug(
-            `id: ${config.id},
+        this.adapter.log.debug(`Journey query parameters:
+             id: ${config.id},
              fromId: ${config.fromStationId},
              toId: ${config.toStationId},
              service: ${JSON.stringify(service)},
              option: ${JSON.stringify(options)},
              countEntires: ${countEntries},
-             products: ${JSON.stringify(products)},
-             client_profil: ${client_profile}`,
-        );
+             client_profil: ${client_profile}`);
 
         try {
             return await this.adapter.journeysRequest.getJourneys(
