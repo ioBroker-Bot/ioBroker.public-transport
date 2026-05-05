@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "public-transport",
-    "version": "0.2.2",
+    "version": "0.3.0",
     "news": {
+      "0.3.0": {
+        "en": "fix issues for latest Repo\nfix disabled for Journeys\nAdapter requires node.js >= 22 now",
+        "de": "probleme latest Repo behoben\nFix deaktivierte Verbindungen\nAdapter benötigt node.js >= 22 jetzt",
+        "ru": "устранение проблем с последним Repo\nфиксация disabled for Journeys\nАдаптер требует node.js >= 22 сейчас",
+        "pt": "corrigir problemas para o Repo mais recente\ncorrigir disabled for Journeys\nAdaptador requer nod.js >= 22 agora",
+        "nl": "problemen oplossen voor nieuwste Repo\nfix disabled for Journeys\nVoor de adapter zijn node.js < 22 nu nodig",
+        "fr": "corriger les problèmes pour la dernière Repo\nfixer disabled for Journeys\nAdaptateur nécessite node.js >= 22 maintenant",
+        "it": "risolvere problemi per l'ultimo Repo\nfix disabled for Journeys\nAdattatore richiede node.js >= 22 ora",
+        "es": "solucionar problemas para la última Repo\nfijar disabled for Journeys\nAdaptador requiere node.js >= 22 ahora",
+        "pl": "naprawić problemy dla najnowszej Repo\nfix disabled for Journeys\nAdapter wymaga node.js >= 22",
+        "uk": "виправлено проблеми для останнього Репо\nвиправити disabled for Journeys\nАдаптер вимагає node.js >= 22 тепер",
+        "zh-cn": "解决最新Repo 的问题\n修补 disabled for Journeys\n适配器需要节点.js 现在22"
+      },
       "0.2.2": {
         "en": "fix countEntries for journeys",
         "de": "fix Anzahl der Verbindungen",
@@ -80,19 +93,6 @@
         "pl": "Widget for Journey\nRefactor admin UI: konwertuj komponenty klasy do funkcjonalnych",
         "uk": "Віджети для подорожі\nRefactor admin UI: перетворення компонентів класу в функціональні компоненти",
         "zh-cn": "行程部件\n重构管理员 UI: 将类组件转换为函数组件"
-      },
-      "0.0.5": {
-        "en": "Upgrade dependency",
-        "de": "Abhängigkeit aktualisieren",
-        "ru": "Обновить зависимость",
-        "pt": "Atualizar a dependência",
-        "nl": "Afhankelijkheid upgraden",
-        "fr": "Amélioration de la dépendance",
-        "it": "Dipendenza di aggiornamento",
-        "es": "Dependencia de actualización",
-        "pl": "Ulepszenie zależności",
-        "uk": "Підвищення залежності",
-        "zh-cn": "提升依赖性"
       }
     },
     "titleLang": {
