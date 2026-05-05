@@ -17,6 +17,7 @@ interface DepartureConfig {
 export class DeparturePolling extends PollingManager<DepartureConfig> {
     constructor(adapter: PublicTransport) {
         super(adapter);
+        this.log.setLogPrefix('depPoll');
     }
 
     /**
@@ -36,7 +37,7 @@ export class DeparturePolling extends PollingManager<DepartureConfig> {
                 continue;
             }
 
-            this.adapter.log.debug(
+            this.log.debug(
                 `Reset states for deactivated station: ${config.customName || config.name || ''} (${config.id})`,
             );
 
@@ -61,13 +62,15 @@ export class DeparturePolling extends PollingManager<DepartureConfig> {
         duration: number;
         services?: string;
         client_profile?: string;
+        products?: any;
     } {
         const offsetTime = config.offsetTime ?? 0;
-        const when: Date | undefined = offsetTime === 0 ? undefined : new Date(Date.now() + offsetTime * 60 * 1000);
-        const duration = config.duration ?? 10;
+        const when: Date = offsetTime === 0 ? new Date() : new Date(Date.now() + offsetTime * 60 * 1000);
+        const duration = config.duration ?? 60;
         const results = config.numDepartures ?? 10;
+        const products = config.products ?? undefined;
 
-        return { results, when, duration };
+        return { results, when, duration, products };
     }
 
     /**
@@ -82,14 +85,13 @@ export class DeparturePolling extends PollingManager<DepartureConfig> {
         const products = config.products ?? undefined;
         const countEntries = config.numDepartures ?? 10;
         const client_profile = config.client_profile ?? undefined;
-        this.adapter.log.debug(
-            `id: ${config.id},
+        this.log.debug(`QueryConfig parameters:
+             id: ${config.id},
              service: ${JSON.stringify(service)},
              option: ${JSON.stringify(options)},
              countEntries: ${countEntries},
              products: ${JSON.stringify(products)},
-             client_profil: ${client_profile}`,
-        );
+             client_profil: ${client_profile}`);
 
         return await this.adapter.depRequest.getDepartures(
             config.id,

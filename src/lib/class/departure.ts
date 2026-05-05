@@ -75,10 +75,13 @@ export class DepartureRequest extends BaseClass {
             this.validateClientProfile(client_profile);
             const mergedOptions = { ...defaultDepartureOpt, ...options };
             // Antwort vom Transport-Client als vollständiger Typ
+            this.log.debug(
+                `Querying departures for station ${stationId} with options: ${JSON.stringify(mergedOptions)}, client_profile: ${client_profile || 'kein Profil angegeben'}`,
+            );
             const response = await service.getDepartures(stationId, mergedOptions);
             // Vollständiges JSON für Debugging
             if (this.adapter.config.logCompletelyJSON) {
-                this.adapter.log.debug(JSON.stringify(response.departures, null, 1));
+                this.log.debug(JSON.stringify(response.departures, null, 1));
             }
             if (!response.departures || response.departures.length === 0) {
                 this.log.info(
@@ -231,7 +234,7 @@ export class DepartureRequest extends BaseClass {
 
             // Garbage Collection (nur einmal!)
             //await this.library.garbageColleting(`Stations.${stationConfig.id}.`);
-
+            products = undefined;
             // Filtere nach Produkten, falls angegeben
             const filteredDepartures = products ? this.filterByProducts(departures, products) : departures;
             // Konvertiere zu reduzierten States

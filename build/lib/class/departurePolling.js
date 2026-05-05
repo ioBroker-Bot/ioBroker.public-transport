@@ -25,6 +25,7 @@ var import_pollingManager = require("./pollingManager");
 class DeparturePolling extends import_pollingManager.PollingManager {
   constructor(adapter) {
     super(adapter);
+    this.log.setLogPrefix("depPoll");
   }
   /**
    * Setzt die States von deaktivierten Stationen auf Standardwerte zurück.
@@ -40,7 +41,7 @@ class DeparturePolling extends import_pollingManager.PollingManager {
       if (!config.id) {
         continue;
       }
-      this.adapter.log.debug(
+      this.log.debug(
         `Reset states for deactivated station: ${config.customName || config.name || ""} (${config.id})`
       );
       await this.adapter.library.garbageColleting(
@@ -59,12 +60,13 @@ class DeparturePolling extends import_pollingManager.PollingManager {
    * @returns Die Optionen für die Abfrage
    */
   createDepartureOptions(config) {
-    var _a, _b, _c;
+    var _a, _b, _c, _d;
     const offsetTime = (_a = config.offsetTime) != null ? _a : 0;
-    const when = offsetTime === 0 ? void 0 : new Date(Date.now() + offsetTime * 60 * 1e3);
-    const duration = (_b = config.duration) != null ? _b : 10;
+    const when = offsetTime === 0 ? /* @__PURE__ */ new Date() : new Date(Date.now() + offsetTime * 60 * 1e3);
+    const duration = (_b = config.duration) != null ? _b : 60;
     const results = (_c = config.numDepartures) != null ? _c : 10;
-    return { results, when, duration };
+    const products = (_d = config.products) != null ? _d : void 0;
+    return { results, when, duration, products };
   }
   /**
    * Führt die Abfrage für eine Station durch.
@@ -79,14 +81,13 @@ class DeparturePolling extends import_pollingManager.PollingManager {
     const products = (_a = config.products) != null ? _a : void 0;
     const countEntries = (_b = config.numDepartures) != null ? _b : 10;
     const client_profile = (_c = config.client_profile) != null ? _c : void 0;
-    this.adapter.log.debug(
-      `id: ${config.id},
+    this.log.debug(`QueryConfig parameters:
+             id: ${config.id},
              service: ${JSON.stringify(service)},
              option: ${JSON.stringify(options)},
              countEntries: ${countEntries},
              products: ${JSON.stringify(products)},
-             client_profil: ${client_profile}`
-    );
+             client_profil: ${client_profile}`);
     return await this.adapter.depRequest.getDepartures(
       config.id,
       service,

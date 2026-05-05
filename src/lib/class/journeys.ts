@@ -89,7 +89,7 @@ export class JourneysRequest extends BaseClass {
             const response: Hafas.Journeys = await this.service.getJourneys(from, to, mergedOptions);
             // Vollständiges JSON für Debugging
             if (this.adapter.config.logCompletelyJSON) {
-                this.adapter.log.debug(JSON.stringify(response, null, 1));
+                this.log.debug(JSON.stringify(response, null, 1));
             }
             if (!response.journeys || response.journeys.length === 0) {
                 this.log.info(
@@ -530,7 +530,7 @@ export class JourneysRequest extends BaseClass {
                     const stationFrom = leg.origin?.name || 'unknown_station';
                     const stationTo = leg.destination?.name || 'unknown_station';
                     const name = leg.walking
-                        ? this.library.translate('journey_Change')
+                        ? this.library.translate('journey_change')
                         : this.library.translate('journey_leg_FromTo', stationFrom, stationTo);
                     const [arrivalDelayed, arrivalOnTime] = await this.library.getDelayStatus(leg.arrivalDelay, 0);
                     const [departureDelayed, departureOnTime] = await this.library.getDelayStatus(

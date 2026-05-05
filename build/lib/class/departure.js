@@ -76,9 +76,12 @@ class DepartureRequest extends import_library.BaseClass {
       }
       this.validateClientProfile(client_profile);
       const mergedOptions = { ...import_types.defaultDepartureOpt, ...options };
+      this.log.debug(
+        `Querying departures for station ${stationId} with options: ${JSON.stringify(mergedOptions)}, client_profile: ${client_profile || "kein Profil angegeben"}`
+      );
       const response = await service.getDepartures(stationId, mergedOptions);
       if (this.adapter.config.logCompletelyJSON) {
-        this.adapter.log.debug(JSON.stringify(response.departures, null, 1));
+        this.log.debug(JSON.stringify(response.departures, null, 1));
       }
       if (!response.departures || response.departures.length === 0) {
         this.log.info(
@@ -206,6 +209,7 @@ class DepartureRequest extends import_library.BaseClass {
           native: {}
         }
       );
+      products = void 0;
       const filteredDepartures = products ? this.filterByProducts(departures, products) : departures;
       const departureStates = (0, import_mapper.mapDeparturesToDepartureStates)(filteredDepartures);
       await this.writeBaseStates(departureStates, stationId, countEntries);

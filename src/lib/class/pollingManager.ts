@@ -1,4 +1,5 @@
 import type { PublicTransport } from '../../main';
+import { BaseClass } from '../tools/library';
 import type { ITransportService } from '../types/transportService';
 
 interface PollingConfig {
@@ -9,12 +10,12 @@ interface PollingConfig {
     [key: string]: any;
 }
 
-export abstract class PollingManager<T extends PollingConfig> {
-    protected adapter: PublicTransport;
+export abstract class PollingManager<T extends PollingConfig> extends BaseClass {
     private pollInterval: ioBroker.Interval | undefined;
 
     constructor(adapter: PublicTransport) {
-        this.adapter = adapter;
+        super(adapter);
+        this.log.setLogPrefix('pollmanager');
     }
 
     /**
@@ -27,14 +28,14 @@ export abstract class PollingManager<T extends PollingConfig> {
      */
     protected getEnabledConfigs(configs: T[] | undefined, noConfigMsg: string, noEnabledMsg: string): T[] | undefined {
         if (!configs || configs.length === 0) {
-            this.adapter.log.debug(noConfigMsg);
+            this.log.debug(noConfigMsg);
             return undefined;
         }
 
         const enabledConfigs = configs.filter(config => config.enabled);
 
         if (enabledConfigs.length === 0) {
-            this.adapter.log.debug(noEnabledMsg);
+            this.log.debug(noEnabledMsg);
             return undefined;
         }
 
@@ -53,9 +54,9 @@ export abstract class PollingManager<T extends PollingConfig> {
         countMsg: (n: number) => string,
         entryMsg: (name: string, id: string) => string,
     ): void {
-        this.adapter.log.info(countMsg(configs.length));
+        this.log.info(countMsg(configs.length));
         for (const config of configs) {
-            this.adapter.log.info(entryMsg(config.customName || config.name || '', config.id ?? ''));
+            this.log.info(entryMsg(config.customName || config.name || '', config.id ?? ''));
         }
     }
 
@@ -94,22 +95,20 @@ export abstract class PollingManager<T extends PollingConfig> {
 
         for (const config of configs) {
             if (!config.id) {
-                this.adapter.log.warn(
-                    `Station "${config.customName || config.name || ''}" has no valid ID, skipping...`,
-                );
+                this.log.warn(`Station "${config.customName || config.name || ''}" has no valid ID, skipping...`);
                 continue;
             }
 
-            this.adapter.log.info(fetchingMsg(config.customName || config.name || '', config.id));
+            this.log.info(fetchingMsg(config.customName || config.name || '', config.id));
 
             const success = await this.queryConfig(config, service);
 
             if (success) {
                 successCount++;
-                this.adapter.log.info(updatedMsg(config.customName || config.name || '', config.id));
+                this.log.info(updatedMsg(config.customName || config.name || '', config.id));
             } else {
                 errorCount++;
-                this.adapter.log.warn(failedMsg(config.customName || config.name || '', config.id));
+                this.log.warn(failedMsg(config.customName || config.name || '', config.id));
             }
         }
 
@@ -173,8 +172,8 @@ export abstract class PollingManager<T extends PollingConfig> {
             messages.updated,
             messages.failed,
         );
-        this.adapter.log.info(messages.firstCompleted(successCount, errorCount));
-        this.adapter.log.info(messages.waiting(pollIntervalMinutes));
+        this.log.info(messages.firstCompleted(successCount, errorCount));
+        this.log.info(messages.waiting(pollIntervalMinutes));
 
         // Starte Intervall für regelmäßige Abfragen
         this.pollInterval = this.adapter.setInterval(async () => {
@@ -188,8 +187,8 @@ export abstract class PollingManager<T extends PollingConfig> {
                 messages.updated,
                 messages.failed,
             );
-            this.adapter.log.info(messages.queryCompleted(successCount, errorCount));
-            this.adapter.log.info(messages.waiting(pollIntervalMinutes));
+            this.log.info(messages.queryCompleted(successCount, errorCount));
+            this.log.info(messages.waiting(pollIntervalMinutes));
         }, pollInterval);
     }
 

@@ -27,6 +27,7 @@ interface JourneyConfig {
 export class JourneyPolling extends PollingManager<JourneyConfig> {
     constructor(adapter: PublicTransport) {
         super(adapter);
+        this.log.setLogPrefix('journeyPoll');
     }
 
     /**
@@ -46,7 +47,7 @@ export class JourneyPolling extends PollingManager<JourneyConfig> {
                 continue;
             }
 
-            this.adapter.log.debug(`Reset states for deactivated journey: ${config.customName || ''} (${config.id})`);
+            this.log.debug(`Reset states for deactivated journey: ${config.customName || ''} (${config.id})`);
 
             // Verwende garbageColleting um States auf Standardwerte zu setzen
             await this.adapter.library.garbageColleting(
@@ -116,9 +117,9 @@ export class JourneyPolling extends PollingManager<JourneyConfig> {
         countMsg: (n: number) => string,
         _entryMsg: (name: string, id: string) => string,
     ): void {
-        this.adapter.log.info(countMsg(configs.length));
+        this.log.info(countMsg(configs.length));
         for (const config of configs) {
-            this.adapter.log.info(
+            this.log.info(
                 `  - ${config.customName || ''} (From: ${config.fromStationName || config.fromStationId || ''}, To: ${config.toStationName || config.toStationId || ''})`,
             );
         }
@@ -133,7 +134,7 @@ export class JourneyPolling extends PollingManager<JourneyConfig> {
      */
     protected async queryConfig(config: JourneyConfig, service: ITransportService): Promise<boolean> {
         if (!config.fromStationId || !config.toStationId) {
-            this.adapter.log.warn('No start or destination station provided');
+            this.log.warn('No start or destination station provided');
             return false;
         }
 
@@ -142,7 +143,7 @@ export class JourneyPolling extends PollingManager<JourneyConfig> {
         const countEntries = config.numResults ?? 5;
         const client_profile = config.client_profile ?? undefined;
 
-        this.adapter.log.debug(`Journey query parameters:
+        this.log.debug(`Journey query parameters:
              id: ${config.id},
              fromId: ${config.fromStationId},
              toId: ${config.toStationId},
@@ -163,7 +164,7 @@ export class JourneyPolling extends PollingManager<JourneyConfig> {
                 client_profile,
             );
         } catch (error) {
-            this.adapter.log.error(`Error querying journey "${config.customName || ''}": ${(error as Error).message}`);
+            this.log.error(`Error querying journey "${config.customName || ''}": ${(error as Error).message}`);
             return false;
         }
     }

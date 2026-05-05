@@ -25,6 +25,7 @@ var import_pollingManager = require("./pollingManager");
 class JourneyPolling extends import_pollingManager.PollingManager {
   constructor(adapter) {
     super(adapter);
+    this.log.setLogPrefix("journeyPoll");
   }
   /**
    * Setzt die States von deaktivierten Journeys auf Standardwerte zurück.
@@ -40,7 +41,7 @@ class JourneyPolling extends import_pollingManager.PollingManager {
       if (!config.id) {
         continue;
       }
-      this.adapter.log.debug(`Reset states for deactivated journey: ${config.customName || ""} (${config.id})`);
+      this.log.debug(`Reset states for deactivated journey: ${config.customName || ""} (${config.id})`);
       await this.adapter.library.garbageColleting(
         `Journeys.${config.id}.`,
         2e3,
@@ -96,9 +97,9 @@ class JourneyPolling extends import_pollingManager.PollingManager {
    * @param _entryMsg Der Übersetzungsschlüssel für jeden Eintrag
    */
   logConfigs(configs, countMsg, _entryMsg) {
-    this.adapter.log.info(countMsg(configs.length));
+    this.log.info(countMsg(configs.length));
     for (const config of configs) {
-      this.adapter.log.info(
+      this.log.info(
         `  - ${config.customName || ""} (From: ${config.fromStationName || config.fromStationId || ""}, To: ${config.toStationName || config.toStationId || ""})`
       );
     }
@@ -113,14 +114,14 @@ class JourneyPolling extends import_pollingManager.PollingManager {
   async queryConfig(config, service) {
     var _a, _b, _c;
     if (!config.fromStationId || !config.toStationId) {
-      this.adapter.log.warn("No start or destination station provided");
+      this.log.warn("No start or destination station provided");
       return false;
     }
     const options = this.createJourneyOptions(config);
     const products = (_a = config.products) != null ? _a : void 0;
     const countEntries = (_b = config.numResults) != null ? _b : 5;
     const client_profile = (_c = config.client_profile) != null ? _c : void 0;
-    this.adapter.log.debug(`Journey query parameters:
+    this.log.debug(`Journey query parameters:
              id: ${config.id},
              fromId: ${config.fromStationId},
              toId: ${config.toStationId},
@@ -140,7 +141,7 @@ class JourneyPolling extends import_pollingManager.PollingManager {
         client_profile
       );
     } catch (error) {
-      this.adapter.log.error(`Error querying journey "${config.customName || ""}": ${error.message}`);
+      this.log.error(`Error querying journey "${config.customName || ""}": ${error.message}`);
       return false;
     }
   }

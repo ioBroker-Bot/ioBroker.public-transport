@@ -78,7 +78,7 @@ export class StationRequest extends BaseClass {
             const station: Hafas.Station | Hafas.Stop = await service.getStop(stationId, options);
             // Vollständiges JSON für Debugging
             if (this.adapter.config.logCompletelyJSON) {
-                this.adapter.log.debug(JSON.stringify(station, null, 1));
+                this.log.debug(JSON.stringify(station, null, 1));
             }
             return station;
         } catch (err) {
