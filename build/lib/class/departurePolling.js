@@ -21,6 +21,7 @@ __export(departurePolling_exports, {
   DeparturePolling: () => DeparturePolling
 });
 module.exports = __toCommonJS(departurePolling_exports);
+var import_library = require("../tools/library");
 var import_pollingManager = require("./pollingManager");
 class DeparturePolling extends import_pollingManager.PollingManager {
   constructor(adapter) {
@@ -60,12 +61,12 @@ class DeparturePolling extends import_pollingManager.PollingManager {
    * @returns Die Optionen für die Abfrage
    */
   createDepartureOptions(config) {
-    var _a, _b, _c, _d;
+    var _a, _b, _c;
     const offsetTime = (_a = config.offsetTime) != null ? _a : 0;
     const when = offsetTime === 0 ? /* @__PURE__ */ new Date() : new Date(Date.now() + offsetTime * 60 * 1e3);
     const duration = (_b = config.duration) != null ? _b : 60;
     const results = (_c = config.numDepartures) != null ? _c : 10;
-    const products = (_d = config.products) != null ? _d : void 0;
+    const products = config.products ? Object.fromEntries(Object.entries(config.products).map(([k, v]) => [(0, import_library.camelToKebab)(k), v])) : void 0;
     return { results, when, duration, products };
   }
   /**

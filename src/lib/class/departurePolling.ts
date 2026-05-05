@@ -1,4 +1,5 @@
 import type { PublicTransport } from '../../main';
+import { camelToKebab } from '../tools/library';
 import type { ITransportService } from '../types/transportService';
 import { PollingManager } from './pollingManager';
 
@@ -68,7 +69,9 @@ export class DeparturePolling extends PollingManager<DepartureConfig> {
         const when: Date = offsetTime === 0 ? new Date() : new Date(Date.now() + offsetTime * 60 * 1000);
         const duration = config.duration ?? 60;
         const results = config.numDepartures ?? 10;
-        const products = config.products ?? undefined;
+        const products = config.products
+            ? Object.fromEntries(Object.entries(config.products).map(([k, v]) => [camelToKebab(k), v]))
+            : undefined;
 
         return { results, when, duration, products };
     }

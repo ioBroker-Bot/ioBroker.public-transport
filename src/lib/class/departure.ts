@@ -1,6 +1,6 @@
 import type * as Hafas from 'hafas-client';
 import type { PublicTransport } from '../../main';
-import { BaseClass, kebabToCamel } from '../tools/library';
+import { BaseClass } from '../tools/library';
 import { mapDeparturesToDepartureStates } from '../tools/mapper';
 import { defaultDepartureOpt, type DepartureState, type Products } from '../types/types';
 
@@ -89,7 +89,7 @@ export class DepartureRequest extends BaseClass {
                 );
             }
             // Schreibe die Abfahrten in die States
-            await this.writeDepartureStates(stationId, response.departures, countEntries, products);
+            await this.writeDepartureStates(stationId, response.departures, countEntries);
             return true;
         } catch (error) {
             this.log.error(`Error querying departures for station ${stationId}: ${(error as Error).message}`);
@@ -108,7 +108,7 @@ export class DepartureRequest extends BaseClass {
      * @param products      Die aktivierten Produkte (true = erlaubt)
      * @returns             Gefilterte Abfahrten
      */
-    filterByProducts(departures: readonly Hafas.Alternative[], products: Partial<Products>): Hafas.Alternative[] {
+    /* filterByProducts(departures: readonly Hafas.Alternative[], products: Partial<Products>): Hafas.Alternative[] {
         // Erstelle eine Liste der aktivierten Produktnamen (camelCase)
         const enabledProducts = Object.entries(products)
             .filter(([_, enabled]) => enabled === true)
@@ -137,7 +137,7 @@ export class DepartureRequest extends BaseClass {
             }
             return isEnabled;
         });
-    }
+    }*/
 
     /**
      * Schreibt die Abfahrten in die States der angegebenen Station.
@@ -145,13 +145,13 @@ export class DepartureRequest extends BaseClass {
      * @param stationId     Die ID der Station, für die die Abfahrten geschrieben werden sollen.
      * @param departures    Die Abfahrten, die geschrieben werden sollen.
      * @param countEntries  Die maximale Anzahl der Einträge, die geschrieben werden sollen.
-     * @param products      Die aktivierten Produkte (true = erlaubt)
+     * /@param products      Die aktivierten Produkte (true = erlaubt)
      */
     async writeDepartureStates(
         stationId: string,
         departures: Hafas.Alternative[],
         countEntries: number,
-        products?: Partial<Products>,
+        // products?: Partial<Products>,
     ): Promise<void> {
         try {
             if (!this.adapter.config.stationConfig) {
@@ -234,11 +234,11 @@ export class DepartureRequest extends BaseClass {
 
             // Garbage Collection (nur einmal!)
             //await this.library.garbageColleting(`Stations.${stationConfig.id}.`);
-            products = undefined;
+
             // Filtere nach Produkten, falls angegeben
-            const filteredDepartures = products ? this.filterByProducts(departures, products) : departures;
+            // const filteredDepartures = products ? this.filterByProducts(departures, products) : departures;
             // Konvertiere zu reduzierten States
-            const departureStates: DepartureState[] = mapDeparturesToDepartureStates(filteredDepartures);
+            const departureStates: DepartureState[] = mapDeparturesToDepartureStates(departures);
             // JSON in die States schreiben
             await this.writeBaseStates(departureStates, stationId, countEntries);
         } catch (err) {

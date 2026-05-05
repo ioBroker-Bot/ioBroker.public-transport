@@ -37,6 +37,7 @@ var library_exports = {};
 __export(library_exports, {
   BaseClass: () => BaseClass,
   Library: () => Library,
+  camelToKebab: () => camelToKebab,
   kebabToCamel: () => kebabToCamel
 });
 module.exports = __toCommonJS(library_exports);
@@ -848,10 +849,21 @@ class Library extends BaseClass {
 function kebabToCamel(str) {
   return str.replace(/-([a-z])/g, (_, char) => char.toUpperCase());
 }
+const CAMEL_TO_KEBAB_MAP = {
+  dialARide: "dial-a-ride",
+  expressTrain: "express-train",
+  nationalTrain: "national-train",
+  localTrain: "local-train"
+};
+function camelToKebab(str) {
+  var _a;
+  return (_a = CAMEL_TO_KEBAB_MAP[str]) != null ? _a : str;
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   BaseClass,
   Library,
+  camelToKebab,
   kebabToCamel
 });
 //# sourceMappingURL=library.js.map

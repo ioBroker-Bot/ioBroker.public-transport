@@ -974,3 +974,23 @@ export class Library extends BaseClass {
 export function kebabToCamel(str: string): string {
     return str.replace(/-([a-z])/g, (_, char: string) => char.toUpperCase());
 }
+
+/** Umkehrmapping: camelCase-Keys → HAFAS-Produktnamen (mit Bindestrichen) */
+const CAMEL_TO_KEBAB_MAP: Record<string, string> = {
+    dialARide: 'dial-a-ride',
+    expressTrain: 'express-train',
+    nationalTrain: 'national-train',
+    localTrain: 'local-train',
+};
+
+/**
+ * Konvertiert bekannte camelCase-Produktkeys zurück in HAFAS-kebab-case-Namen.
+ * Nur die explizit definierten Einträge werden konvertiert; alle anderen werden unverändert zurückgegeben.
+ * Beispiel: "dialARide" → "dial-a-ride"
+ *
+ * @param str   camelCase String
+ * @returns     kebab-case String oder unveränderten Input
+ */
+export function camelToKebab(str: string): string {
+    return CAMEL_TO_KEBAB_MAP[str] ?? str;
+}

@@ -1,5 +1,6 @@
 import type * as Hafas from 'hafas-client';
 import type { PublicTransport } from '../../main';
+import { camelToKebab } from '../tools/library';
 import type { ITransportService } from '../types/transportService';
 import { PollingManager } from './pollingManager';
 
@@ -99,7 +100,9 @@ export class JourneyPolling extends PollingManager<JourneyConfig> {
         }
 
         if (config.products) {
-            options.products = config.products;
+            options.products = Object.fromEntries(
+                Object.entries(config.products).map(([k, v]) => [camelToKebab(k), v]),
+            );
         }
 
         return options;
@@ -139,7 +142,9 @@ export class JourneyPolling extends PollingManager<JourneyConfig> {
         }
 
         const options = this.createJourneyOptions(config);
-        const products = config.products ?? undefined;
+        const products = config.products
+            ? Object.fromEntries(Object.entries(config.products).map(([k, v]) => [camelToKebab(k), v]))
+            : undefined;
         const countEntries = config.numResults ?? 5;
         const client_profile = config.client_profile ?? undefined;
 
@@ -150,6 +155,7 @@ export class JourneyPolling extends PollingManager<JourneyConfig> {
              service: ${JSON.stringify(service)},
              option: ${JSON.stringify(options)},
              countEntires: ${countEntries},
+             products: ${JSON.stringify(products)},
              client_profil: ${client_profile}`);
 
         try {
