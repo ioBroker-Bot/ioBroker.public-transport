@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "public-transport",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "news": {
+      "0.4.0": {
+        "en": "fix select Products\nadd Profil VBN (Bremen/Niedersachsen)",
+        "de": "Problem mit Auswahl der Verkehrsmittel behoben\nProfil VBN (Bremen/Niedersachsen) hinzugefügt",
+        "ru": "выберите продукты\nдобавить Profil VBN (Bremen/Niedersachsen)",
+        "pt": "corrigir selecionar produtos\nadicionar Perfil VBN (Bremen/Niedersachsen)",
+        "nl": "fix select producten\nprofil VBN (Bremen/Niedersachsen) toevoegen",
+        "fr": "corriger la sélection des produits\najouter Profil VBN (Bremen/Niedersachsen)",
+        "it": "selezionare i prodotti\naggiungere Profil VBN (Bremen/Niedersachsen)",
+        "es": "selecto Productos\nañadir Profil VBN (Bremen/Niedersachsen)",
+        "pl": "fix select Products\ndodaj Profil VBN (Bremen / Niedersachsen)",
+        "uk": "оберіть товари\nдодати Profil VBN (Бремен/Нідерсачсен)",
+        "zh-cn": "固定选中的产品\n添加 Profil VBN (不来梅/尼德萨赫森)"
+      },
       "0.3.0": {
         "en": "fix issues for latest Repo\nfix disabled for Journeys\nAdapter requires node.js >= 22 now",
         "de": "probleme latest Repo behoben\nFix deaktivierte Verbindungen\nAdapter benötigt node.js >= 22 jetzt",
@@ -80,19 +93,6 @@
         "pl": "rozpocząć test beta",
         "uk": "початок бета-тест",
         "zh-cn": "开始β测试"
-      },
-      "0.0.6": {
-        "en": "Widget for Journey\nRefactor admin UI: convert class components to functional components",
-        "de": "Widget für die Verbindungen\nRefactor admin UI: Klassenkomponenten in Funktionskomponenten umwandeln",
-        "ru": "Виджет для путешествия\nRefactor admin UI: преобразование компонентов класса в функциональные компоненты",
-        "pt": "Widget para viagem\nRefactor admin UI: converter componentes de classe para componentes funcionais",
-        "nl": "Widget voor reis\nRefactor admin UI: klassecomponenten omzetten naar functionele componenten",
-        "fr": "Widget pour Voyage\nRefactor admin UI: convertir les composants de classe en composants fonctionnels",
-        "it": "Widget per il viaggio\nRefactor admin UI: convertire i componenti di classe in componenti funzionali",
-        "es": "Widget para el viaje\nRefactor admin UI: convertir componentes de clase a componentes funcionales",
-        "pl": "Widget for Journey\nRefactor admin UI: konwertuj komponenty klasy do funkcjonalnych",
-        "uk": "Віджети для подорожі\nRefactor admin UI: перетворення компонентів класу в функціональні компоненти",
-        "zh-cn": "行程部件\n重构管理员 UI: 将类组件转换为函数组件"
       }
     },
     "titleLang": {
