@@ -224,6 +224,8 @@ export class PublicTransport extends utils.Adapter {
                               }
                             : undefined,
                         products: location.products,
+                        service: this.config.serviceType || 'unknown',
+                        profile: this.config.profile || 'unknown',
                     }));
 
                     if (obj.callback) {

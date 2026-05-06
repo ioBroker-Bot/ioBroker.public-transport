@@ -8,6 +8,8 @@ import type * as Hafas from 'hafas-client';
 import { createClient as hafasClient } from 'hafas-client';
 import { profile as oebbProfile } from 'hafas-client/p/oebb/index.js';
 import { profile as vbbProfile } from 'hafas-client/p/vbb/index.js';
+import { profile as vbnProfile } from 'hafas-client/p/vbn/index.js';
+import { withThrottling } from 'hafas-client/throttle.js';
 import type { ITransportService } from '../types/transportService';
 
 export class HafasService implements ITransportService {
@@ -36,10 +38,10 @@ export class HafasService implements ITransportService {
     public init(): boolean {
         try {
             const profile = this.resolveProfile(this.profileName);
-            this.client = hafasClient(profile, this.clientName);
+            this.client = hafasClient(withThrottling(profile), this.clientName);
             return true;
         } catch (error) {
-            throw new Error(`HAFAS-Client konnte nicht initialisiert werden: ${(error as Error).message}`);
+            throw new Error(`The HAFAS client could not be initialized: ${(error as Error).message}`);
         }
     }
 
@@ -55,7 +57,7 @@ export class HafasService implements ITransportService {
      */
     private getClient(): ReturnType<typeof hafasClient> {
         if (!this.client) {
-            throw new Error('HafasService wurde noch nicht initialisiert. Bitte zuerst init() aufrufen.');
+            throw new Error('HafasService has not been initialized yet. Please call init() first.');
         }
         return this.client;
     }
@@ -79,8 +81,11 @@ export class HafasService implements ITransportService {
             case 'oebb': {
                 return oebbProfile;
             }
+            case 'vbn': {
+                return vbnProfile;
+            }
             default: {
-                throw new Error(`Unbekanntes Profile: ${String(profile)}. Verfügbare Profile: 'vbb', 'oebb'.`);
+                throw new Error(`unknown profile: ${String(profile)}. available profiles: 'vbb', 'oebb', 'vbn'.`);
             }
         }
     }

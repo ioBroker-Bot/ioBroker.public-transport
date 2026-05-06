@@ -24,6 +24,8 @@ module.exports = __toCommonJS(hafasService_exports);
 var import_hafas_client = require("hafas-client");
 var import_oebb = require("hafas-client/p/oebb/index.js");
 var import_vbb = require("hafas-client/p/vbb/index.js");
+var import_vbn = require("hafas-client/p/vbn/index.js");
+var import_throttle = require("hafas-client/throttle.js");
 class HafasService {
   client = null;
   clientName;
@@ -48,10 +50,10 @@ class HafasService {
   init() {
     try {
       const profile = this.resolveProfile(this.profileName);
-      this.client = (0, import_hafas_client.createClient)(profile, this.clientName);
+      this.client = (0, import_hafas_client.createClient)((0, import_throttle.withThrottling)(profile), this.clientName);
       return true;
     } catch (error) {
-      throw new Error(`HAFAS-Client konnte nicht initialisiert werden: ${error.message}`);
+      throw new Error(`The HAFAS client could not be initialized: ${error.message}`);
     }
   }
   /**
@@ -65,7 +67,7 @@ class HafasService {
    */
   getClient() {
     if (!this.client) {
-      throw new Error("HafasService wurde noch nicht initialisiert. Bitte zuerst init() aufrufen.");
+      throw new Error("HafasService has not been initialized yet. Please call init() first.");
     }
     return this.client;
   }
@@ -87,8 +89,11 @@ class HafasService {
       case "oebb": {
         return import_oebb.profile;
       }
+      case "vbn": {
+        return import_vbn.profile;
+      }
       default: {
-        throw new Error(`Unbekanntes Profile: ${String(profile)}. Verf\xFCgbare Profile: 'vbb', 'oebb'.`);
+        throw new Error(`unknown profile: ${String(profile)}. available profiles: 'vbb', 'oebb', 'vbn'.`);
       }
     }
   }

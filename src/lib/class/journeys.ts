@@ -89,7 +89,7 @@ export class JourneysRequest extends BaseClass {
             const response: Hafas.Journeys = await this.service.getJourneys(from, to, mergedOptions);
             // Vollständiges JSON für Debugging
             if (this.adapter.config.logCompletelyJSON) {
-                this.adapter.log.debug(JSON.stringify(response, null, 1));
+                this.log.debug(JSON.stringify(response, null, 1));
             }
             if (!response.journeys || response.journeys.length === 0) {
                 this.log.info(
@@ -292,6 +292,7 @@ export class JourneysRequest extends BaseClass {
         try {
             if (Array.isArray(journeys.journeys) && journeys.journeys.length > 0) {
                 for (const [index, journey] of journeys.journeys.entries()) {
+                    this.log.info2(`=== Starting object ${index + 1} of ${journeys.journeys.length} ===`);
                     const journeyPath = `${basePath}.Journey_${`00${index}`.slice(-2)}`;
                     const [arrivalDelayed, arrivalOnTime] = await this.library.getDelayStatus(
                         journey.legs[journey.legs.length - 1].arrivalDelay,
@@ -499,6 +500,7 @@ export class JourneysRequest extends BaseClass {
                     });
                     // Teilstrecken/Legs der Verbindung
                     await this.writeLegStates(journeyPath, journey.legs);
+                    this.log.info2(`✓ Object ${index + 1} processed successfully`);
                     if (index === countEntries - 1) {
                         this.log.debug(
                             `=== Maximum number of journeys reached (${countEntries}), further journeys will not be processed ===`,
@@ -530,7 +532,7 @@ export class JourneysRequest extends BaseClass {
                     const stationFrom = leg.origin?.name || 'unknown_station';
                     const stationTo = leg.destination?.name || 'unknown_station';
                     const name = leg.walking
-                        ? this.library.translate('journey_Change')
+                        ? this.library.translate('journey_change')
                         : this.library.translate('journey_leg_FromTo', stationFrom, stationTo);
                     const [arrivalDelayed, arrivalOnTime] = await this.library.getDelayStatus(leg.arrivalDelay, 0);
                     const [departureDelayed, departureOnTime] = await this.library.getDelayStatus(

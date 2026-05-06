@@ -18,7 +18,7 @@ type departureOpt = {
 // Default-Werte
 export const defaultDepartureOpt: Partial<departureOpt> = {
     duration: 60,
-    results: 3,
+    results: 10,
     language: 'de',
 };
 
@@ -40,19 +40,7 @@ type journeyOpt = {
     walkingSpeed?: 'slow' | 'normal' | 'fast'; // Gehgeschwindigkeit (Standard: 'normal')
     // Berücksichtige Fußweg zu nahegelegenen Stationen am Beginn einer Verbindung?
     startWithWalking?: boolean; // Standard: true
-    products?: {
-        // diese Einträge können von Profil zu Profil variieren
-        suburban?: boolean; // S-Bahn (Standard: true)
-        subway?: boolean; // U-Bahn (Standard: true)
-        tram?: boolean; // Straßenbahn (Standard: true)
-        bus?: boolean; // Bus (Standard: true)
-        ferry?: boolean; // Fähre (Standard: true)
-        express?: boolean; // Fernverkehr (Standard: true)
-        regional?: boolean; // Regionalverkehr (Standard: true)
-        regionalExpress?: boolean; // Regional-Express (Standard: true)
-        national?: boolean; // Nah- und Fernverkehr (Standard: true)
-        nationalExpress?: boolean; // ICE, IC, EC (Standard: true)
-    };
+    products?: Products; // welche Verkehrsmittel sollen berücksichtigt werden? (Standard: alle)
     tickets?: boolean; // gebe Tickets zurück? nur mit einigen Profilen verfügbar (Standard: false)
     polylines?: boolean; // gebe eine Form für jede Teilstrecke zurück? (Standard: false)
     subStops?: boolean; // parse & zeige Unterhaltestellen von Stationen? (Standard: true)
@@ -64,21 +52,28 @@ type journeyOpt = {
 
 // Default-Werte
 export const defaultJourneyOpt: Partial<journeyOpt> = {
-    results: 3,
+    results: 10,
     language: 'de',
 };
 
 export type Products = {
-    suburban?: boolean;
-    subway?: boolean;
-    tram?: boolean;
-    bus?: boolean;
-    ferry?: boolean;
-    express?: boolean;
-    regional?: boolean;
-    regionalExpress?: boolean;
-    national?: boolean;
-    nationalExpress?: boolean;
+    // Bei neuen Produkten die heir nicht aufgeführt sind,
+    // einfach hier hinzufügen, damit sie in der UI berücksichtigt werden können.
+    suburban?: boolean; // S-Bahn (Standard: true)
+    subway?: boolean; // U-Bahn (Standard: true)
+    tram?: boolean; // Straßenbahn (Standard: true)
+    bus?: boolean; // Bus (Standard: true)
+    ferry?: boolean; // Fähre (Standard: true)
+    express?: boolean; // Fernverkehr (Standard: true)
+    regional?: boolean; // Regionalverkehr (Standard: true)
+    regionalExpress?: boolean; // Regional-Express (Standard: true)
+    national?: boolean; // Nah- und Fernverkehr (Standard: true)
+    nationalExpress?: boolean; // ICE, IC, EC (Standard: true)
+    dialARide?: boolean; // AST - Anrufverkehr (Standard: true)
+    localTrain?: boolean; // Nahverkehr (Standard: true)
+    expressTrain?: boolean; // ICE (Standard: true)
+    nationalTrain?: boolean; // InterCity, EuroCity, CityNightLine, InterRegio', (Standard: true)
+    watercraft?: boolean; // Wasserfahrzeuge (Standard: true)
 };
 
 type Location = {
@@ -114,7 +109,7 @@ export type Stopstate = {
         type: string | undefined;
         location?: Location | undefined;
         products?: Products | undefined;
-        tansitAuthority?: string | undefined;
+        transitAuthority?: string | undefined;
         facilities?:
             | {
                   Zentrale?: string | undefined;

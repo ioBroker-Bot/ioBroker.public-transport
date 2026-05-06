@@ -1,5 +1,6 @@
 import type * as Hafas from 'hafas-client';
 import type { PublicTransport } from '../../main';
+import { camelToKebab } from '../tools/library';
 import type { ITransportService } from '../types/transportService';
 import { PollingManager } from './pollingManager';
 
@@ -27,6 +28,7 @@ interface JourneyConfig {
 export class JourneyPolling extends PollingManager<JourneyConfig> {
     constructor(adapter: PublicTransport) {
         super(adapter);
+        this.log.setLogPrefix('journeyPoll');
     }
 
     /**
@@ -46,7 +48,7 @@ export class JourneyPolling extends PollingManager<JourneyConfig> {
                 continue;
             }
 
-            this.adapter.log.debug(`Reset states for deactivated journey: ${config.customName || ''} (${config.id})`);
+            this.log.debug(`Reset states for deactivated journey: ${config.customName || ''} (${config.id})`);
 
             // Verwende garbageColleting um States auf Standardwerte zu setzen
             await this.adapter.library.garbageColleting(
@@ -98,7 +100,9 @@ export class JourneyPolling extends PollingManager<JourneyConfig> {
         }
 
         if (config.products) {
-            options.products = config.products;
+            options.products = Object.fromEntries(
+                Object.entries(config.products).map(([k, v]) => [camelToKebab(k), v]),
+            );
         }
 
         return options;
@@ -116,9 +120,9 @@ export class JourneyPolling extends PollingManager<JourneyConfig> {
         countMsg: (n: number) => string,
         _entryMsg: (name: string, id: string) => string,
     ): void {
-        this.adapter.log.info(countMsg(configs.length));
+        this.log.info(countMsg(configs.length));
         for (const config of configs) {
-            this.adapter.log.info(
+            this.log.info(
                 `  - ${config.customName || ''} (From: ${config.fromStationName || config.fromStationId || ''}, To: ${config.toStationName || config.toStationId || ''})`,
             );
         }
@@ -133,25 +137,26 @@ export class JourneyPolling extends PollingManager<JourneyConfig> {
      */
     protected async queryConfig(config: JourneyConfig, service: ITransportService): Promise<boolean> {
         if (!config.fromStationId || !config.toStationId) {
-            this.adapter.log.warn('No start or destination station provided');
+            this.log.warn('No start or destination station provided');
             return false;
         }
 
         const options = this.createJourneyOptions(config);
-        const products = config.products ?? undefined;
+        const products = config.products
+            ? Object.fromEntries(Object.entries(config.products).map(([k, v]) => [camelToKebab(k), v]))
+            : undefined;
         const countEntries = config.numResults ?? 5;
         const client_profile = config.client_profile ?? undefined;
 
-        this.adapter.log.debug(
-            `id: ${config.id},
+        this.log.debug(`Journey query parameters:
+             id: ${config.id},
              fromId: ${config.fromStationId},
              toId: ${config.toStationId},
              service: ${JSON.stringify(service)},
              option: ${JSON.stringify(options)},
              countEntires: ${countEntries},
              products: ${JSON.stringify(products)},
-             client_profil: ${client_profile}`,
-        );
+             client_profil: ${client_profile}`);
 
         try {
             return await this.adapter.journeysRequest.getJourneys(
@@ -165,7 +170,7 @@ export class JourneyPolling extends PollingManager<JourneyConfig> {
                 client_profile,
             );
         } catch (error) {
-            this.adapter.log.error(`Error querying journey "${config.customName || ''}": ${(error as Error).message}`);
+            this.log.error(`Error querying journey "${config.customName || ''}": ${(error as Error).message}`);
             return false;
         }
     }

@@ -75,10 +75,13 @@ export class DepartureRequest extends BaseClass {
             this.validateClientProfile(client_profile);
             const mergedOptions = { ...defaultDepartureOpt, ...options };
             // Antwort vom Transport-Client als vollständiger Typ
+            this.log.debug(
+                `Querying departures for station ${stationId} with options: ${JSON.stringify(mergedOptions)}, client_profile: ${client_profile || 'kein Profil angegeben'}`,
+            );
             const response = await service.getDepartures(stationId, mergedOptions);
             // Vollständiges JSON für Debugging
             if (this.adapter.config.logCompletelyJSON) {
-                this.adapter.log.debug(JSON.stringify(response.departures, null, 1));
+                this.log.debug(JSON.stringify(response.departures, null, 1));
             }
             if (!response.departures || response.departures.length === 0) {
                 this.log.info(
@@ -86,7 +89,7 @@ export class DepartureRequest extends BaseClass {
                 );
             }
             // Schreibe die Abfahrten in die States
-            await this.writeDepartureStates(stationId, response.departures, countEntries, products);
+            await this.writeDepartureStates(stationId, response.departures, countEntries);
             return true;
         } catch (error) {
             this.log.error(`Error querying departures for station ${stationId}: ${(error as Error).message}`);
@@ -96,14 +99,17 @@ export class DepartureRequest extends BaseClass {
 
     /**
      * Filtert Abfahrten nach den gewählten Produkten.
-     * Es werden nur Abfahrten zurückgegeben, deren Produkt in den aktivierten Produkten enthalten ist.
+     * Die API liefert Produktnamen in kebab-case (z.B. "regional-express"),
+     * die Config-Keys sind camelCase (z.B. "regionalExpress") – daher wird
+     * der API-Wert vor dem Vergleich normalisiert. Über Funktion kebabToCamel()
+     * aus der library.ts wird die Normalisierung durchgeführt.
      *
      * @param departures    Die zu filternden Abfahrten
      * @param products      Die aktivierten Produkte (true = erlaubt)
      * @returns             Gefilterte Abfahrten
      */
-    filterByProducts(departures: readonly Hafas.Alternative[], products: Partial<Products>): Hafas.Alternative[] {
-        // Erstelle eine Liste der aktivierten Produktnamen
+    /* filterByProducts(departures: readonly Hafas.Alternative[], products: Partial<Products>): Hafas.Alternative[] {
+        // Erstelle eine Liste der aktivierten Produktnamen (camelCase)
         const enabledProducts = Object.entries(products)
             .filter(([_, enabled]) => enabled === true)
             .map(([productName, _]) => productName);
@@ -113,7 +119,7 @@ export class DepartureRequest extends BaseClass {
             return [...departures];
         }
 
-        // Filtere Abfahrten: behalte nur die, deren line.product in enabledProducts ist
+        // Filtere Abfahrten: normalisiere API-Produktnamen von kebab-case zu camelCase
         return departures.filter(departure => {
             const lineProduct = departure.line?.product;
             if (!lineProduct) {
@@ -122,15 +128,16 @@ export class DepartureRequest extends BaseClass {
                 );
                 return false;
             }
-            const isEnabled = enabledProducts.includes(lineProduct);
+            const normalizedProduct = kebabToCamel(lineProduct);
+            const isEnabled = enabledProducts.includes(normalizedProduct);
             if (!isEnabled) {
                 this.log.info2(
-                    `Departure ${departure.line?.name || 'unbekannt / unknown'} to ${departure.direction ?? 'unbekannt / unknown'} filtered: Product "${lineProduct}" not enabled`,
+                    `Departure ${departure.line?.name || 'unbekannt / unknown'} to ${departure.direction ?? 'unbekannt / unknown'} filtered: Product "${lineProduct}" (normalized: "${normalizedProduct}") not enabled`,
                 );
             }
             return isEnabled;
         });
-    }
+    }*/
 
     /**
      * Schreibt die Abfahrten in die States der angegebenen Station.
@@ -138,13 +145,13 @@ export class DepartureRequest extends BaseClass {
      * @param stationId     Die ID der Station, für die die Abfahrten geschrieben werden sollen.
      * @param departures    Die Abfahrten, die geschrieben werden sollen.
      * @param countEntries  Die maximale Anzahl der Einträge, die geschrieben werden sollen.
-     * @param products      Die aktivierten Produkte (true = erlaubt)
+     * /@param products      Die aktivierten Produkte (true = erlaubt)
      */
     async writeDepartureStates(
         stationId: string,
         departures: Hafas.Alternative[],
         countEntries: number,
-        products?: Partial<Products>,
+        // products?: Partial<Products>,
     ): Promise<void> {
         try {
             if (!this.adapter.config.stationConfig) {
@@ -229,9 +236,9 @@ export class DepartureRequest extends BaseClass {
             //await this.library.garbageColleting(`Stations.${stationConfig.id}.`);
 
             // Filtere nach Produkten, falls angegeben
-            const filteredDepartures = products ? this.filterByProducts(departures, products) : departures;
+            // const filteredDepartures = products ? this.filterByProducts(departures, products) : departures;
             // Konvertiere zu reduzierten States
-            const departureStates: DepartureState[] = mapDeparturesToDepartureStates(filteredDepartures);
+            const departureStates: DepartureState[] = mapDeparturesToDepartureStates(departures);
             // JSON in die States schreiben
             await this.writeBaseStates(departureStates, stationId, countEntries);
         } catch (err) {

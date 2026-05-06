@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { withConfigGeneric, type ConfigComponentProps } from './ConfigGenericWrapper';
 import JourneyConfig from './JourneyConfig';
 import JourneyList from './JourneyList';
-import { type Products } from './ProductSelector';
+import { getProductsForProfile, type Products } from './Products';
 
 interface Journey {
     id: string;
@@ -16,6 +16,7 @@ interface Journey {
     enabled?: boolean;
     numResults?: number;
     products?: Products;
+    availableProducts?: Partial<Products>;
     client_profile?: string;
 }
 
@@ -40,11 +41,15 @@ const JourneyManagerContent: React.FC<ConfigComponentProps> = ({ oContext, data,
         const profile = ConfigGeneric.getValue(data, 'profile') as string;
         const client_profile = `${serviceType || 'unknown'}:${profile || 'unknown'}`;
 
+        const availableProducts = getProductsForProfile(serviceType, profile);
+
         const newJourney: Journey = {
             id: newId,
             customName: `Journey ${journeys.length + 1}`,
             enabled: true,
             numResults: 5,
+            products: { ...availableProducts } as Products,
+            availableProducts,
             client_profile,
         };
 
@@ -134,6 +139,8 @@ const JourneyManagerContent: React.FC<ConfigComponentProps> = ({ oContext, data,
                         onUpdate={handleJourneyUpdate}
                         oContext={oContext}
                         alive={alive}
+                        serviceType={ConfigGeneric.getValue(data, 'serviceType') as string}
+                        profile={ConfigGeneric.getValue(data, 'profile') as string}
                     />
                 </Box>
             </Box>

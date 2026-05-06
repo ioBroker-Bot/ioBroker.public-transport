@@ -21,10 +21,12 @@ __export(journeyPolling_exports, {
   JourneyPolling: () => JourneyPolling
 });
 module.exports = __toCommonJS(journeyPolling_exports);
+var import_library = require("../tools/library");
 var import_pollingManager = require("./pollingManager");
 class JourneyPolling extends import_pollingManager.PollingManager {
   constructor(adapter) {
     super(adapter);
+    this.log.setLogPrefix("journeyPoll");
   }
   /**
    * Setzt die States von deaktivierten Journeys auf Standardwerte zurück.
@@ -40,7 +42,7 @@ class JourneyPolling extends import_pollingManager.PollingManager {
       if (!config.id) {
         continue;
       }
-      this.adapter.log.debug(`Reset states for deactivated journey: ${config.customName || ""} (${config.id})`);
+      this.log.debug(`Reset states for deactivated journey: ${config.customName || ""} (${config.id})`);
       await this.adapter.library.garbageColleting(
         `Journeys.${config.id}.`,
         2e3,
@@ -84,7 +86,9 @@ class JourneyPolling extends import_pollingManager.PollingManager {
       options.bike = config.bike;
     }
     if (config.products) {
-      options.products = config.products;
+      options.products = Object.fromEntries(
+        Object.entries(config.products).map(([k, v]) => [(0, import_library.camelToKebab)(k), v])
+      );
     }
     return options;
   }
@@ -96,9 +100,9 @@ class JourneyPolling extends import_pollingManager.PollingManager {
    * @param _entryMsg Der Übersetzungsschlüssel für jeden Eintrag
    */
   logConfigs(configs, countMsg, _entryMsg) {
-    this.adapter.log.info(countMsg(configs.length));
+    this.log.info(countMsg(configs.length));
     for (const config of configs) {
-      this.adapter.log.info(
+      this.log.info(
         `  - ${config.customName || ""} (From: ${config.fromStationName || config.fromStationId || ""}, To: ${config.toStationName || config.toStationId || ""})`
       );
     }
@@ -111,25 +115,24 @@ class JourneyPolling extends import_pollingManager.PollingManager {
    * @returns true wenn erfolgreich, false sonst
    */
   async queryConfig(config, service) {
-    var _a, _b, _c;
+    var _a, _b;
     if (!config.fromStationId || !config.toStationId) {
-      this.adapter.log.warn("No start or destination station provided");
+      this.log.warn("No start or destination station provided");
       return false;
     }
     const options = this.createJourneyOptions(config);
-    const products = (_a = config.products) != null ? _a : void 0;
-    const countEntries = (_b = config.numResults) != null ? _b : 5;
-    const client_profile = (_c = config.client_profile) != null ? _c : void 0;
-    this.adapter.log.debug(
-      `id: ${config.id},
+    const products = config.products ? Object.fromEntries(Object.entries(config.products).map(([k, v]) => [(0, import_library.camelToKebab)(k), v])) : void 0;
+    const countEntries = (_a = config.numResults) != null ? _a : 5;
+    const client_profile = (_b = config.client_profile) != null ? _b : void 0;
+    this.log.debug(`Journey query parameters:
+             id: ${config.id},
              fromId: ${config.fromStationId},
              toId: ${config.toStationId},
              service: ${JSON.stringify(service)},
              option: ${JSON.stringify(options)},
              countEntires: ${countEntries},
              products: ${JSON.stringify(products)},
-             client_profil: ${client_profile}`
-    );
+             client_profil: ${client_profile}`);
     try {
       return await this.adapter.journeysRequest.getJourneys(
         config.id,
@@ -142,7 +145,7 @@ class JourneyPolling extends import_pollingManager.PollingManager {
         client_profile
       );
     } catch (error) {
-      this.adapter.log.error(`Error querying journey "${config.customName || ""}": ${error.message}`);
+      this.log.error(`Error querying journey "${config.customName || ""}": ${error.message}`);
       return false;
     }
   }

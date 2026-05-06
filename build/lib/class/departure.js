@@ -76,16 +76,19 @@ class DepartureRequest extends import_library.BaseClass {
       }
       this.validateClientProfile(client_profile);
       const mergedOptions = { ...import_types.defaultDepartureOpt, ...options };
+      this.log.debug(
+        `Querying departures for station ${stationId} with options: ${JSON.stringify(mergedOptions)}, client_profile: ${client_profile || "kein Profil angegeben"}`
+      );
       const response = await service.getDepartures(stationId, mergedOptions);
       if (this.adapter.config.logCompletelyJSON) {
-        this.adapter.log.debug(JSON.stringify(response.departures, null, 1));
+        this.log.debug(JSON.stringify(response.departures, null, 1));
       }
       if (!response.departures || response.departures.length === 0) {
         this.log.info(
           `No departures found for station ${stationId}, client_profile: ${client_profile || "kein Profil angegeben"}`
         );
       }
-      await this.writeDepartureStates(stationId, response.departures, countEntries, products);
+      await this.writeDepartureStates(stationId, response.departures, countEntries);
       return true;
     } catch (error) {
       this.log.error(`Error querying departures for station ${stationId}: ${error.message}`);
@@ -94,44 +97,54 @@ class DepartureRequest extends import_library.BaseClass {
   }
   /**
    * Filtert Abfahrten nach den gewählten Produkten.
-   * Es werden nur Abfahrten zurückgegeben, deren Produkt in den aktivierten Produkten enthalten ist.
+   * Die API liefert Produktnamen in kebab-case (z.B. "regional-express"),
+   * die Config-Keys sind camelCase (z.B. "regionalExpress") – daher wird
+   * der API-Wert vor dem Vergleich normalisiert. Über Funktion kebabToCamel()
+   * aus der library.ts wird die Normalisierung durchgeführt.
    *
    * @param departures    Die zu filternden Abfahrten
    * @param products      Die aktivierten Produkte (true = erlaubt)
    * @returns             Gefilterte Abfahrten
    */
-  filterByProducts(departures, products) {
-    const enabledProducts = Object.entries(products).filter(([_, enabled]) => enabled === true).map(([productName, _]) => productName);
-    if (enabledProducts.length === 0) {
-      return [...departures];
-    }
-    return departures.filter((departure) => {
-      var _a, _b, _c, _d, _e;
-      const lineProduct = (_a = departure.line) == null ? void 0 : _a.product;
-      if (!lineProduct) {
-        this.log.info2(
-          `Departure ${((_b = departure.line) == null ? void 0 : _b.name) || "unbekannt / unknown"} to ${(_c = departure.direction) != null ? _c : "unbekannt / unknown"} filtered: No product info available`
-        );
-        return false;
-      }
-      const isEnabled = enabledProducts.includes(lineProduct);
-      if (!isEnabled) {
-        this.log.info2(
-          `Departure ${((_d = departure.line) == null ? void 0 : _d.name) || "unbekannt / unknown"} to ${(_e = departure.direction) != null ? _e : "unbekannt / unknown"} filtered: Product "${lineProduct}" not enabled`
-        );
-      }
-      return isEnabled;
-    });
-  }
+  /* filterByProducts(departures: readonly Hafas.Alternative[], products: Partial<Products>): Hafas.Alternative[] {
+          // Erstelle eine Liste der aktivierten Produktnamen (camelCase)
+          const enabledProducts = Object.entries(products)
+              .filter(([_, enabled]) => enabled === true)
+              .map(([productName, _]) => productName);
+  
+          // Wenn keine Produkte aktiviert sind, gib alle zurück
+          if (enabledProducts.length === 0) {
+              return [...departures];
+          }
+  
+          // Filtere Abfahrten: normalisiere API-Produktnamen von kebab-case zu camelCase
+          return departures.filter(departure => {
+              const lineProduct = departure.line?.product;
+              if (!lineProduct) {
+                  this.log.info2(
+                      `Departure ${departure.line?.name || 'unbekannt / unknown'} to ${departure.direction ?? 'unbekannt / unknown'} filtered: No product info available`,
+                  );
+                  return false;
+              }
+              const normalizedProduct = kebabToCamel(lineProduct);
+              const isEnabled = enabledProducts.includes(normalizedProduct);
+              if (!isEnabled) {
+                  this.log.info2(
+                      `Departure ${departure.line?.name || 'unbekannt / unknown'} to ${departure.direction ?? 'unbekannt / unknown'} filtered: Product "${lineProduct}" (normalized: "${normalizedProduct}") not enabled`,
+                  );
+              }
+              return isEnabled;
+          });
+      }*/
   /**
    * Schreibt die Abfahrten in die States der angegebenen Station.
    *
    * @param stationId     Die ID der Station, für die die Abfahrten geschrieben werden sollen.
    * @param departures    Die Abfahrten, die geschrieben werden sollen.
    * @param countEntries  Die maximale Anzahl der Einträge, die geschrieben werden sollen.
-   * @param products      Die aktivierten Produkte (true = erlaubt)
+   * /@param products      Die aktivierten Produkte (true = erlaubt)
    */
-  async writeDepartureStates(stationId, departures, countEntries, products) {
+  async writeDepartureStates(stationId, departures, countEntries) {
     try {
       if (!this.adapter.config.stationConfig) {
         return;
@@ -202,8 +215,7 @@ class DepartureRequest extends import_library.BaseClass {
           native: {}
         }
       );
-      const filteredDepartures = products ? this.filterByProducts(departures, products) : departures;
-      const departureStates = (0, import_mapper.mapDeparturesToDepartureStates)(filteredDepartures);
+      const departureStates = (0, import_mapper.mapDeparturesToDepartureStates)(departures);
       await this.writeBaseStates(departureStates, stationId, countEntries);
     } catch (err) {
       this.log.error(`Error writing departures: ${err.message}`);

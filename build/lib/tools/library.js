@@ -36,7 +36,9 @@ var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "
 var library_exports = {};
 __export(library_exports, {
   BaseClass: () => BaseClass,
-  Library: () => Library
+  Library: () => Library,
+  camelToKebab: () => camelToKebab,
+  kebabToCamel: () => kebabToCamel
 });
 module.exports = __toCommonJS(library_exports);
 var import_node_fs = __toESM(require("node:fs"));
@@ -844,9 +846,24 @@ class Library extends BaseClass {
     return [delayed, onTime];
   }
 }
+function kebabToCamel(str) {
+  return str.replace(/-([a-z])/g, (_, char) => char.toUpperCase());
+}
+const CAMEL_TO_KEBAB_MAP = {
+  dialARide: "dial-a-ride",
+  expressTrain: "express-train",
+  nationalTrain: "national-train",
+  localTrain: "local-train"
+};
+function camelToKebab(str) {
+  var _a;
+  return (_a = CAMEL_TO_KEBAB_MAP[str]) != null ? _a : str;
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   BaseClass,
-  Library
+  Library,
+  camelToKebab,
+  kebabToCamel
 });
 //# sourceMappingURL=library.js.map

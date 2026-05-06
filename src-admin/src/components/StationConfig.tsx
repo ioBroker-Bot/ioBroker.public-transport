@@ -1,7 +1,8 @@
 import { I18n } from '@iobroker/adapter-react-v5';
 import { Box, Divider, FormControlLabel, Paper, Switch, TextField, Typography } from '@mui/material';
 import React from 'react';
-import ProductSelector, { defaultProducts, type Products } from './ProductSelector';
+import ProductSelector from './ProductSelector';
+import { defaultProducts, type Products } from './Products';
 
 interface Station {
     id: string;
@@ -12,6 +13,7 @@ interface Station {
     offsetTime?: number;
     products?: Products;
     availableProducts?: Partial<Products>; // Produkte die von HAFAS für diese Station zurückgegeben wurden
+    nativeProducts?: Partial<Products>; // Von HAFAS gemeldete Produkte der Station (unveränderlich)
     client_profile?: string;
 }
 
@@ -153,6 +155,7 @@ const StationConfig: React.FC<StationConfigProps> = ({ station, onUpdate, alive 
                             onChange={handleProductsChange}
                             disabled={station.enabled === false || !alive}
                             availableProducts={station.availableProducts}
+                            nativeProducts={station.nativeProducts}
                         />
                     </Box>
                 </Box>

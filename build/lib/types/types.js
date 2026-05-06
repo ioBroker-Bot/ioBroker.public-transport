@@ -24,11 +24,11 @@ __export(types_exports, {
 module.exports = __toCommonJS(types_exports);
 const defaultDepartureOpt = {
   duration: 60,
-  results: 3,
+  results: 10,
   language: "de"
 };
 const defaultJourneyOpt = {
-  results: 3,
+  results: 10,
   language: "de"
 };
 // Annotate the CommonJS export names for ESM import in node:

@@ -47,7 +47,7 @@ class VendoService {
       this.navClient = (0, import_db_vendo_client.createClient)((0, import_throttle.withThrottling)(import_db.profile), this.clientName);
       return true;
     } catch (error) {
-      throw new Error(`db-vendo-Client konnte nicht initialisiert werden: ${error.message}`);
+      throw new Error(`The db-vendo client could not be initialized: ${error.message}`);
     }
   }
   /**
@@ -61,7 +61,7 @@ class VendoService {
    */
   getNavClient() {
     if (!this.navClient) {
-      throw new Error("VendoService wurde noch nicht initialisiert. Bitte zuerst init() aufrufen.");
+      throw new Error("VendoService has not been initialized yet. Please call init() first.");
     }
     return this.navClient;
   }

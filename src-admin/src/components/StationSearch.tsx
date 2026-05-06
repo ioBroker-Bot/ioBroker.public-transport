@@ -1,11 +1,5 @@
 import { I18n } from '@iobroker/adapter-react-v5';
 import type { ConfigGenericProps } from '@iobroker/json-config';
-import DirectionsBoatIcon from '@mui/icons-material/DirectionsBoat';
-import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
-import DirectionsRailwayIcon from '@mui/icons-material/DirectionsRailway';
-import SubwayIcon from '@mui/icons-material/Subway';
-import TrainIcon from '@mui/icons-material/Train';
-import TramIcon from '@mui/icons-material/Tram';
 import {
     Box,
     Button,
@@ -22,8 +16,9 @@ import {
     Typography,
 } from '@mui/material';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { normalizeProducts, productConfig, type Products } from './Products';
 
-interface Station {
+export interface Station {
     id: string;
     name: string;
     type?: string;
@@ -31,18 +26,7 @@ interface Station {
         latitude?: number;
         longitude?: number;
     };
-    products?: {
-        tram?: boolean;
-        bus?: boolean;
-        subway?: boolean;
-        express?: boolean;
-        regional?: boolean;
-        regionalExpress?: boolean;
-        nationalExpress?: boolean;
-        national?: boolean;
-        ferry?: boolean;
-        suburban?: boolean;
-    };
+    products?: Products;
 }
 
 interface StationSearchProps {
@@ -52,19 +36,6 @@ interface StationSearchProps {
     alive: boolean;
 }
 
-const ICON_MAP: Record<string, { icon: React.ReactElement; label: string; color: string }> = {
-    tram: { icon: <TramIcon fontSize="small" />, label: 'tram', color: '#D5001C' },
-    bus: { icon: <DirectionsBusIcon fontSize="small" />, label: 'bus', color: '#A5027D' },
-    subway: { icon: <SubwayIcon fontSize="small" />, label: 'u_bahn', color: '#0065AE' },
-    express: { icon: <DirectionsRailwayIcon fontSize="small" />, label: 'ice_ic_ec', color: '#EC0016' },
-    regional: { icon: <TrainIcon fontSize="small" />, label: 're_rb', color: '#1455C0' },
-    regionalExpress: { icon: <TrainIcon fontSize="small" />, label: 're', color: '#709EBF' },
-    nationalExpress: { icon: <TrainIcon fontSize="small" />, label: 'ice', color: '#FF6F00' },
-    national: { icon: <TrainIcon fontSize="small" />, label: 'ic_ec', color: '#FF8F00' },
-    ferry: { icon: <DirectionsBoatIcon fontSize="small" />, label: 'ferry', color: '#0080C8' },
-    suburban: { icon: <TrainIcon fontSize="small" />, label: 's_bahn', color: '#008D4F' },
-};
-
 const getProductIcons = (products?: Station['products']): React.ReactElement[] => {
     if (!products) {
         return [];
@@ -72,27 +43,30 @@ const getProductIcons = (products?: Station['products']): React.ReactElement[] =
 
     const icons: React.ReactElement[] = [];
     Object.entries(products).forEach(([key, value]) => {
-        if (value && ICON_MAP[key]) {
-            icons.push(
-                <Tooltip
-                    key={key}
-                    title={I18n.t(ICON_MAP[key].label)}
-                    arrow
-                >
-                    <Box
-                        component="span"
-                        title={ICON_MAP[key].label}
-                        sx={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            color: ICON_MAP[key].color,
-                            mr: 1,
-                        }}
+        if (value) {
+            const config = productConfig.find(p => p.key === key);
+            if (config) {
+                const IconComponent = config.icon;
+                icons.push(
+                    <Tooltip
+                        key={key}
+                        title={I18n.t(config.label)}
+                        arrow
                     >
-                        {ICON_MAP[key].icon}
-                    </Box>
-                </Tooltip>,
-            );
+                        <Box
+                            component="span"
+                            sx={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                color: config.color,
+                                mr: 1,
+                            }}
+                        >
+                            <IconComponent fontSize="small" />
+                        </Box>
+                    </Tooltip>,
+                );
+            }
         }
     });
 
@@ -128,7 +102,12 @@ const StationSearch: React.FC<StationSearchProps> = ({ oContext, onStationSelect
                 );
 
                 if (result && Array.isArray(result)) {
-                    setStations(result);
+                    console.log('Search result:', result);
+                    const normalized = result.map((station: Station) => ({
+                        ...station,
+                        products: normalizeProducts(station.products as Record<string, boolean>),
+                    }));
+                    setStations(normalized);
                     setLoading(false);
                 } else {
                     setStations([]);
