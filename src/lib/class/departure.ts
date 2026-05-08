@@ -488,6 +488,24 @@ export class DepartureRequest extends BaseClass {
                     },
                     true,
                 );
+                // Line ProductName
+                await this.library.writedp(
+                    `${this.adapter.namespace}.Stations.${stationId}.${departureIndex}.ProductName`,
+                    obj.line?.productName,
+                    {
+                        _id: 'nicht_definieren',
+                        type: 'state',
+                        common: {
+                            name: this.library.translate('departure_lineProductName'),
+                            type: 'string',
+                            role: 'text',
+                            read: true,
+                            write: false,
+                        },
+                        native: {},
+                    },
+                    true,
+                );
                 // Remarks Channel
                 await this.library.writedp(
                     `${this.adapter.namespace}.Stations.${stationId}.${departureIndex}.Remarks`,

@@ -229,7 +229,7 @@ class DepartureRequest extends import_library.BaseClass {
    * @param countEntries  Die maximale Anzahl der Einträge, die geschrieben werden sollen.
    */
   async writeBaseStates(response, stationId, countEntries) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k;
     for (const [index, obj] of response.entries()) {
       try {
         this.log.info2(`=== Starting object ${index + 1} of ${response.length} ===`);
@@ -452,6 +452,23 @@ class DepartureRequest extends import_library.BaseClass {
           true
         );
         await this.library.writedp(
+          `${this.adapter.namespace}.Stations.${stationId}.${departureIndex}.ProductName`,
+          (_e = obj.line) == null ? void 0 : _e.productName,
+          {
+            _id: "nicht_definieren",
+            type: "state",
+            common: {
+              name: this.library.translate("departure_lineProductName"),
+              type: "string",
+              role: "text",
+              read: true,
+              write: false
+            },
+            native: {}
+          },
+          true
+        );
+        await this.library.writedp(
           `${this.adapter.namespace}.Stations.${stationId}.${departureIndex}.Remarks`,
           void 0,
           {
@@ -465,7 +482,7 @@ class DepartureRequest extends import_library.BaseClass {
         );
         await this.library.writedp(
           `${this.adapter.namespace}.Stations.${stationId}.${departureIndex}.Remarks.Hint`,
-          (_e = obj.remarks) == null ? void 0 : _e.hint,
+          (_f = obj.remarks) == null ? void 0 : _f.hint,
           {
             _id: "nicht_definieren",
             type: "state",
@@ -482,7 +499,7 @@ class DepartureRequest extends import_library.BaseClass {
         );
         await this.library.writedp(
           `${this.adapter.namespace}.Stations.${stationId}.${departureIndex}.Remarks.Status`,
-          (_f = obj.remarks) == null ? void 0 : _f.status,
+          (_g = obj.remarks) == null ? void 0 : _g.status,
           {
             _id: "nicht_definieren",
             type: "state",
@@ -499,7 +516,7 @@ class DepartureRequest extends import_library.BaseClass {
         );
         await this.library.writedp(
           `${this.adapter.namespace}.Stations.${stationId}.${departureIndex}.Remarks.Warning`,
-          (_g = obj.remarks) == null ? void 0 : _g.warning,
+          (_h = obj.remarks) == null ? void 0 : _h.warning,
           {
             _id: "nicht_definieren",
             type: "state",
@@ -528,7 +545,7 @@ class DepartureRequest extends import_library.BaseClass {
         );
         await this.library.writedp(
           `${this.adapter.namespace}.Stations.${stationId}.${departureIndex}.Stop.Name`,
-          (_h = obj.stopinfo) == null ? void 0 : _h.name,
+          (_i = obj.stopinfo) == null ? void 0 : _i.name,
           {
             _id: "nicht_definieren",
             type: "state",
@@ -545,7 +562,7 @@ class DepartureRequest extends import_library.BaseClass {
         );
         await this.library.writedp(
           `${this.adapter.namespace}.Stations.${stationId}.${departureIndex}.Stop.Id`,
-          (_i = obj.stopinfo) == null ? void 0 : _i.id,
+          (_j = obj.stopinfo) == null ? void 0 : _j.id,
           {
             _id: "nicht_definieren",
             type: "state",
@@ -562,7 +579,7 @@ class DepartureRequest extends import_library.BaseClass {
         );
         await this.library.writedp(
           `${this.adapter.namespace}.Stations.${stationId}.${departureIndex}.Stop.Type`,
-          (_j = obj.stopinfo) == null ? void 0 : _j.type,
+          (_k = obj.stopinfo) == null ? void 0 : _k.type,
           {
             _id: "nicht_definieren",
             type: "state",

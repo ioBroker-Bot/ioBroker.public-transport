@@ -888,6 +888,18 @@ class JourneysRequest extends import_library.BaseClass {
           },
           native: {}
         });
+        await this.library.writedp(`${linePath}.ProductName`, leg.line.productName, {
+          _id: "nicht_definieren",
+          type: "state",
+          common: {
+            name: this.library.translate("journey_product_name"),
+            type: "string",
+            role: "text",
+            read: true,
+            write: false
+          },
+          native: {}
+        });
       }
     } catch (err) {
       this.log.error(`Error writing line states of the leg. Error message: ${err.message}`);
