@@ -258,4 +258,4 @@ public-transport.0
 
 ### 1. Vis-Anzeige
 
-für Vis1 gibt es ein Widget für die Abfahrten. Für die Anzeige wird das JSON genutzt.  
+Für Vis1/2 gibt es je ein Widget für Abfahrten und Verbindugen. Für die Anzeige wird das JSON genutzt.  

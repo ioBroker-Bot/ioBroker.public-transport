@@ -15,7 +15,7 @@ $.extend(true, systemDictionary, {
 
 // Widget Binding
 vis.binds['public-transportConnections'] = {
-    version: '0.0.2',
+    version: '0.0.3',
 
     showVersion: function () {
         if (vis.binds['public-transportConnections'].version) {
@@ -68,6 +68,7 @@ vis.binds['public-transportConnections'] = {
         html += '<div class="col-arr-delay">Verspätung</div>';
         html += '<div class="col-arr-platform">Gleis An</div>';
         html += '<div class="col-transfers">Umstiege</div>';
+        html += '<div class="col-info">Info</div>';
         html += '</div>';
 
         // Content-Bereich für Verbindungen
@@ -157,6 +158,37 @@ vis.binds['public-transportConnections'] = {
             return Math.max(0, transfers - 1); // -1 weil erste Fahrt kein Transfer ist
         }
 
+        // SVG-Icons für Remark-Typen
+        const SVG_WARNING = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" class="pub-trans-conn-remark-icon"><circle cx="12" cy="12" r="11" fill="#cc0000"/><text x="12" y="17" text-anchor="middle" fill="white" font-size="16" font-weight="bold" font-family="Arial,sans-serif">!</text></svg>';
+        const SVG_HINT    = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 26" width="18" height="16" class="pub-trans-conn-remark-icon"><polygon points="14,1 27,25 1,25" fill="#ffcc00"/><text x="14" y="22" text-anchor="middle" fill="#000000" font-size="13" font-weight="bold" font-family="Arial,sans-serif">!</text></svg>';
+        const SVG_STATUS  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" class="pub-trans-conn-remark-icon"><circle cx="12" cy="12" r="11" fill="#0066b3"/><text x="12" y="17" text-anchor="middle" fill="white" font-size="14" font-style="italic" font-weight="bold" font-family="Arial,sans-serif">i</text></svg>';
+
+        function groupRemarksByType(remarks) {
+            const hints = [];
+            const warnings = [];
+            const statuses = [];
+
+            for (const remark of remarks) {
+                switch (remark.type) {
+                    case 'hint':
+                        hints.push(remark.text || '');
+                        break;
+                    case 'warning':
+                        warnings.push(remark.text || '');
+                        break;
+                    case 'status':
+                        statuses.push(remark.text || '');
+                        break;
+                }
+            }
+
+            return {
+                hint: hints.length > 0 ? hints.join('<br>') : undefined,
+                warning: warnings.length > 0 ? warnings.join('<br>') : undefined,
+                status: statuses.length > 0 ? statuses.join('<br>') : undefined,
+            };
+        }
+
         function showJourneyDetails(journey) {
             const $modalBody = $('#modal-body-' + widgetID);
             let html = '';
@@ -173,8 +205,11 @@ vis.binds['public-transportConnections'] = {
                 const product = leg.line && leg.line.product ? leg.line.product : 'walking';
                 const lineName = leg.line && leg.line.name ? leg.line.name : 'Fußweg';
                 const direction = leg.direction || '';
+                const legDepDelay = leg.departureDelay || 0;
+                const legArrDelay = leg.arrivalDelay || 0;
+                const legHasDelay = !isWalking && (legDepDelay > 0 || legArrDelay > 0);
 
-                html += '<div class="pub-trans-conn-leg' + (isWalking ? ' walking' : '') + '">';
+                html += '<div class="pub-trans-conn-leg' + (isWalking ? ' walking' : '') + (legHasDelay ? ' delayed' : '') + '">';
 
                 // Header
                 html += '<div class="pub-trans-conn-leg-header">';
@@ -203,7 +238,7 @@ vis.binds['public-transportConnections'] = {
                     html += '<span class="pub-trans-conn-leg-detail-value">' + depTime;
                     if (depDelay !== 0) {
                         html +=
-                            ' <span class="' +
+                            ' <span class="pub-trans-conn-delay ' +
                             (depDelay > 0 ? 'delayed' : 'ontime') +
                             '">(+' +
                             Math.round(depDelay / 60) +
@@ -235,7 +270,7 @@ vis.binds['public-transportConnections'] = {
                 html += '<span class="pub-trans-conn-leg-detail-value">' + arrTime;
                 if (arrDelay !== 0 && !isWalking) {
                     html +=
-                        ' <span class="' +
+                        ' <span class="pub-trans-conn-delay ' +
                         (arrDelay > 0 ? 'delayed' : 'ontime') +
                         '">(+' +
                         Math.round(arrDelay / 60) +
@@ -280,6 +315,34 @@ vis.binds['public-transportConnections'] = {
                 }
 
                 html += '</div>'; // leg-details
+
+                // Remarks der Teilstrecke
+                if (leg.remarks && leg.remarks.length > 0) {
+                    const legRemarks = groupRemarksByType(leg.remarks);
+                    if (legRemarks.warning || legRemarks.hint || legRemarks.status) {
+                        html += '<div class="pub-trans-conn-leg-remarks">';
+                        if (legRemarks.warning) {
+                            html += '<div class="pub-trans-conn-leg-remark-section warning">';
+                            html += SVG_WARNING;
+                            html += '<span class="pub-trans-conn-leg-remark-text">' + legRemarks.warning + '</span>';
+                            html += '</div>';
+                        }
+                        if (legRemarks.hint) {
+                            html += '<div class="pub-trans-conn-leg-remark-section hint">';
+                            html += SVG_HINT;
+                            html += '<span class="pub-trans-conn-leg-remark-text">' + legRemarks.hint + '</span>';
+                            html += '</div>';
+                        }
+                        if (legRemarks.status) {
+                            html += '<div class="pub-trans-conn-leg-remark-section status">';
+                            html += SVG_STATUS;
+                            html += '<span class="pub-trans-conn-leg-remark-text">' + legRemarks.status + '</span>';
+                            html += '</div>';
+                        }
+                        html += '</div>'; // leg-remarks
+                    }
+                }
+
                 html += '</div>'; // leg
             });
 
@@ -333,8 +396,25 @@ vis.binds['public-transportConnections'] = {
                 const arrPlatformChanged = arrPlannedPlatform && arrPlannedPlatform !== arrPlatform;
 
                 const transfers = getTransferCount(journey);
+                const journeyHasDelay = depDelay > 0 || arrDelay > 0;
 
-                html += '<div class="pub-trans-conn-row" data-journey-index="' + index + '">';
+                // Remarks aus allen Legs sammeln
+                const journeyRemarks = { warning: undefined, hint: undefined, status: undefined };
+                journey.legs.forEach(function (leg) {
+                    if (leg.remarks && leg.remarks.length > 0) {
+                        const lr = groupRemarksByType(leg.remarks);
+                        if (lr.warning) journeyRemarks.warning = lr.warning;
+                        if (lr.hint) journeyRemarks.hint = lr.hint;
+                        if (lr.status) journeyRemarks.status = lr.status;
+                    }
+                });
+
+                let iconsHtml = '';
+                if (journeyRemarks.warning) iconsHtml += SVG_WARNING;
+                if (journeyRemarks.hint) iconsHtml += SVG_HINT;
+                if (journeyRemarks.status) iconsHtml += SVG_STATUS;
+
+                html += '<div class="pub-trans-conn-row' + (journeyHasDelay ? ' delayed' : '') + '" data-journey-index="' + index + '">';
                 html += '<div class="pub-trans-conn-time">' + depTime + '</div>';
                 html += '<div>' + formatDelay(depDelay) + '</div>';
                 html +=
@@ -352,13 +432,14 @@ vis.binds['public-transportConnections'] = {
                     arrPlatform +
                     '</div>';
                 html += '<div class="pub-trans-conn-transfers">' + transfers + '</div>';
+                html += '<div class="pub-trans-conn-info-cell">' + iconsHtml + '</div>';
                 html += '</div>';
             });
 
             $content.html(html);
 
-            // Click-Handler für die Zeilen
-            $('.pub-trans-conn-row').on('click', function () {
+            // Click-Handler für die Zeilen (nur innerhalb dieses Widgets)
+            $content.find('.pub-trans-conn-row').on('click', function () {
                 const journeyIndex = $(this).data('journey-index');
                 showJourneyDetails(journeys[journeyIndex]);
             });

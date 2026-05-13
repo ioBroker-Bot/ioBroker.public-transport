@@ -260,7 +260,7 @@ public-transport.0
 
 ### 1. Vis Display
 
-For Vis1, there is a widget available for displaying departures. The JSON data is used for the display.
+Vis1/2 includes a separate widget for departures and connections. The JSON data is used for the display.
 
 ## Changelog
 <!--
@@ -269,6 +269,9 @@ For Vis1, there is a widget available for displaying departures. The JSON data i
 -->
 ### **WORK IN PROGRESS**
 * (tt-tom17) added productName to states
+* (tt-tom17) connections widget: show remarks icons (warning/hint/status) per leg in journey detail popup
+* (tt-tom17) connections widget: show remarks icons in main table (new Info column)
+* (tt-tom17) connections widget: highlight delayed journeys/legs with red left border
 
 ### 0.4.0 (2026-05-06)
 * (tt-tom17) fix select Products

@@ -31,7 +31,7 @@
     color: #ffcc00;
     padding: 8px 10px;
     display: grid;
-    grid-template-columns: 80px 100px 80px 80px 100px 80px 100px;
+    grid-template-columns: 80px 100px 80px 80px 100px 80px 100px 50px;
     gap: 10px;
     font-size: 13px;
     font-weight: bold;
@@ -53,7 +53,7 @@
 /* Einzelne Verbindungszeile */
 .pub-trans-conn-row {
     display: grid;
-    grid-template-columns: 80px 100px 80px 80px 100px 80px 100px;
+    grid-template-columns: 80px 100px 80px 80px 100px 80px 100px 50px;
     gap: 10px;
     padding: 10px;
     border-bottom: 1px solid #333;
@@ -367,4 +367,68 @@
 
 .pub-trans-conn-modal-content::-webkit-scrollbar-thumb:hover {
     background: #a2a2a2;
+}
+
+/* Delay-Indikator in der Haupttabelle */
+.pub-trans-conn-row.delayed {
+    border-left: 3px solid #ff0000;
+}
+
+/* Info-Zelle mit Remark-Icons in der Haupttabelle */
+.pub-trans-conn-info-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+}
+
+/* Remark-Icons (allgemein) */
+.pub-trans-conn-remark-icon {
+    vertical-align: middle;
+    cursor: default;
+}
+
+/* Delay-Indikator am Leg-Container im Popup */
+.pub-trans-conn-leg.delayed {
+    border-left: 4px solid #ff0000;
+}
+
+/* Remarks-Block im Leg-Detail */
+.pub-trans-conn-leg-remarks {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid #444;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.pub-trans-conn-leg-remark-section {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 3px;
+    border-left: 4px solid transparent;
+}
+
+.pub-trans-conn-leg-remark-section.warning {
+    border-left-color: #cc0000;
+    background-color: rgba(204, 0, 0, 0.12);
+}
+
+.pub-trans-conn-leg-remark-section.hint {
+    border-left-color: #ffcc00;
+    background-color: rgba(255, 204, 0, 0.10);
+}
+
+.pub-trans-conn-leg-remark-section.status {
+    border-left-color: #0066b3;
+    background-color: rgba(0, 102, 179, 0.12);
+}
+
+.pub-trans-conn-leg-remark-text {
+    color: #dddddd;
+    font-size: 13px;
+    line-height: 1.4;
 }
