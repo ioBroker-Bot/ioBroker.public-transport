@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "public-transport",
-    "version": "0.4.0",
+    "version": "0.5.0",
     "news": {
+      "0.5.0": {
+        "en": "added productName to states\nconnections widget: show remarks icons in main table (new Info column)\nconnections widget: highlight delayed journeys/legs with red left border",
+        "de": "productName zu States hinzugefügt\nWidget Verbindungen: Icons in der Haupttabelle anzeigen (Neue Infospalte)\nWidget Verbindungen: Markierung für verspätete Verbindungen mit roten linken Balken",
+        "ru": "добавлено название продукта в штаты\nвиджет соединений: покажите значки замечаний в главной таблице (новая колонка Инфо)\nвиджет соединений: выделение отложенных поездок / ног с красной левой границей",
+        "pt": "produto adicionadoName to states\nwidget de conexões: mostrar ícones de observações na tabela principal (nova coluna Info)\nwidget de conexões: destacar jornadas/pernas atrasadas com borda esquerda vermelha",
+        "nl": "toegevoegd productNaam aan toestanden\nverbindingswidget: toon opmerkingen iconen in hoofdtabel (nieuwe Info kolom)\nverbindingswidget: markeer vertraagde ritten/benen met rode linkerrand",
+        "fr": "produit ajoutéNom aux états\nwidget de connexions: afficher les icônes de remarques dans la table principale (nouvelle colonne Info)\nwidget de connexions: mettre en évidence les trajets / jambes retardés avec bordure rouge gauche",
+        "it": "aggiunto productName agli stati\nwidget connessioni: mostra le icone della tabella principale (nuova colonna Info)\nwidget connessioni: evidenziare viaggi / gambe ritardati con bordo sinistro rosso",
+        "es": "producto añadidoName a estados\nwidget de conexiones: mostrar comentarios iconos en la tabla principal (nueva columna Info)\nwidget de conexiones: resaltar los viajes retardados / patas con frontera izquierda roja",
+        "pl": "dodano productName do stanów\nwidget połączeń: pokazanie ikon uwag w tabeli głównej (nowa kolumna Info)\nwidżet połączeń: podkreślenie opóźnionych podróży / nóg z czerwoną lewą granicą",
+        "uk": "додано продуктName до штатів\nз'єднання віджету: показати значки зауваження в головному таблиці (новий інформаційний стовпчик)\nз'єднання віджету: виділіть затримані подорожі/леги з червоним лівим кордоном",
+        "zh-cn": "添加到状态的产品Name\n连接部件: 在主表格中显示注释图标( 新信息列)\n连接部件:用红色左边框突出显示延迟行程/腿部"
+      },
       "0.4.0": {
         "en": "fix select Products\nadd Profil VBN (Bremen/Niedersachsen)",
         "de": "Problem mit Auswahl der Verkehrsmittel behoben\nProfil VBN (Bremen/Niedersachsen) hinzugefügt",
@@ -80,19 +93,6 @@
         "pl": "fix App.tsx\nFix [Bug]: Departure JSON remains empty or all entries are identical [#28] (https://github.com/tt-tom17/ioBroker.public-transport/issues/28)",
         "uk": "завантажити App.tsx\n[Bug]: Departure JSON remains empty or all entries are identical [#28] (https://github.com/tt-tom17/ioBroker.public-transport/issues/28)",
         "zh-cn": "修复 App.tsx\nFix [Bug]: Departure JSON remains empty or all entries are identical [#28] (https://github.com/tt-tom17/ioBroker.public-transport/issues/28) (中文(简体) )"
-      },
-      "0.1.0": {
-        "en": "begin beta-test",
-        "de": "Beginn der Beta-Tests",
-        "ru": "начать бета-тестирование",
-        "pt": "iniciar o teste beta",
-        "nl": "begin beta-test",
-        "fr": "commencer l'essai bêta",
-        "it": "iniziare beta-test",
-        "es": "empezar el examen beta-test",
-        "pl": "rozpocząć test beta",
-        "uk": "початок бета-тест",
-        "zh-cn": "开始β测试"
       }
     },
     "titleLang": {
