@@ -19,7 +19,7 @@ import { withConfigGeneric, type ConfigComponentProps } from './ConfigGenericWra
 interface ServiceOption {
     value: string;
     label: string;
-    serviceType: 'hafas' | 'vendo';
+    serviceType: 'hafas' | 'vendo' | 'motis';
     profile: string;
 }
 
@@ -28,6 +28,7 @@ const SERVICE_OPTIONS: ServiceOption[] = [
     { value: 'hafas:oebb', label: 'HAFAS - ÖBB (Österreich)', serviceType: 'hafas', profile: 'oebb' },
     { value: 'hafas:vbn', label: 'HAFAS - VBN (Bremen/Niedersachsen)', serviceType: 'hafas', profile: 'vbn' },
     { value: 'vendo:db', label: 'Vendo - Deutsche Bahn', serviceType: 'vendo', profile: 'db' },
+    { value: 'motis:compat', label: 'MOTIS - Transitous (DE & Europa)', serviceType: 'motis', profile: 'compat' },
 ];
 
 const ClientConfigContent: React.FC<ConfigComponentProps> = ({ data, onChange, alive, disabled }) => {

@@ -5,6 +5,7 @@ import { DeparturePolling } from './lib/class/departurePolling';
 import { HafasService } from './lib/class/hafasService';
 import { JourneyPolling } from './lib/class/journeyPolling';
 import { JourneysRequest } from './lib/class/journeys';
+import { MotisService } from './lib/class/motisService';
 import { StationRequest } from './lib/class/station';
 import { Library } from './lib/tools/library';
 import type { ITransportService } from './lib/types/transportService';
@@ -14,6 +15,7 @@ export class PublicTransport extends utils.Adapter {
     unload: boolean = false;
     hService!: HafasService;
     vService!: VendoService;
+    mService!: MotisService;
     activeService!: ITransportService | undefined;
     depRequest!: DepartureRequest;
     journeysRequest!: JourneysRequest;
@@ -113,6 +115,12 @@ export class PublicTransport extends utils.Adapter {
                 this.vService.init();
                 this.activeService = this.vService;
                 this.log.info(`VendoService initialized with ClientName: ${clientName}`);
+            } else if (serviceType === 'motis') {
+                // MotisService (Transitous) initialisieren
+                this.mService = new MotisService(clientName);
+                this.mService.init();
+                this.activeService = this.mService;
+                this.log.info(`MOTIS client (Transitous) initialized with ClientName: ${clientName}`);
             } else {
                 // HafasService initialisieren (Standard)
                 const profileName = this.config.profile || 'unknown';

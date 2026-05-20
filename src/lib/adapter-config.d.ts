@@ -4,7 +4,7 @@
 declare global {
 	namespace ioBroker {
 		interface AdapterConfig {
-			serviceType: 'hafas' | 'vendo';
+			serviceType: 'hafas' | 'vendo' | 'motis';
 			profile?: string;
 			clientName?: string;
 			stationConfig?: StationConfig[];

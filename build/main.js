@@ -38,6 +38,7 @@ var import_departurePolling = require("./lib/class/departurePolling");
 var import_hafasService = require("./lib/class/hafasService");
 var import_journeyPolling = require("./lib/class/journeyPolling");
 var import_journeys = require("./lib/class/journeys");
+var import_motisService = require("./lib/class/motisService");
 var import_station = require("./lib/class/station");
 var import_library = require("./lib/tools/library");
 class PublicTransport extends utils.Adapter {
@@ -45,6 +46,7 @@ class PublicTransport extends utils.Adapter {
   unload = false;
   hService;
   vService;
+  mService;
   activeService;
   depRequest;
   journeysRequest;
@@ -129,6 +131,11 @@ class PublicTransport extends utils.Adapter {
         this.vService.init();
         this.activeService = this.vService;
         this.log.info(`VendoService initialized with ClientName: ${clientName}`);
+      } else if (serviceType === "motis") {
+        this.mService = new import_motisService.MotisService(clientName);
+        this.mService.init();
+        this.activeService = this.mService;
+        this.log.info(`MOTIS client (Transitous) initialized with ClientName: ${clientName}`);
       } else {
         const profileName = this.config.profile || "unknown";
         this.hService = new import_hafasService.HafasService(clientName, profileName);
