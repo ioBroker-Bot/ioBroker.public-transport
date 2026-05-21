@@ -291,6 +291,14 @@ vis.binds['public-transportConnections'] = {
                     html += '</div>';
                 }
 
+                // Fußweg-Distanz
+                if (isWalking) {
+                    html += '<div class="pub-trans-conn-leg-detail-item">';
+                    html += '<span class="pub-trans-conn-leg-detail-label">Distanz:</span>';
+                    html += '<span class="pub-trans-conn-leg-detail-value">' + (leg.distance ? leg.distance + ' m' : '--') + '</span>';
+                    html += '</div>';
+                }
+
                 // Origin und Destination
                 if (leg.origin && leg.origin.name) {
                     html += '<div class="pub-trans-conn-leg-detail-item">';
@@ -303,14 +311,6 @@ vis.binds['public-transportConnections'] = {
                     html += '<div class="pub-trans-conn-leg-detail-item">';
                     html += '<span class="pub-trans-conn-leg-detail-label">Nach:</span>';
                     html += '<span class="pub-trans-conn-leg-detail-value">' + leg.destination.name + '</span>';
-                    html += '</div>';
-                }
-
-                // Fußweg-Distanz
-                if (isWalking && leg.distance) {
-                    html += '<div class="pub-trans-conn-leg-detail-item">';
-                    html += '<span class="pub-trans-conn-leg-detail-label">Distanz:</span>';
-                    html += '<span class="pub-trans-conn-leg-detail-value">' + leg.distance + ' m</span>';
                     html += '</div>';
                 }
 
