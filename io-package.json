@@ -1,9 +1,9 @@
 {
   "common": {
     "name": "public-transport",
-    "version": "0.5.1-alpha.0",
+    "version": "0.5.1-alpha.1",
     "news": {
-      "0.5.1-alpha.0": {
+      "0.5.1-alpha.1": {
         "en": "Widget Connections: change Layout for walking (popup)",
         "de": "Widget Connections: Layout ändern für Fußwege (Popup)",
         "ru": "Widget Connections: изменить макет для пешеходов (всплывающее окно)",
@@ -80,19 +80,6 @@
         "pl": "fix Vendo zabronione - > zmiana dbnav na db",
         "uk": "fix Vendo заборонений -> змінити dbnav до db",
         "zh-cn": "将 Vendo 禁用 - > 将 dbnav 更改为 db"
-      },
-      "0.2.0": {
-        "en": "Widget departures: add popup for hints and warnings",
-        "de": "Widget Abfahrten: Popup für Hinweise und Warnungen hinzufügen",
-        "ru": "Выход виджетов: добавьте всплывающее окно для подсказок и предупреждений",
-        "pt": "Partidas do widget: adicionar popup para dicas e avisos",
-        "nl": "Widget vertrekt: voeg popup voor hints en waarschuwingen",
-        "fr": "Départs Widget: ajouter popup pour les conseils et les avertissements",
-        "it": "Partenze Widget: aggiungere popup per suggerimenti e avvisi",
-        "es": "Widget de salidas: añadir popup para sugerencias y advertencias",
-        "pl": "Wyjazdy widget: dodać popup dla wskazówek i ostrzeżeń",
-        "uk": "Відправлення Віджети: додавати спливаючі натяки та попередження",
-        "zh-cn": "部件离开: 为提示和警告添加弹出"
       }
     },
     "titleLang": {
