@@ -267,7 +267,7 @@ Vis1/2 includes a separate widget for departures and connections. The JSON data 
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
-### 0.5.1-alpha.0 (2026-05-22)
+### **WORK IN PROGRESS**
 * (tt-tom17) Widget Connections: change Layout for walking (popup)
 
 ### 0.5.0 (2026-05-17)
