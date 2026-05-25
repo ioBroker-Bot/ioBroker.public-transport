@@ -267,9 +267,9 @@ Vis1/2 includes a separate widget for departures and connections. The JSON data 
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 0.6.0 (2026-05-25)
 * (tt-tom17) add Motis service support
-* (tt-tom17) add nsPanelTimetable class for NS Panel integration
+* (tt-tom17) add nsPanelTimetable class for 'NSPanel-Lovelace-UI Next Level' integration
 * (tt-tom17) connections widget: fix walking detail info display
 * (tt-tom17) connections widget: add link styling for modal remarks
 

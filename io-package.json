@@ -1,20 +1,20 @@
 {
   "common": {
     "name": "public-transport",
-    "version": "0.5.1-alpha.1",
+    "version": "0.6.0",
     "news": {
-      "0.5.1-alpha.1": {
-        "en": "Widget Connections: change Layout for walking (popup)",
-        "de": "Widget Connections: Layout ändern für Fußwege (Popup)",
-        "ru": "Widget Connections: изменить макет для пешеходов (всплывающее окно)",
-        "pt": "Conexões de Widget: mudar o layout para andar (popup)",
-        "nl": "Widget Verbindingen: verandering Layout voor wandelen (poppoep)",
-        "fr": "Connexions Widget: changement Disposition pour la marche (popup)",
-        "it": "Widget Collegamenti: cambiare Layout per camminare (popup)",
-        "es": "Conexiones de Widget: cambio de diseño para caminar (popup)",
-        "pl": "Widget Connections: zmiana układu do chodzenia (popup)",
-        "uk": "Віджети з'єднання: зміна маршруту для ходьби (поповнення)",
-        "zh-cn": "部件连接: 更改行走的布局( 弹出)"
+      "0.6.0": {
+        "en": "add Motis service support\nadd nsPanelTimetable class for NSPanel integration\nconnections widget: fix walking detail info display\nconnections widget: add link styling for modal remarks",
+        "de": "motis Service Support hinzufügen\nnsPanelTimetable Klasse für NSPanel Integration hinzufügen\nverbindungen widget: fix gehdetail-info-anzeige\nverbindungen widget: link-styling für modale bemerkungen hinzufügen",
+        "ru": "поддержка сервиса Motis\nдобавить класс nsPanelTimetable для интеграции NSPanel\nвиджет соединений: фиксация отображения информации о деталях ходьбы\nвиджет соединений: добавьте стиль ссылок для модальных замечаний",
+        "pt": "adicionar suporte ao serviço Motis\nadicionar a classe nsPanelTimetable para integração com o NSPanel\nwidget de conexões: corrigir exibição de informações de detalhes de caminhada\nwidget de conexões: adicionar estilo de link para observações modais",
+        "nl": "motis service ondersteuning toevoegen\nnsPanelTimetable klasse toevoegen voor NSPanel integratie\nverbindingswidget: fix loop detail info display\nverbindingswidget: linkstyling toevoegen voor modale opmerkingen",
+        "fr": "ajouter le support de service Motis\najouter la classe nsPanelTimetable pour l'intégration NSPanel\nwidget de connexions: fixer l'affichage des détails de marche\nwidget de connexions: ajouter un style de lien pour les remarques modales",
+        "it": "aggiungere assistenza Motis\naggiungere la classe nsPanelTimetable per l'integrazione del NSPanel\nwidget connessioni: fix walk dettaglio info display\nwidget connessioni: aggiungere link styling per commenti modali",
+        "es": "añadir Motis soporte de servicio\nañadir nsPanelClase de tiempo para la integración de NSPanel\nwidget de conexiones: fijar detalle caminar info display\nwidget de conexiones: añadir link styling para comentarios modal",
+        "pl": "dodaj obsługę Motis\ndodaj klasę nsPanelDescription dla integracji NSPanel\nwidżet połączeń: poprawiaj wyświetlacz szczegółów chodzenia\nwidget połączeń: dodaj stylizację łącza dla uwag modalnych",
+        "uk": "додати підтримку сервісу Motis\nadd nsPanelTimetable клас для інтеграції NSPanel\nconnections віджет: виправити детальну інформацію про хід\nз'єднання віджет: додати вкладку для модальних зауважень",
+        "zh-cn": "添加 Motis 服务支持\n为NSPanel 集成添加 nsPanelTimable 类\n连接部件: 修补行走细节信息显示\n连接部件: 为模式语句添加链接样式"
       },
       "0.5.0": {
         "en": "added productName to states\nconnections widget: show remarks icons in main table (new Info column)\nconnections widget: highlight delayed journeys/legs with red left border",
