@@ -514,7 +514,7 @@ export class JourneysRequest extends BaseClass {
                     await this.writeLegStates(journeyPath, journey.legs);
                     // NSPanel Timetable Channel
                     if (nspanel) {
-                        await this.nsPanelTimetable.writeJourneyNsPanel(journeyPath, journey);
+                        await this.nsPanelTimetable.writeJourneyNsPanel(journeyPath, journey, index);
                     }
                     this.log.info2(`✓ Object ${index + 1} processed successfully`);
                     if (index === countEntries - 1) {

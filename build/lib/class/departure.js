@@ -601,7 +601,8 @@ class DepartureRequest extends import_library.BaseClass {
         if (nspanel) {
           await this.nsPanelTimetable.writeDepartureNsPanel(
             `${this.adapter.namespace}.Stations.${stationId}.${departureIndex}`,
-            obj
+            obj,
+            index
           );
         }
         this.log.info2(`\u2713 Object ${index + 1} processed successfully`);
