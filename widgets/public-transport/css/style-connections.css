@@ -432,3 +432,18 @@
     font-size: 13px;
     line-height: 1.4;
 }
+
+/* Link-Styling im Modal */
+.pub-trans-conn-leg-remark-text a {
+    color: #00ccff;
+    text-decoration: underline;
+}
+
+.pub-trans-conn-leg-remark-text a:hover {
+    color: #ffcc00;
+    text-decoration: none;
+}
+
+.pub-trans-conn-leg-remark-text a:visited {
+    color: #0099cc;
+}
