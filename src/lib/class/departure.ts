@@ -654,6 +654,7 @@ export class DepartureRequest extends BaseClass {
                     await this.nsPanelTimetable.writeDepartureNsPanel(
                         `${this.adapter.namespace}.Stations.${stationId}.${departureIndex}`,
                         obj,
+                        index,
                     );
                 }
                 this.log.info2(`✓ Object ${index + 1} processed successfully`);

@@ -124,6 +124,18 @@ export const PROFILE_PRODUCTS: Record<string, Partial<Products>> = {
         tram: true,
         taxi: true,
     },
+    // MOTIS – Transitous (compat-Profil, GTFS-basiert)
+    compat: {
+        nationalExpress: true,
+        national: true,
+        regionalExpress: true,
+        regional: true,
+        suburban: true,
+        bus: true,
+        ferry: true,
+        subway: true,
+        tram: true,
+    },
 };
 
 /**
