@@ -267,8 +267,11 @@ Vis1/2 includes a separate widget for departures and connections. The JSON data 
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
-### 0.5.1-alpha.1 (2026-05-22)
-* (tt-tom17) Widget Connections: change Layout for walking (popup)
+### **WORK IN PROGRESS**
+* (tt-tom17) add Motis service support
+* (tt-tom17) add nsPanelTimetable class for NS Panel integration
+* (tt-tom17) connections widget: fix walking detail info display
+* (tt-tom17) connections widget: add link styling for modal remarks
 
 ### 0.5.0 (2026-05-17)
 * (tt-tom17) added productName to states
