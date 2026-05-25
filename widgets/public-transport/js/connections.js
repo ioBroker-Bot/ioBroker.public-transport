@@ -15,7 +15,7 @@ $.extend(true, systemDictionary, {
 
 // Widget Binding
 vis.binds['public-transportConnections'] = {
-    version: '0.0.3',
+    version: '0.0.4',
 
     showVersion: function () {
         if (vis.binds['public-transportConnections'].version) {
@@ -295,7 +295,7 @@ vis.binds['public-transportConnections'] = {
                 if (isWalking) {
                     html += '<div class="pub-trans-conn-leg-detail-item">';
                     html += '<span class="pub-trans-conn-leg-detail-label">Distanz:</span>';
-                    html += '<span class="pub-trans-conn-leg-detail-value">' + (leg.distance ? leg.distance + ' m' : '--') + '</span>';
+                    html += '<span class="pub-trans-conn-leg-detail-value">' + (leg.distance ? leg.distance + ' m' : ' --') + '</span>';
                     html += '</div>';
                 }
 

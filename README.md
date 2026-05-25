@@ -267,6 +267,9 @@ Vis1/2 includes a separate widget for departures and connections. The JSON data 
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+### 0.5.1-alpha.1 (2026-05-22)
+* (tt-tom17) Widget Connections: change Layout for walking (popup)
+
 ### 0.5.0 (2026-05-17)
 * (tt-tom17) added productName to states
 * (tt-tom17) connections widget: show remarks icons (warning/hint/status) per leg in journey detail popup
