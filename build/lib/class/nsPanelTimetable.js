@@ -31,8 +31,8 @@ class NsPanelTimetable extends import_library.BaseClass {
    * Schreibt den nspanel-Channel für eine Abfahrt.
    *
    * @param prefix     Vollständiger Pfad zur Abfahrt (z.B. `adapter.namespace.Stations.id.Departures_00`)
-   * @param index      Index der Abfahrt (0, 1, 2, ...)
    * @param departure  Die Abfahrts-State-Daten
+   * @param index      Index der Abfahrt (0, 1, 2, ...)
    */
   async writeDepartureNsPanel(prefix, departure, index) {
     var _a, _b, _c, _d, _e, _f;

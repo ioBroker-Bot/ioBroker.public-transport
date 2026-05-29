@@ -13,8 +13,8 @@ export class NsPanelTimetable extends BaseClass {
      * Schreibt den nspanel-Channel für eine Abfahrt.
      *
      * @param prefix     Vollständiger Pfad zur Abfahrt (z.B. `adapter.namespace.Stations.id.Departures_00`)
-     * @param index      Index der Abfahrt (0, 1, 2, ...)
      * @param departure  Die Abfahrts-State-Daten
+     * @param index      Index der Abfahrt (0, 1, 2, ...)
      */
     async writeDepartureNsPanel(prefix: string, departure: DepartureState, index: number): Promise<void> {
         // Channel
