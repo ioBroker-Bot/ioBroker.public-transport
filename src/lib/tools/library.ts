@@ -395,7 +395,7 @@ export class Library extends BaseClass {
                     const existing = await this.adapter.getObjectAsync(dp);
                     if (existing) {
                         existing.common.states = obj.common.states;
-                        await this.adapter.setObject(dp, existing);
+                        await this.adapter.setObjectNotExists(dp, existing);
                     }
                 }
                 await this.adapter.extendObject(dp, obj);
@@ -414,7 +414,7 @@ export class Library extends BaseClass {
                     const existing = await this.adapter.getObjectAsync(dp);
                     if (existing) {
                         existing.common.states = obj.common.states;
-                        await this.adapter.setObject(dp, existing);
+                        await this.adapter.setObjectNotExists(dp, existing);
                     }
                 }
                 await this.adapter.extendObject(dp, obj);
