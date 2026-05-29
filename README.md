@@ -24,6 +24,9 @@ The public-transport adapter enables seamless integration of real-time public tr
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+* (tt-tom17) fixed issue from repo checker
+
 ### 0.6.0 (2026-05-25)
 * (tt-tom17) add Motis service support
 * (tt-tom17) add nsPanelTimetable class for 'NSPanel-Lovelace-UI Next Level' integration
